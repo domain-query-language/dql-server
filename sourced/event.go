@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"time"
-	"github.com/lyonscf/boltdb-test/src/store"
+	"github.com/domain-query-language/dql-server/src/store"
 )
 
 type Event_ struct {

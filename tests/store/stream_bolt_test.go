@@ -4,8 +4,8 @@ package store
 
 import (
 	"testing"
-	"github.com/lyonscf/boltdb-test/sourced"
-	"github.com/lyonscf/boltdb-test/sourced/stream"
+	"github.com/domain-query-language/dql-server/sourced"
+	"github.com/domain-query-language/dql-server/stream"
 	"github.com/satori/go.uuid"
 	"fmt"
 )

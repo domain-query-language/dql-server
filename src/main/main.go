@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/satori/go.uuid"
 	"fmt"
-	"github.com/lyonscf/boltdb-test/sourced"
+	"github.com/domain-query-language/dql-server/sourced"
 )
 
 /**
