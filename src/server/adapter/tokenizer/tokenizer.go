@@ -1,7 +1,7 @@
 package tokenizer
 
 import (
-	tok "dql-server/src/server/adapter/token"
+	tok "github.com/domain-query-language/dql-server/src/server/adapter/token"
 )
 
 type Tokenizer interface {
