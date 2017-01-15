@@ -3,8 +3,8 @@ package store
 import (
 	"testing"
 	"github.com/satori/go.uuid"
-	"github.com/lyonscf/boltdb-test/src/store"
-	"github.com/lyonscf/boltdb-test/sourced"
+	"github.com/domain-query-language/dql-server/src/store"
+	"github.com/domain-query-language/dql-server/sourced"
 )
 
 var aggregate_id uuid.UUID
