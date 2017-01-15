@@ -1,7 +1,7 @@
 package tokenizer
 
 import (
-	tok "parser/token"
+	tok "dql-server/src/server/adapter/token"
 )
 
 type Tokenizer interface {

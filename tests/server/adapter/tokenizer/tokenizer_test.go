@@ -3,7 +3,9 @@ package tokenizer
 import (
 	"testing"
 	"strconv"
-	tok "parser/token"
+	tok "dql-server/src/server/adapter/token"
+	"dql-server/src/server/adapter/tokenizer"
+
 )
 
 var dbStatements = testStatements {
@@ -704,19 +706,19 @@ var badStatements = []struct{
 
 func TestBadStatements(t *testing.T){
 	for _, statement := range badStatements {
-		tokenizer := NewTokenizer(statement.dql);
+		tkizer := tokenizer.NewTokenizer(statement.dql);
 
 		var token *tok.Token
 		var err *tok.Error
 		for {
-			token, err = tokenizer.Next()
+			token, err = tkizer.Next()
 			if (token == nil) {
 				break;
 			}
 		}
 		if (err == nil) {
 			t.Error("No error found in DQL statement '"+statement.dql+"'")
-			t.Error(tokenizer.Tokens())
+			t.Error(tkizer.Tokens())
 		} else if (!err.Equals(statement.err)) {
 			t.Error("Error found in DQL statement '"+statement.dql+"' does not match expected")
 			t.Error("Expected: "+statement.err.String())
@@ -735,13 +737,13 @@ type testStatements []testStatement
 func (statements testStatements) test(t *testing.T) {
 
 	for _, statement := range statements {
-		tokenizer := NewTokenizer(statement.dql);
+		tkizer := tokenizer.NewTokenizer(statement.dql);
 
 		var token *tok.Token
 		var actual []tok.Token
 		var err *tok.Error
 		for {
-			token, err = tokenizer.Next()
+			token, err = tkizer.Next()
 			if (token == nil) {
 				break;
 			}

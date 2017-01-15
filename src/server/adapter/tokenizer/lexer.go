@@ -3,7 +3,7 @@ package tokenizer
 import (
 	"strings"
 	"unicode/utf8"
-	tok "parser/token"
+	tok "dql-server/src/server/adapter/token"
 	"fmt"
 )
 

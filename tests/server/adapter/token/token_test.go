@@ -1,9 +1,12 @@
 package token
 
-import "testing"
+import (
+	"testing"
+	"dql-server/src/server/adapter/token"
+)
 
 func TestToString(t *testing.T) {
-	tok := NewToken(STRING, "value", 10)
+	tok := token.NewToken(token.STRING, "value", 10)
 
 	expected := "Token(string, \"value\", 10)"
 
