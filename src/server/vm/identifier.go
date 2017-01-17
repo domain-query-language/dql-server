@@ -1,4 +1,4 @@
-package handler
+package vm
 
 type Identifier interface {
 
