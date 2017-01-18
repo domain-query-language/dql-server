@@ -10,6 +10,10 @@ type Handler interface {
 	Handle(command vm.Command) ([]vm.Event, error)
 }
 
+/*
+	SimpleHandler Implementation
+ */
+
 type SimpleHandler struct {
 
 	context_map map[vm.Identifier][]vm.Identifier
@@ -30,7 +34,11 @@ func (self *SimpleHandler) Handle(command vm.Command) ([]vm.Event, error) {
 	)
 
 	// Handle Command
-	events, error := agg.Handle(command)
+	events, handling_error := agg.Handle(command)
+
+	if(handling_error) {
+		return nil, handling_error
+	}
 
 	// Save Aggregate to Repository
 	self.repository.Save(agg)
@@ -44,5 +52,5 @@ func (self *SimpleHandler) Handle(command vm.Command) ([]vm.Event, error) {
 		self.players[player_id].Play()
 	}
 
-	return events, error
+	return events, nil
 }

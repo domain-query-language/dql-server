@@ -13,10 +13,7 @@ type Projection interface {
 
 type SimpleProjecton struct {
 
-	values_schema map[string] int
-
 	values map[string]vm.Value
 	entities map[vm.Identifier]vm.Entity
 	indexes map[string]vm.Index
-
 }

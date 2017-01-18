@@ -10,66 +10,82 @@ var (
 	AGGREGATE_HANDLER_NOT_EXISTS = errors.New("Aggregate handler does not exist.")
 )
 
-type AggregateHandler func(projector projector.Projector) []vm.Event
+type AggregateHandler func(projector projector.Projector, command vm.Command) ([]vm.Event, error)
 
 type Aggregate interface {
-
-	Handle(command vm.Command) ([]vm.Event, error)
 
 	Reset()
 
 	Flush()
 
-	State() projector.Projection
+	Commands() []vm.Command
 
-	Changes() []vm.Event
+	Events() []vm.Event
+
+	Snapshot() projector.Snapshot
+
+	Handle(command vm.Command) ([]vm.Event, error)
 }
 
 /**
 
-	Implementation of SimpleAggregate
+	Implementation of Aggregate
 
  */
 
-type SimpleAggregate struct {
-
-	id Identifier
+type Aggregate_ struct {
 
 	handlers map[Identifier]AggregateHandler
 
 	projector projector.Projector
 
-	changes []vm.Event
+	commands []vm.Command
+	events []vm.Event
 }
 
-func (self *SimpleAggregate) Handle(command vm.Command) ([]vm.Event, error) {
+func (self *Aggregate_) Reset() {
 
-	handler, ok := self.handlers[command.TypeId()]
+	self.projector.Reset()
 
-	if(!ok) {
-		return []vm.Event{}, AGGREGATE_HANDLER_NOT_EXISTS
+	self.commands = []vm.Command{}
+	self.events = []vm.Event{}
+}
+
+func (self *Aggregate_) Flush() {
+
+	self.commands = []vm.Command{}
+	self.events = []vm.Event{}
+}
+
+func (self *Aggregate_) Commands() []vm.Command {
+	return self.commands
+}
+
+func (self *Aggregate_) Events() []vm.Event {
+	return self.events
+}
+
+func (self *Aggregate_) Snapshot() projector.Snapshot {
+
+	return self.projector.Snapshot()
+}
+
+func (self *Aggregate_) Handle(command vm.Command) ([]vm.Event, error) {
+
+	handler, handler_exists := self.handlers[command.TypeId()]
+
+	if(!handler_exists) {
+		return nil, AGGREGATE_HANDLER_NOT_EXISTS
 	}
 
-	events := handler(self.projector)
+	events, handling_err := handler(self.projector, command)
 
-	self.changes = append(self.changes, events)
+	if(handling_err) {
+		return nil, handling_err
+	}
+
+	self.commands append(self.commands, command)
+	self.events = append(self.events, events)
 
 	return events, nil
-}
-
-func (self *SimpleAggregate) Reset() {
-	self.projector.Reset()
-	self.changes = []vm.Event{}
-}
-
-func (self *SimpleAggregate) Flush() {
-	self.changes = []vm.Event{}
-}
-
-func (self *SimpleAggregate) State() projector.Projection {
-	return self.projector.Projection()
-}
-
-func (self *SimpleAggregate) Changes() []vm.Event {
-	return self.changes
 }

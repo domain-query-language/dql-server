@@ -22,9 +22,13 @@ type Projector interface {
 
 	Version() int
 
+	Snapshot() Snapshot
+
 }
 
 type SimpleProjector struct {
+
+	id vm.Identifier
 
 	version int
 
@@ -53,10 +57,19 @@ func (self *SimpleProjector) Apply(event vm.Event) error {
 	return nil
 }
 
-func (self *SimpleProjector) State() Projection {
+func (self *SimpleProjector) Projection() Projection {
 	return self.projection
 }
 
 func (self *SimpleProjector) Version() int {
 	return self.version
+}
+
+func (self *SimpleProjector) Snapshot() Snapshot {
+
+	return CreateSnapshot(
+		self.id,
+		self.version,
+		self.projection.GobEncode(),
+	)
 }
