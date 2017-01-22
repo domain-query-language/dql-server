@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/domain-query-language/dql-server/src/server/vm/projector"
 	"github.com/domain-query-language/dql-server/src/server/vm"
+	"time"
 )
 
 var (
@@ -22,7 +23,7 @@ type Aggregate interface {
 
 	Events() []vm.Event
 
-	Snapshot() projector.Snapshot
+	Snapshot() Snapshot
 
 	Handle(command vm.Command) ([]vm.Event, error)
 }
@@ -35,7 +36,9 @@ type Aggregate interface {
 
 type Aggregate_ struct {
 
-	handlers map[Identifier]AggregateHandler
+	id Identifier
+
+	handlers map[vm.Identifier]AggregateHandler
 
 	projector projector.Projector
 
@@ -65,9 +68,14 @@ func (self *Aggregate_) Events() []vm.Event {
 	return self.events
 }
 
-func (self *Aggregate_) Snapshot() projector.Snapshot {
+func (self *Aggregate_) Snapshot() Snapshot {
 
-	return self.projector.Snapshot()
+	return Snapshot {
+		Id: self.id,
+		OccurredAt: time.Now(),
+		Version: self.projector.Version(),
+		Payload: self.projector.Projection().GobDecode(),
+	}
 }
 
 func (self *Aggregate_) Handle(command vm.Command) ([]vm.Event, error) {

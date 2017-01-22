@@ -6,7 +6,5 @@ type Command interface {
 
 	TypeId() Identifier
 
-	AggregateId() Identifier
-
 	AggregateTypeId() Identifier
 }

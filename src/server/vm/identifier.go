@@ -3,7 +3,6 @@ package vm
 type Identifier interface {
 
 	Bytes() []byte
-
 }
 
 type IdentifierGenerator interface {
