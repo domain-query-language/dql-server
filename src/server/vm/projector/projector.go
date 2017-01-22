@@ -21,29 +21,27 @@ type Projector interface {
 	Projection() Projection
 
 	Version() int
-
-	Snapshot() Snapshot
-
 }
 
-type SimpleProjector struct {
+/*
+	Implementation of Projector
+ */
 
-	id vm.Identifier
+type Projector_ struct {
 
 	version int
 
 	projection Projection
 
 	handlers map[vm.Identifier]ProjectorHandler
-
 }
 
-func (self *SimpleProjector) Reset() {
+func (self *Projector_) Reset() {
 	self.version = 0
 	self.projection.Reset()
 }
 
-func (self *SimpleProjector) Apply(event vm.Event) error {
+func (self *Projector_) Apply(event vm.Event) error {
 
 	handler, ok := self.handlers[event.TypeId()]
 
@@ -57,19 +55,10 @@ func (self *SimpleProjector) Apply(event vm.Event) error {
 	return nil
 }
 
-func (self *SimpleProjector) Projection() Projection {
+func (self *Projector_) Projection() Projection {
 	return self.projection
 }
 
-func (self *SimpleProjector) Version() int {
+func (self *Projector_) Version() int {
 	return self.version
-}
-
-func (self *SimpleProjector) Snapshot() Snapshot {
-
-	return CreateSnapshot(
-		self.id,
-		self.version,
-		self.projection.GobEncode(),
-	)
 }

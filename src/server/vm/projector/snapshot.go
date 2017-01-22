@@ -11,8 +11,6 @@ type Snapshot interface {
 
 	OccurredAt() time.Time
 
-	Version() int
-
 	Payload() []byte
 
 	GobEncode() []byte
@@ -24,16 +22,13 @@ type Snapshot_ struct {
 
 	occurred_at time.Time
 
-	version int
-
 	payload []byte
 }
 
-func CreateSnapshot(id vm.Identifier, version int, payload []byte) Snapshot {
+func CreateSnapshot(id vm.Identifier, payload []byte) Snapshot {
 
 	return &Snapshot_ {
 		id: id,
-		version: version,
 		occurred_at: time.Now(),
 		payload: payload,
 	}

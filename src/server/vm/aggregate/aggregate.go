@@ -84,7 +84,7 @@ func (self *Aggregate_) Handle(command vm.Command) ([]vm.Event, error) {
 		return nil, handling_err
 	}
 
-	self.commands append(self.commands, command)
+	self.commands = append(self.commands, command)
 	self.events = append(self.events, events)
 
 	return events, nil

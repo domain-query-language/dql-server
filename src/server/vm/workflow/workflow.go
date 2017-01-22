@@ -26,4 +26,21 @@ type SimpleWorkflow struct {
 	id vm.Identifier
 	last_id vm.Identifier
 
+	version int
+
+	handlers map[vm.Identifier]WorkflowHandler
+
+}
+
+func (self *SimpleWorkflow) Reset() {
+	self.version = 0
+}
+
+func (self *SimpleWorkflow) Apply(event vm.Event) error {
+
+	handler, handler_err := self.handlers[event.TypeId()]
+}
+
+func (self *SimpleWorkflow) Version() int {
+	return self.version
 }
