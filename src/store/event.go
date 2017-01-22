@@ -8,13 +8,19 @@ type Event interface {
 
 	TypeId() Identifier
 
-	AggregateId() Identifier
-
-	AggregateTypeId() Identifier
-
 	OccurredAt() time.Time
 
 	GobEncode() []byte
 
 	GobDecode([]byte) error
+}
+
+type Event_ struct {
+
+	id Identifier
+	type_id Identifier
+
+	occurred_at time.Time
+
+	payload []byte
 }
