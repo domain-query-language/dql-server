@@ -12,6 +12,6 @@ type HandleableType string
 
 const (
 	CMD HandleableType = "command"
-	EVT  = "event"
+	QRY = "query"
 )
 
