@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	AGGREGATE_HANDLER_NOT_EXISTS = errors.New("Aggregate handler does not exist.")
+	AGGREGATE_HANDLER_NOT_EXISTS = errors.New("Aggregate command does not exist.")
 )
 
 type AggregateHandler func(projector projector.Projector, command vm.Command) ([]vm.Event, error)

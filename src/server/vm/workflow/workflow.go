@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	WORKFLOW_HANDLER_NOT_EXISTS = errors.New("Projector handler does not exist.")
+	WORKFLOW_HANDLER_NOT_EXISTS = errors.New("Projector command does not exist.")
 )
 
 type WorkflowHandler func(handler handler.Handler, event vm.Event) []vm.Event

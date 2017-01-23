@@ -69,7 +69,7 @@ const (
 	// Class components
 	PROPERTIES = "properties"
 	CHECK      = "check"
-	HANDLER    = "handler"
+	HANDLER    = "command"
 	FUNCTION   = "function"
 	WHENEVENT  = "when event"
 

@@ -7,7 +7,7 @@ import (
 
 var (
 
-	PROJECTOR_HANDLER_NOT_EXISTS = errors.New("Projector handler does not exist.")
+	PROJECTOR_HANDLER_NOT_EXISTS = errors.New("Projector command does not exist.")
 )
 
 type ProjectorHandler func(projection Projection, event vm.Event) Projection

@@ -1,13 +1,14 @@
-package handler
+package command
 
 import (
 	"github.com/domain-query-language/dql-server/src/server/vm/aggregate"
 	"github.com/domain-query-language/dql-server/src/server/vm"
+	"github.com/domain-query-language/dql-server/src/server/vm/player"
 )
 
 type Handler interface {
 
-	Handle(command vm.Command) ([]vm.Event, error)
+	Handle(command Command) ([]vm.Event, error)
 }
 
 /*
@@ -18,17 +19,16 @@ type SimpleHandler struct {
 
 	context_map map[vm.Identifier][]vm.Identifier
 
-	players map[vm.Identifier]Player
-
-	repository aggregate.Repository
+	repository_aggregates aggregate.Repository
+	repository_players player.Repository
 }
 
-func (self *SimpleHandler) Handle(command vm.Command) ([]vm.Event, error) {
+func (self *SimpleHandler) Handle(command Command) ([]vm.Event, error) {
 
 	// Get Aggregate from Repository
-	agg, _ := self.repository.Get(
+	agg, _ := self.repository_aggregates.Get(
 		aggregate.CreateIdentifier(
-			command.AggregateId(),
+			command.Id(),
 			command.AggregateTypeId(),
 		),
 	)
@@ -41,7 +41,7 @@ func (self *SimpleHandler) Handle(command vm.Command) ([]vm.Event, error) {
 	}
 
 	// Save Aggregate to Repository
-	self.repository.Save(agg)
+	self.repository_aggregates.Save(agg)
 
 	/*
 		Play Domain Projectors
@@ -49,7 +49,9 @@ func (self *SimpleHandler) Handle(command vm.Command) ([]vm.Event, error) {
 	players_index := self.context_map[command.AggregateTypeId()]
 
 	for player_id := range players_index {
-		self.players[player_id].Play()
+		player, err := self.repository_players.Get(player_id)
+
+		player.Play(1000)
 	}
 
 	return events, nil

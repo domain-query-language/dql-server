@@ -1,4 +1,4 @@
-package handler
+package command
 
 type Player interface {
 
