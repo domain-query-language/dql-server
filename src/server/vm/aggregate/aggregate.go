@@ -5,27 +5,28 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/vm/projector"
 	"github.com/domain-query-language/dql-server/src/server/vm"
 	"time"
+	"github.com/domain-query-language/dql-server/src/server/vm/handler/command"
 )
 
 var (
 	AGGREGATE_HANDLER_NOT_EXISTS = errors.New("Aggregate command does not exist.")
 )
 
-type AggregateHandler func(projector projector.Projector, command vm.Command) ([]vm.Event, error)
+type AggregateHandler func(projector projector.Projector, command command.Command) ([]vm.Event, error)
 
 type Aggregate interface {
-
+ d
 	Reset()
 
 	Flush()
 
-	Commands() []vm.Command
+	Commands() []command.Command
 
 	Events() []vm.Event
 
 	Snapshot() Snapshot
 
-	Handle(command vm.Command) ([]vm.Event, error)
+	Handle(command command.Command) ([]vm.Event, error)
 }
 
 /**
@@ -42,7 +43,7 @@ type Aggregate_ struct {
 
 	projector projector.Projector
 
-	commands []vm.Command
+	commands []command.Command
 	events []vm.Event
 }
 
@@ -50,17 +51,17 @@ func (self *Aggregate_) Reset() {
 
 	self.projector.Reset()
 
-	self.commands = []vm.Command{}
+	self.commands = []command.Command{}
 	self.events = []vm.Event{}
 }
 
 func (self *Aggregate_) Flush() {
 
-	self.commands = []vm.Command{}
+	self.commands = []command.Command{}
 	self.events = []vm.Event{}
 }
 
-func (self *Aggregate_) Commands() []vm.Command {
+func (self *Aggregate_) Commands() []command.Command {
 	return self.commands
 }
 
@@ -78,7 +79,7 @@ func (self *Aggregate_) Snapshot() Snapshot {
 	}
 }
 
-func (self *Aggregate_) Handle(command vm.Command) ([]vm.Event, error) {
+func (self *Aggregate_) Handle(command command.Command) ([]vm.Event, error) {
 
 	handler, handler_exists := self.handlers[command.TypeId()]
 

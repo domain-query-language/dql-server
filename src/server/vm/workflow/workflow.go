@@ -4,13 +4,14 @@ import (
 	"errors"
 	"github.com/domain-query-language/dql-server/src/server/vm"
 	"github.com/domain-query-language/dql-server/src/server/vm/handler"
+	"github.com/domain-query-language/dql-server/src/server/vm/handler/command"
 )
 
 var (
 	WORKFLOW_HANDLER_NOT_EXISTS = errors.New("Projector command does not exist.")
 )
 
-type WorkflowHandler func(handler handler.Handler, event vm.Event) []vm.Event
+type WorkflowHandler func(handler command.Handler, event vm.Event) []vm.Event
 
 type Workflow interface {
 
@@ -38,7 +39,8 @@ func (self *SimpleWorkflow) Reset() {
 
 func (self *SimpleWorkflow) Apply(event vm.Event) error {
 
-	handler, handler_err := self.handlers[event.TypeId()]
+	//handler, handler_err := self.handlers[event.TypeId()]
+	return nil
 }
 
 func (self *SimpleWorkflow) Version() int {
