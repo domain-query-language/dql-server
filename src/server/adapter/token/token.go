@@ -52,7 +52,9 @@ const (
 
 	//DQL Keywords - Objects
 	CREATE 	   = "create"
+	LIST	   = "list"
 	DATABASE   = "database"
+	DATABASES   = "databases"
 	DOMAIN     = "domain"
 	CONTEXT    = "context"
 	AGGREGATE  = "aggregate"

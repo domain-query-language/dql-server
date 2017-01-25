@@ -29,6 +29,17 @@ var multipleStatements = testStatements{
 	},
 }
 
+var listStatements = testStatements{
+	{
+		"list databases;",
+		[]tok.Token{tk(tok.LIST, "list"), tk(tok.DATABASES, "databases"), semi()},
+	},
+}
+
+func TestListStatements(t *testing.T) {
+	listStatements.test(t);
+}
+
 func TestMultipeStatements(t *testing.T) {
 	multipleStatements.test(t);
 }

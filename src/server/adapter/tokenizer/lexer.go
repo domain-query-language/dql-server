@@ -37,6 +37,7 @@ func lex(name, input string) (*lexer) {
 
 	tokenToLexer = map[string]stateFn {
 		"create": lexCreate,
+		"list": lexList,
 		"using": lexUsingDatabase,
 		"for": lexForDomain,
 		"in": lexInContext,
@@ -430,6 +431,16 @@ func lexCreate(l *lexer) stateFn {
 func lexNSObjectType(l *lexer) stateFn {
 	l.skipWS()
 	return l.lexMatchingPrefix([]tok.TokenType{tok.DATABASE, tok.DOMAIN, tok.CONTEXT, tok.AGGREGATE})
+}
+
+func lexList(l *lexer) stateFn {
+	l.lexAsToken(tok.LIST);
+	return lexNSListObjectType
+}
+
+func lexNSListObjectType(l *lexer) stateFn {
+	l.skipWS()
+	return l.lexMatchingPrefix([]tok.TokenType{tok.DATABASES})
 }
 
 func lexNSObjectName(l *lexer) stateFn {
