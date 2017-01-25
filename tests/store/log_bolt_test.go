@@ -3,7 +3,7 @@ package store
 import (
 	"testing"
 	"github.com/satori/go.uuid"
-	"github.com/domain-query-language/dql-server/src/store"
+	"github.com/domain-query-language/dql-server/src/server/domain/store"
 	"github.com/domain-query-language/dql-server/sourced"
 )
 
