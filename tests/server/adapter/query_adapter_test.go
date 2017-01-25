@@ -27,16 +27,16 @@ func TestStatementToListQuery(t *testing.T){
 		actual, err := adptr.Next();
 
 		if (err != nil) {
-			t.Error("Got error")
+
+			t.Error("Got error on '"+testCase.statement+"'")
 			t.Error(err);
 		}
 
-		if (actual.Query == nil) {
+		if (actual == nil) {
 
 			t.Error("Query cannot be nil, expected valid query object")
 
 		} else if (testCase.expected.Query != actual.Query) {
-
 			t.Error("Expected query cases to match");
 			t.Error("Expected: "+testCase.expected.Query.String())
 			t.Error("Got: "+actual.Query.String())
@@ -49,8 +49,16 @@ var invalidStatments = []struct{
 	error error
 }{
 	{
-		"CREATE DATABASE 'db'",
+		"LIST DATABASES",
+		errors.New("Expected next token to be ;, got nil instead"),
+	},
+	{
+		"CREATE DATABASE 'db';",
 		errors.New("Unexpected token 'CREATE'"),
+	},
+	{
+		"LIST BANANAS;",
+		errors.New("Expected next token to be databases, got identifier instead"),
 	},
 }
 
@@ -63,10 +71,12 @@ func TestInvalidStatement(t *testing.T) {
 		actual, err := adptr.Next();
 
 		if (actual != nil) {
+			t.Error("Got error on '"+testCase.statement+"'")
 			t.Error("Expected error, got object");
 			t.Error("Got object: "+actual.String());
 			t.Error("Expected error: "+testCase.error.Error());
 		} else if (err.Error() != testCase.error.Error()) {
+			t.Error("Got error on '"+testCase.statement+"'")
 			t.Error("Errors do not match");
 			t.Error("Expected: "+testCase.error.Error());
 			t.Error("Got: "+err.Error());
