@@ -5,6 +5,7 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/adapter"
 	schemaAdapter "github.com/domain-query-language/dql-server/src/server/adapter/schema"
 	query "github.com/domain-query-language/dql-server/src/server/query/schema"
+	"errors"
 )
 
 var listStatements = []struct{
@@ -42,3 +43,34 @@ func TestStatementToListQuery(t *testing.T){
 		}
 	}
 }
+
+var invalidStatments = []struct{
+	statement string
+	error error
+}{
+	{
+		"CREATE DATABASE 'db'",
+		errors.New("Unexpected token 'CREATE'"),
+	},
+}
+
+func TestInvalidStatement(t *testing.T) {
+
+	for _, testCase := range invalidStatments {
+
+		adptr := schemaAdapter.NewQueryAdapter(testCase.statement);
+
+		actual, err := adptr.Next();
+
+		if (actual != nil) {
+			t.Error("Expected error, got object");
+			t.Error("Got object: "+actual.String());
+			t.Error("Expected error: "+testCase.error.Error());
+		} else if (err != testCase.error) {
+			t.Error("Errors do not match");
+			t.Error("Expected: "+testCase.error.Error());
+			t.Error("Got: "+err.Error());
+		}
+	}
+}
+
