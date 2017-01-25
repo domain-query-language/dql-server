@@ -12,9 +12,9 @@ type Adapter interface {
 // Make it easy to get the correct type out, no need for casting based on "HandleableType"
 type Handleable struct {
 
-	typ HandleableType
-	command handler.Command
-	query handler.Query
+	Typ HandleableType
+	Command handler.Command
+	Query handler.Query
 }
 
 type HandleableType string
@@ -32,6 +32,6 @@ func NewCommand(cmd handler.Command) *Handleable {
 
 func NewQuery(qry handler.Query) *Handleable {
 
-	return &Handleable{QRY, qry, nil}
+	return &Handleable{QRY, nil, qry}
 }
 
