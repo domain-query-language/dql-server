@@ -6,7 +6,7 @@ import (
 
 type Adapter interface {
 
-	Next() (Handleable, error)
+	Next() (*Handleable, error)
 }
 
 // Make it easy to get the correct type out, no need for casting based on "HandleableType"
