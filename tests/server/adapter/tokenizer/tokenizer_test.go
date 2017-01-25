@@ -33,6 +33,17 @@ func TestMultipeStatements(t *testing.T) {
 	multipleStatements.test(t);
 }
 
+var listStatements = testStatements{
+	{
+		"list databases;",
+		[]tok.Token{tk(tok.LIST, "list"), tk(tok.DATABASES, "databases"), semi()},
+	},
+}
+
+func TestListStatements(t *testing.T) {
+	listStatements.test(t);
+}
+
 var domainStatements = testStatements{
 	{
 		"create domain 'dmn' using database 'db';",
