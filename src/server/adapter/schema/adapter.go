@@ -21,7 +21,7 @@ func (a *queryAdapter) Next() (*adapter.Handleable, error) {
 
 	tkn, _ := a.tokenizer.Next();
 	if (tkn.Typ == token.LIST) {
-		return adapter.NewQuery( &schema.ListDatabases{} );
+		return adapter.NewQuery( &schema.ListDatabases{} ), nil;
 	}
 	return nil, errors.New("Unexpected token '"+tkn.Val+"'")
 

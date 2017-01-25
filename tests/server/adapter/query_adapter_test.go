@@ -66,7 +66,7 @@ func TestInvalidStatement(t *testing.T) {
 			t.Error("Expected error, got object");
 			t.Error("Got object: "+actual.String());
 			t.Error("Expected error: "+testCase.error.Error());
-		} else if (err != testCase.error) {
+		} else if (err.Error() != testCase.error.Error()) {
 			t.Error("Errors do not match");
 			t.Error("Expected: "+testCase.error.Error());
 			t.Error("Got: "+err.Error());
