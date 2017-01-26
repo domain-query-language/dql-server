@@ -10,13 +10,12 @@ import (
 
 var ListDatabasesQueryID, _ = uuid.FromString("c50d6791-3fc5-4be8-91fc-c01f20526872")
 var ListDatabasesQuery = query.CreateQuery(ListDatabasesQueryID)
+
 var ListDatabasesQueryHandler = func(query query.Query, p projection.Projection) query.Result {
 
-	result := query.Result_{
+	return query.Result_ {
 		Data: p.(Projection).Databases,
 	}
-
-	return result
 }
 
 var ListDatabasesProjection = Projection {
