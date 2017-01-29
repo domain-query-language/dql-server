@@ -34,7 +34,7 @@ func NewQueryAdapter(statements string) adapter.Adapter {
 func (a *queryAdapter) nextToken() {
 
 	a.curToken = a.peekToken
-	a.peekToken, _ = a.t.Next()
+	a.peekToken = a.t.Next();
 }
 
 func (a *queryAdapter) curTokenIs(t token.TokenType) bool {

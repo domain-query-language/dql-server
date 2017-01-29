@@ -2,7 +2,6 @@ package token
 
 import (
 	"fmt"
-	"strconv"
 )
 
 type Token struct {
@@ -31,7 +30,7 @@ func (i *Token) String() string {
 	}
 	val := i.Val
 	if len(val) > 10 {
-		val = fmt.Sprintf("%.10q...", val)
+		//val = fmt.Sprintf("%.10q...", val)
 	}
 	return fmt.Sprintf("Token(%v, %q, %d)", i.Typ, val, i.Pos)
 }
@@ -40,6 +39,7 @@ type TokenType string
 
 const (
 	EOF TokenType	= "eof"
+	ERROR 		= "error"
 
 	USINGDATABASE 	= "usingDatabase"
 	FORDOMAIN 	= "forDomain"
@@ -137,19 +137,4 @@ func ClsOpen(pos int) Token {
 
 func ClsClose(pos int) Token {
 	return NewToken(CLASSCLOSE, "|>", pos);
-}
-
-type Error struct {
-	Dql string
-	Pos int
-	Expected string
-	Found string
-}
-
-func (e Error) Equals(other Error) bool {
-	return e == other
-}
-
-func (e Error) String() string {
-	return "Parse error in statement '"+e.Dql+"' at pos '"+strconv.Itoa(e.Pos)+", expected "+e.Expected+", found "+e.Found
 }

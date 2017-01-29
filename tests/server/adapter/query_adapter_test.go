@@ -58,7 +58,7 @@ var invalidStatments = []struct{
 	},
 	{
 		"LIST BANANAS;",
-		errors.New("Expected next token to be databases, got identifier instead"),
+		errors.New("Expected next token to be databases, got error instead"),
 	},
 }
 

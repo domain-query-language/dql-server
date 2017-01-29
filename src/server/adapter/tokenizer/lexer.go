@@ -16,7 +16,6 @@ type lexer struct {
 	pos   int       // current position in the input.
 	width int       // width of last rune read from input.
 	tokens []tok.Token
-	error *tok.Error
 }
 
 type stateFn func(*lexer) stateFn
@@ -259,12 +258,9 @@ func (l *lexer) peek() int {
 
 func (l *lexer) err(expected string, found string) stateFn {
 
-	l.error = &tok.Error {
-		l.input,
-		l.start,
-		expected,
-		found,
-	}
+	msg := "Parse error, expected "+expected+", found "+found;
+	l.tokens = append(l.tokens, tok.Token{tok.ERROR, msg, l.start});
+	l.start = l.pos
 
 	return nil
 }

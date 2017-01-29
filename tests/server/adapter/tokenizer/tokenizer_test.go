@@ -8,6 +8,25 @@ import (
 
 )
 
+func tk(typ tok.TokenType, val string) tok.Token {
+	return tok.Token{typ, val, tok.IgnoreTokenPos};
+}
+
+func tkErr(expected string, found string) tok.Token {
+	return tk(tok.ERROR, "Parse error, expected "+expected+", found "+found);
+}
+
+func semi() tok.Token {
+	return tok.Semicolon(tok.IgnoreTokenPos);
+}
+
+type testStatement struct {
+	dql string;
+	expected []tok.Token;
+}
+
+type testStatements []testStatement
+
 var dbStatements = testStatements {
 	{
 		"create database 'db1';",
@@ -56,14 +75,6 @@ var domainStatements = testStatements{
 
 	},
 };
-
-func tk(typ tok.TokenType, val string) tok.Token {
-	return tok.Token{typ, val, tok.IgnoreTokenPos};
-}
-
-func semi() tok.Token {
-	return tok.Semicolon(tok.IgnoreTokenPos);
-}
 
 func TestCreateDomain(t *testing.T) {
 	domainStatements.test(t);
@@ -656,62 +667,62 @@ func TestKeywordsInExpressions(t *testing.T) {
 
 var badStatements = []struct{
 	dql string
-	err tok.Error
+	err tok.Token
 }{
 	{
 		"create dbase",
-		tok.Error{"create dbase", 7, "database, domain, context, aggregate", "dbase", },
+		tkErr("database, domain, context, aggregate", "dbase"),
 	},{
 		"create database1",
-		tok.Error{"create database1", 7, "database, domain, context, aggregate", "database1", },
+		tkErr("database, domain, context, aggregate", "database1"),
 	},{
 		"create dmain",
-		tok.Error{"create dmain", 7, "database, domain, context, aggregate", "dmain", },
+		tkErr("database, domain, context, aggregate", "dmain"),
 	},{
 		"create cntext",
-		tok.Error{"create cntext", 7, "database, domain, context, aggregate", "cntext", },
+		tkErr("database, domain, context, aggregate", "cntext"),
 	},{
 		"create aggrege",
-		tok.Error{"create aggrege", 7, "database, domain, context, aggregate", "aggrege",},
+		tkErr("database, domain, context, aggregate", "aggrege"),
 	},{
 		"using dbase",
-		tok.Error{"using dbase", 6, "database", "dbase",},
+		tkErr("database", "dbase"),
 	},{
 		"for dom",
-		tok.Error{"for dom", 4, "domain", "dom",},
+		tkErr("domain", "dom"),
 	},{
 		"in cntext",
-		tok.Error{"in cntext", 3, "context", "cntext",},
+		tkErr("context", "cntext"),
 	},{
 		"within agg",
-		tok.Error{"within agg", 7, "aggregate", "agg",},
+		tkErr("aggregate", "agg"),
 	},{
 		"assert invar",
-		tok.Error{"assert invar", 0, "assert invariant", "assert invar",},
+		tkErr("assert invariant", "assert invar"),
 	},{
 		"run qry",
-		tok.Error{"run qry", 0, "run query", "run qry",},
+		tkErr("run query", "run qry"),
 	},{
 		"apply evt",
-		tok.Error{"apply evt", 0, "apply event", "apply evt",},
+		tkErr("apply event", "apply evt"),
 	},{
 		"when evt",
-		tok.Error{"when evt", 5, "event", "evt",},
+		tkErr("event", "evt"),
 	},{
 		"<| valu ",
-		tok.Error{"<| valu ", 3, "value, entity, event, command, query, invariant, projection", "valu",},
+		tkErr("value, entity, event, command, query, invariant, projection", "valu"),
 	},{
 		"for domain ",
-		tok.Error{"for domain ", 11, "'", "EOF",},
+		tkErr("'", "EOF"),
 	},{
 		"for domain '",
-		tok.Error{"for domain '", 12, "'", "EOF",},
+		tkErr("'", "EOF"),
 	},{
 		"<| value ''",
-		tok.Error{"<| value ''", 10, "value name", "empty name",},
+		tkErr("value name", "empty name"),
 	},{
 		"~",
-		tok.Error{"~", 0, "keyword", "~",},
+		tkErr("keyword", "~"),
 	},
 }
 
@@ -719,31 +730,21 @@ func TestBadStatements(t *testing.T){
 	for _, statement := range badStatements {
 		tkizer := tokenizer.NewTokenizer(statement.dql);
 
-		var token *tok.Token
-		var err *tok.Error
-		for {
-			token, err = tkizer.Next()
-			if (token == nil) {
-				break;
-			}
+		var errToken *tok.Token = tkizer.Next();
+		for errToken != nil && errToken.Typ != tok.ERROR{
+			errToken = tkizer.Next()
 		}
-		if (err == nil) {
+
+		if (errToken == nil) {
 			t.Error("No error found in DQL statement '"+statement.dql+"'")
 			t.Error(tkizer.Tokens())
-		} else if (!err.Equals(statement.err)) {
+		} else if (!errToken.Compare(statement.err)) {
 			t.Error("Error found in DQL statement '"+statement.dql+"' does not match expected")
 			t.Error("Expected: "+statement.err.String())
-			t.Error("Actual: "+err.String())
+			t.Error("Actual: "+errToken.String())
 		}
 	}
 }
-
-type testStatement struct {
-	dql string;
-	expected []tok.Token;
-}
-
-type testStatements []testStatement
 
 func (statements testStatements) test(t *testing.T) {
 
@@ -752,9 +753,9 @@ func (statements testStatements) test(t *testing.T) {
 
 		var token *tok.Token
 		var actual []tok.Token
-		var err *tok.Error
+
 		for {
-			token, err = tkizer.Next()
+			token = tkizer.Next()
 			if (token == nil) {
 				break;
 			}
@@ -762,11 +763,6 @@ func (statements testStatements) test(t *testing.T) {
 		}
 
 		compareTokenLists(statement.expected, actual, statement.dql, t);
-
-		if (err != nil) {
-			t.Error("Got error")
-			t.Error(err);
-		}
 	}
 }
 

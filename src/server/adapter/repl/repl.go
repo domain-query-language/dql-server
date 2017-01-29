@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"github.com/domain-query-language/dql-server/src/server/adapter/token"
 	"github.com/domain-query-language/dql-server/src/server/adapter/tokenizer"
 )
 
@@ -32,14 +31,10 @@ func Start(in io.Reader, out io.Writer) {
 
 		t := tokenizer.NewTokenizer(line)
 
-		tokens, err := t.Tokens()
+		tokens := t.Tokens()
 
-		if (err != nil) {
-			printTokenizerErrors(out, err)
-		} else {
-			for _, tok := range tokens {
-				io.WriteString(out, tok.String()+"\n")
-			}
+		for _, tok := range tokens {
+			io.WriteString(out, tok.String()+"\n")
 		}
 		io.WriteString(out, "\n")
 	}
@@ -53,7 +48,3 @@ const LOGO = `    ____  ____    __
 
 `
 
-func printTokenizerErrors(out io.Writer, err *token.Error) {
-	io.WriteString(out, "Tokenization Error!\n")
-	io.WriteString(out, err.String()+"\n")
-}

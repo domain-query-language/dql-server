@@ -5,8 +5,8 @@ import (
 )
 
 type Tokenizer interface {
-	Tokens() ([]tok.Token, *tok.Error)
-	Next() (*tok.Token, *tok.Error)
+	Tokens() []tok.Token
+	Next() *tok.Token
 }
 
 type tokeniser struct {
@@ -14,17 +14,17 @@ type tokeniser struct {
 	index int
 }
 
-func (t *tokeniser) Tokens () ([]tok.Token, *tok.Error) {
-	return t.l.tokens, t.l.error;
+func (t *tokeniser) Tokens () []tok.Token {
+	return t.l.tokens;
 }
 
-func (t *tokeniser) Next() (*tok.Token, *tok.Error) {
+func (t *tokeniser) Next() (*tok.Token) {
 	if (t.index >= len(t.l.tokens)) {
-		return nil, t.l.error
+		return nil
 	}
 	token := t.l.tokens[t.index];
 	t.index++;
-	return &token, t.l.error;
+	return &token;
 }
 
 func NewTokenizer(dql string) Tokenizer {
