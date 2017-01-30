@@ -29,9 +29,7 @@ func (i *Token) String() string {
 		return "EOF"
 	}
 	val := i.Val
-	if len(val) > 10 {
-		//val = fmt.Sprintf("%.10q...", val)
-	}
+
 	return fmt.Sprintf("Token(%v, %q, %d)", i.Typ, val, i.Pos)
 }
 
