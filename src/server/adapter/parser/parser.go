@@ -1,16 +1,16 @@
-package schema
+package parser
 
 import (
 	"errors"
 	"fmt"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
-	"github.com/domain-query-language/dql-server/src/server/adapter/token"
-	"github.com/domain-query-language/dql-server/src/server/adapter/tokenizer"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
 	"github.com/domain-query-language/dql-server/src/server/query/schema"
 	"github.com/domain-query-language/dql-server/src/server/vm/handler"
 )
 
-type queryAdapter struct {
+type parser struct {
 
 	t tokenizer.Tokenizer
 	error error
@@ -19,11 +19,11 @@ type queryAdapter struct {
 	peekToken *token.Token
 }
 
-func NewQueryAdapter(statements string) adapter.Adapter {
+func New(statements string) adapter.Adapter {
 
 	t := tokenizer.NewTokenizer(statements);
 
-	a:= &queryAdapter{t, nil, nil, nil}
+	a:= &parser{t, nil, nil, nil}
 
 	a.nextToken()
 	a.nextToken()
@@ -31,18 +31,18 @@ func NewQueryAdapter(statements string) adapter.Adapter {
 	return a;
 }
 
-func (a *queryAdapter) nextToken() {
+func (a *parser) nextToken() {
 
 	a.curToken = a.peekToken
 	a.peekToken = a.t.Next();
 }
 
-func (a *queryAdapter) curTokenIs(t token.TokenType) bool {
+func (a *parser) curTokenIs(t token.TokenType) bool {
 
 	return a.curToken.Typ == t
 }
 
-func (a *queryAdapter) peekTokenIs(t token.TokenType) bool {
+func (a *parser) peekTokenIs(t token.TokenType) bool {
 
 	if a.peekToken == nil {
 		return false
@@ -51,7 +51,7 @@ func (a *queryAdapter) peekTokenIs(t token.TokenType) bool {
 	return a.peekToken.Typ == t
 }
 
-func (a *queryAdapter) expectPeek(t token.TokenType) bool {
+func (a *parser) expectPeek(t token.TokenType) bool {
 
  	if a.peekTokenIs(t) {
 
@@ -64,7 +64,7 @@ func (a *queryAdapter) expectPeek(t token.TokenType) bool {
 	}
 }
 
-func (a *queryAdapter) peekError(t token.TokenType) {
+func (a *parser) peekError(t token.TokenType) {
 
 	if (a.peekToken == nil) {
 		msg := fmt.Sprintf("Expected next token to be %s, got nil instead", t)
@@ -75,7 +75,7 @@ func (a *queryAdapter) peekError(t token.TokenType) {
 	a.error = errors.New(msg);
 }
 
-func (a *queryAdapter) Next() (*adapter.Handleable, error) {
+func (a *parser) Next() (*adapter.Handleable, error) {
 
 	if (a.curToken == nil) {
 
@@ -92,7 +92,7 @@ func (a *queryAdapter) Next() (*adapter.Handleable, error) {
 	return adapter.NewQuery(qry), nil;
 }
 
-func (a *queryAdapter) ParseQuery() handler.Query {
+func (a *parser) ParseQuery() handler.Query {
 
 	if (a.curTokenIs(token.LIST)) {
 
@@ -103,7 +103,7 @@ func (a *queryAdapter) ParseQuery() handler.Query {
 	return nil;
 }
 
-func (a *queryAdapter) ParseListQuery() handler.Query {
+func (a *parser) ParseListQuery() handler.Query {
 
 	qry := &schema.ListDatabases{};
 

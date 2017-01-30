@@ -3,7 +3,7 @@ package adapter
 import (
 	"testing"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
-	schemaAdapter "github.com/domain-query-language/dql-server/src/server/adapter/schema"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
 	query "github.com/domain-query-language/dql-server/src/server/query/schema"
 	"errors"
 )
@@ -22,7 +22,7 @@ func TestStatementToListQuery(t *testing.T){
 
 	for _, testCase := range listStatements {
 
-		adptr := schemaAdapter.NewQueryAdapter(testCase.statement);
+		adptr := parser.New(testCase.statement);
 
 		actual, err := adptr.Next();
 
@@ -66,7 +66,7 @@ func TestInvalidStatement(t *testing.T) {
 
 	for _, testCase := range invalidStatments {
 
-		adptr := schemaAdapter.NewQueryAdapter(testCase.statement);
+		adptr := parser.New(testCase.statement);
 
 		actual, err := adptr.Next();
 

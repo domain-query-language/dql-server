@@ -3,8 +3,8 @@ package tokenizer
 import (
 	"testing"
 	"strconv"
-	tok "github.com/domain-query-language/dql-server/src/server/adapter/token"
-	"github.com/domain-query-language/dql-server/src/server/adapter/tokenizer"
+	tok "github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
 
 )
 

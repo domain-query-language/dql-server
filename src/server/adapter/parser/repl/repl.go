@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"github.com/domain-query-language/dql-server/src/server/adapter/tokenizer"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
 )
 
 const PROMPT = ">> "
