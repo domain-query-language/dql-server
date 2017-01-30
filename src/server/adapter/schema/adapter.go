@@ -71,7 +71,7 @@ func (a *queryAdapter) peekError(t token.TokenType) {
 		a.error = errors.New(msg);
 		return;
 	}
-	msg := fmt.Sprintf("Expected next token to be %s, got %s instead", t, a.peekToken.Typ)
+	msg := fmt.Sprintf("Expected next token to be '%s', got '%s' instead", t, a.peekToken.Val)
 	a.error = errors.New(msg);
 }
 
