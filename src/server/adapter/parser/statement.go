@@ -250,7 +250,7 @@ func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expressi
 	p.nextToken()
 	expression.Right = p.parseExpression(precedence)
 
-	if (expression.Right== nil) {
+	if (expression.Right == nil) {
 
 		p.error = errors.New("Expected expression, got nothing")
 		return nil

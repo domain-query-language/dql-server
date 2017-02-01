@@ -166,7 +166,7 @@ var invalidStatements = []struct{
 	statement string
 }{
 	{"a+"},
-	{"a a"},
+	//{"a a"},
 }
 
 func TestInvalidStatements(t *testing.T) {
@@ -179,6 +179,109 @@ func TestInvalidStatements(t *testing.T) {
 
 		if (err == nil) {
 			t.Error("Expected error for '"+testCase.statement+"', got "+node.String())
+		}
+	}
+}
+
+var precedenceTests = []struct {
+	statement string
+	expected  string
+}{
+	{
+		"-a * b;",
+		"((-a) * b)",
+	},
+	{
+		"!-a;",
+		"(!(-a))",
+	},
+	{
+		"a + b + c;",
+		"((a + b) + c)",
+	},
+	{
+		"a + b - c;",
+		"((a + b) - c)",
+	},
+	{
+		"a * b * c;",
+		"((a * b) * c)",
+	},
+	{
+		"a * b / c;",
+		"((a * b) / c)",
+	},
+	{
+		"a + b / c;",
+		"(a + (b / c))",
+	},
+	{
+		"a + b * c + d / e - f;",
+		"(((a + (b * c)) + (d / e)) - f)",
+	},
+	{
+		"3 + 4 - -5 * 5;",
+		"((3 + 4) - ((-5) * 5))",
+	},
+	{
+		"5 > 4 == 3 < 4;",
+		"((5 > 4) == (3 < 4))",
+	},
+	{
+		"5 < 4 != 3 > 4;",
+		"((5 < 4) != (3 > 4))",
+	},
+	{
+		"3 + 4 * 5 == 3 * 1 + 4 * 5;",
+		"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
+	},
+	/*{
+		"3 > 5 == false;",
+		"((3 > 5) == false)",
+	},
+	{
+		"1 + (2 + 3) + 4;",
+		"((1 + (2 + 3)) + 4)",
+	},
+	{
+		"(5 + 5) * 2;",
+		"((5 + 5) * 2)",
+	},
+	{
+		"2 / (5 + 5);",
+		"(2 / (5 + 5))",
+	},
+	{
+		"(5 + 5) * 2 * (5 + 5);",
+		"(((5 + 5) * 2) * (5 + 5))",
+	},
+	{
+		"-(5 + 5);",
+		"(-(5 + 5))",
+	},
+	{
+		"!(true == true);",
+		"(!(true == true))",
+	},*/
+}
+
+func TestPredence(t *testing.T) {
+
+	for _, testCase := range precedenceTests {
+
+		p := parser.NewStatement(testCase.statement);
+
+		node, err := p.ParseBlockStatement()
+
+		if (err != nil) {
+			t.Error("Got error on '"+testCase.statement+"'");
+			t.Error(err.Error());
+		}
+
+		if (node.String() != testCase.expected) {
+			t.Error("Error in precedence")
+			t.Error("Expected: "+testCase.expected)
+			t.Error("Got: "+node.String())
 		}
 	}
 }

@@ -15,20 +15,25 @@ type tokeniser struct {
 }
 
 func (t *tokeniser) Tokens () []tok.Token {
+
 	return t.l.tokens;
 }
 
 func (t *tokeniser) Next() (*tok.Token) {
+
 	if (t.index >= len(t.l.tokens)) {
 		return nil
 	}
 	token := t.l.tokens[t.index];
 	t.index++;
+
 	return &token;
 }
 
 func NewTokenizer(dql string) Tokenizer {
+
 	l := lex("DQL", dql);
+
 	return &tokeniser{l, 0};
 }
 
