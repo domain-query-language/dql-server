@@ -235,7 +235,7 @@ var precedenceTests = []struct {
 		"3 + 4 * 5 == 3 * 1 + 4 * 5;",
 		"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
 	},
-	/*{
+	{
 		"3 > 5 == false;",
 		"((3 > 5) == false)",
 	},
@@ -262,7 +262,7 @@ var precedenceTests = []struct {
 	{
 		"!(true == true);",
 		"(!(true == true))",
-	},*/
+	},
 }
 
 func TestPredence(t *testing.T) {

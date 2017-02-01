@@ -67,6 +67,7 @@ func NewStatement(statements string) *statementParser {
 	p.registerPrefix(token.PLUS, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 	p.registerPrefix(token.BOOLEAN, p.parseBoolean)
+	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -283,4 +284,16 @@ func (p *statementParser) parseIntegerLiteral() ast.Expression {
 func (p *statementParser) parseBoolean() ast.Expression {
 
 	return &ast.Boolean{Type:"boolean", Value: p.curToken.Val == "true"}
+}
+
+func (p *statementParser) parseGroupedExpression() ast.Expression {
+	p.nextToken()
+
+	exp := p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RPAREN) {
+		return nil
+	}
+
+	return exp
 }
