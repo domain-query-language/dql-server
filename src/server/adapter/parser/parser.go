@@ -10,6 +10,7 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/vm/handler"
 )
 
+/** Implementation of the adapter, written using the tokenizer, parser pattern */
 type parser struct {
 
 	t tokenizer.Tokenizer
@@ -67,7 +68,7 @@ func (a *parser) expectPeek(t token.TokenType) bool {
 func (a *parser) peekError(t token.TokenType) {
 
 	if (a.peekToken == nil) {
-		msg := fmt.Sprintf("Expected next token to be %s, got nil instead", t)
+		msg := fmt.Sprintf("Expected next token to be '%s', got EOF instead", t)
 		a.error = errors.New(msg);
 		return;
 	}

@@ -50,7 +50,7 @@ var invalidStatments = []struct{
 }{
 	{
 		"LIST DATABASES",
-		errors.New("Expected next token to be ;, got nil instead"),
+		errors.New("Expected next token to be ';', got EOF instead"),
 	},
 	{
 		"CREATE DATABASE 'db';",
