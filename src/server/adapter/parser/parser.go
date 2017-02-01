@@ -76,6 +76,7 @@ func (a *parser) peekError(t token.TokenType) {
 	a.error = errors.New(msg);
 }
 
+// Return the next handlable object
 func (a *parser) Next() (*adapter.Handleable, error) {
 
 	if (a.curToken == nil) {
@@ -83,7 +84,7 @@ func (a *parser) Next() (*adapter.Handleable, error) {
 		return nil, nil;
 	}
 
-	qry := a.ParseQuery();
+	qry := a.parseQuery();
 
 	if (qry == nil) {
 
@@ -93,18 +94,19 @@ func (a *parser) Next() (*adapter.Handleable, error) {
 	return adapter.NewQuery(qry), nil;
 }
 
-func (a *parser) ParseQuery() handler.Query {
+func (a *parser) parseQuery() handler.Query {
 
+	// This is where the type of object to be parsed is figured out
 	if (a.curTokenIs(token.LIST)) {
 
-		return a.ParseListQuery();
+		return a.parseListQuery();
 	}
 
 	a.error = errors.New("Unexpected token '"+a.curToken.Val+"'")
 	return nil;
 }
 
-func (a *parser) ParseListQuery() handler.Query {
+func (a *parser) parseListQuery() handler.Query {
 
 	qry := &schema.ListDatabases{};
 
