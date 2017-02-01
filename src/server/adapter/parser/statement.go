@@ -129,9 +129,9 @@ func (p *statementParser) peekError(t token.TokenType) {
 }
 
 
-func (p *statementParser) ParseBlockStatement() (ast.BlockStatement, error) {
+func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
-	block := ast.BlockStatement{}
+	block := &ast.BlockStatement{}
 	block.Statements = []ast.Node{}
 
 	stmt := p.parseStatement()
@@ -199,7 +199,7 @@ func (p *statementParser) parseIdentifier() ast.Expression {
 
 func (p *statementParser) parseIntegerLiteral() ast.Expression {
 
-	lit := ast.IntegerLiteral{}
+	lit := &ast.IntegerLiteral{}
 
 	value, err := strconv.ParseInt(p.curToken.Val, 0, 64)
 	if err != nil {
@@ -221,7 +221,7 @@ func (p *statementParser) parsePrefixExpression() ast.Expression {
 		operator += p.curToken.Val
 	}
 
-	expression := ast.Prefix{
+	expression := &ast.Prefix{
 		Type: "prefix",
 		Operator: operator,
 	}
@@ -239,5 +239,5 @@ func (p *statementParser) isIncrementOrDecrement() bool {
 
 func (p *statementParser) parseBoolean() ast.Expression {
 
-	return ast.Boolean{Value: p.curToken.Val == "true"}
+	return &ast.Boolean{Value: p.curToken.Val == "true"}
 }

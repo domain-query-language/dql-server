@@ -12,40 +12,40 @@ var prefixExpressions = []struct {
 }{
 	{
 		"--a;",
-		ast.Prefix{
+		&ast.Prefix{
 			"prefix",
 			"--",
-			ast.Identifier{
+			&ast.Identifier{
 				"identifier",
 				"a",
 			},
 		},
 	},{
 		"++a;",
-		ast.Prefix{
+		&ast.Prefix{
 			"prefix",
 			"++",
-			ast.Identifier{
+			&ast.Identifier{
 				"identifier",
 				"a",
 			},
 		},
 	},{
 		"!true;",
-		ast.Prefix{
+		&ast.Prefix{
 			"prefix",
 			"!",
-			ast.Identifier{
+			&ast.Identifier{
 				"boolean",
 				"true",
 			},
 		},
 	},{
 		"-15;",
-		ast.Prefix{
+		&ast.Prefix{
 			"prefix",
 			"-",
-			ast.Identifier{
+			&ast.Identifier{
 				"integer",
 				"15",
 			},
@@ -53,9 +53,9 @@ var prefixExpressions = []struct {
 	},
 }
 
-func stmtBlk(node ast.Node) ast.BlockStatement {
+func stmtBlk(node ast.Node) *ast.BlockStatement {
 
-	return ast.BlockStatement{
+	return &ast.BlockStatement{
 		Statements: []ast.Node{node},
 	}
 }
@@ -82,7 +82,7 @@ func TestPrefixExpressions(t *testing.T) {
 	}
 }
 
-func compareBlockStatements(a ast.BlockStatement, b ast.BlockStatement) bool {
+func compareBlockStatements(a *ast.BlockStatement, b *ast.BlockStatement) bool {
 
 	return a.String() == b.String();
 }
