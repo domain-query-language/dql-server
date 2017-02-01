@@ -64,6 +64,7 @@ func NewStatement(statements string) *statementParser {
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INTEGER, p.parseIntegerLiteral)
 	p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
+	p.registerPrefix(token.STRING, p.parseString)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.PLUS, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
@@ -144,9 +145,12 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 	block := &ast.BlockStatement{Type:"blockstatement"}
 	block.Statements = []ast.Node{}
 
-	stmt := p.parseStatement()
-	if stmt != nil {
-		block.Statements = append(block.Statements, stmt);
+	for p.curToken != nil {
+		stmt := p.parseStatement()
+		if stmt != nil {
+			block.Statements  = append(block.Statements, stmt)
+		}
+		p.nextToken()
 	}
 
 	return block, p.error
@@ -155,13 +159,22 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
 func (p *statementParser) parseStatement() ast.Node {
 
-	stmt := p.parseExpression(LOWEST)
+	stmt := p.parseExpressionStatement()
+
+	return stmt;
+}
+
+func (p *statementParser) parseExpressionStatement() ast.Node {
+
+	stmt := &ast.ExpressionStatement{Type:"expressionstatement"}
+
+	stmt.Expression = p.parseExpression(LOWEST)
 
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
-	return stmt;
+	return stmt
 }
 
 func (p *statementParser) parseExpression(precedence int) ast.Expression {
@@ -313,4 +326,9 @@ func (p *statementParser) parseFloatLiteral() ast.Expression {
 	lit.Value = value
 
 	return lit
+}
+
+func (p *statementParser) parseString() ast.Expression {
+
+	return &ast.String{Type:"string", Value:p.curToken.Val}
 }

@@ -16,7 +16,7 @@ func compareBlockStatements(a *ast.BlockStatement, b *ast.BlockStatement) bool {
 }
 
 
-func stmtBlk(node ast.Node) *ast.BlockStatement {
+func blkStmt(node ast.Node) *ast.BlockStatement {
 
 	return &ast.BlockStatement{
 		Type: "blockstatement",
@@ -24,61 +24,76 @@ func stmtBlk(node ast.Node) *ast.BlockStatement {
 	}
 }
 
+func expStmt(exp ast.Expression) ast.Statement {
+
+	return &ast.ExpressionStatement{
+		Type: "expressionstatement",
+		Expression: exp,
+	}
+}
+
 func infixInt(a int64, op string, b int64) ast.Node {
 
-	return &ast.Infix{
+	return expStmt(&ast.Infix{
 		"infix",
 		&ast.IntegerLiteral{"integer",a},
 		op,
 		&ast.IntegerLiteral{"integer",b},
-	};
+	});
 }
 
 func infixIdent(a string, op string, b string) ast.Node {
 
-	return &ast.Infix{
+	return expStmt(&ast.Infix{
 		"infix",
 		&ast.Identifier{"identifier",a},
 		op,
 		&ast.Identifier{"identifier",b},
-	};
+	});
 }
 
 func infixBool(a bool, op string, b bool) ast.Node {
 
-	return &ast.Infix{
+	return expStmt(&ast.Infix{
 		"infix",
 		&ast.Boolean{"boolean",a},
 		op,
 		&ast.Boolean{"boolean",b},
-	};
+	});
 }
 
-type testCases []struct {
+type testCase struct {
 	expression string
 	node ast.Node
 }
+
+type testCases []testCase
 
 
 func (testCases testCases) test(t *testing.T) {
 
 	for _, testCase := range testCases {
 
-		p := parser.NewStatement(testCase.expression);
+		testCase.test(t)
+	}
+}
 
-		actual, err := p.ParseBlockStatement();
-		expected := stmtBlk(testCase.node);
+func (testCase testCase) test(t *testing.T) {
 
-		if (err != nil) {
-			t.Error("Got error on '"+testCase.expression+"'");
-			t.Error(err.Error());
-		}
+	p := parser.NewStatement(testCase.expression);
 
-		if (!compareBlockStatements(actual, expected)) {
-			t.Error("Expected AST does not match actual");
-			t.Error("Expected: "+expected.String());
-			t.Error("Actual: "+actual.String());
-		}
+	actual, err := p.ParseBlockStatement();
+	expected := blkStmt(testCase.node);
+
+	if (err != nil) {
+		t.Error("Got error on '" + testCase.expression + "'");
+		t.Error(err.Error());
+	}
+
+	if (!compareBlockStatements(actual, expected)) {
+		t.Error("Expected AST does not match actual");
+		t.Error("Expected: " + expected.String());
+		t.Error("Actual: " + actual.String());
 	}
 }
 
@@ -89,44 +104,44 @@ func (testCases testCases) test(t *testing.T) {
 var prefixExpressions = testCases{
 	{
 		"--a;",
-		&ast.Prefix{
+		expStmt(&ast.Prefix{
 			"prefix",
 			"--",
 			&ast.Identifier{
 				"identifier",
 				"a",
 			},
-		},
+		}),
 	}, {
 		"++a;",
-		&ast.Prefix{
+		expStmt(&ast.Prefix{
 			"prefix",
 			"++",
 			&ast.Identifier{
 				"identifier",
 				"a",
 			},
-		},
+		}),
 	}, {
 		"!true;",
-		&ast.Prefix{
+		expStmt(&ast.Prefix{
 			"prefix",
 			"!",
 			&ast.Identifier{
 				"boolean",
 				"true",
 			},
-		},
+		}),
 	}, {
 		"-15;",
-		&ast.Prefix{
+		expStmt(&ast.Prefix{
 			"prefix",
 			"-",
 			&ast.Identifier{
 				"integer",
 				"15",
 			},
-		},
+		}),
 	},
 }
 
@@ -189,79 +204,79 @@ var precedenceTests = []struct {
 }{
 	{
 		"-a * b;",
-		"((-a) * b)",
+		"((-a) * b);",
 	},
 	{
 		"!-a;",
-		"(!(-a))",
+		"(!(-a));",
 	},
 	{
 		"a + b + c;",
-		"((a + b) + c)",
+		"((a + b) + c);",
 	},
 	{
 		"a + b - c;",
-		"((a + b) - c)",
+		"((a + b) - c);",
 	},
 	{
 		"a * b * c;",
-		"((a * b) * c)",
+		"((a * b) * c);",
 	},
 	{
 		"a * b / c;",
-		"((a * b) / c)",
+		"((a * b) / c);",
 	},
 	{
 		"a + b / c;",
-		"(a + (b / c))",
+		"(a + (b / c));",
 	},
 	{
 		"a + b * c + d / e - f;",
-		"(((a + (b * c)) + (d / e)) - f)",
+		"(((a + (b * c)) + (d / e)) - f);",
 	},
 	{
 		"3 + 4 - -5 * 5;",
-		"((3 + 4) - ((-5) * 5))",
+		"((3 + 4) - ((-5) * 5));",
 	},
 	{
 		"5 > 4 == 3 < 4;",
-		"((5 > 4) == (3 < 4))",
+		"((5 > 4) == (3 < 4));",
 	},
 	{
 		"5 < 4 != 3 > 4;",
-		"((5 < 4) != (3 > 4))",
+		"((5 < 4) != (3 > 4));",
 	},
 	{
 		"3 + 4 * 5 == 3 * 1 + 4 * 5;",
-		"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)))",
+		"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)));",
 	},
 	{
 		"3 > 5 == false;",
-		"((3 > 5) == false)",
+		"((3 > 5) == false);",
 	},
 	{
 		"1 + (2 + 3) + 4;",
-		"((1 + (2 + 3)) + 4)",
+		"((1 + (2 + 3)) + 4);",
 	},
 	{
 		"(5 + 5) * 2;",
-		"((5 + 5) * 2)",
+		"((5 + 5) * 2);",
 	},
 	{
 		"2 / (5 + 5);",
-		"(2 / (5 + 5))",
+		"(2 / (5 + 5));",
 	},
 	{
 		"(5 + 5) * 2 * (5 + 5);",
-		"(((5 + 5) * 2) * (5 + 5))",
+		"(((5 + 5) * 2) * (5 + 5));",
 	},
 	{
 		"-(5 + 5);",
-		"(-(5 + 5))",
+		"(-(5 + 5));",
 	},
 	{
 		"!(true == true);",
-		"(!(true == true))",
+		"(!(true == true));",
 	},
 }
 
@@ -286,20 +301,51 @@ func TestPredence(t *testing.T) {
 	}
 }
 
-var floatExpressions = testCases{
+var basicTypes = testCases{
 	{
 		"15.1;",
-		&ast.FloatLiteral{
+		expStmt(&ast.FloatLiteral{
 			"float",
 			15.1,
-		},
+		}),
+	},
+	{
+		"\"I am a string, ohh yes I am!\";",
+		expStmt(&ast.String{
+			"string",
+			"I am a string, ohh yes I am!",
+		}),
+	},
+}
 
+func TestBasicTypes(t *testing.T) {
+
+	basicTypes.test(t);
+}
+
+var statementBlock = testCase{
+	`
+	a;
+	b;
+	`,
+	&ast.BlockStatement{
+		Type: "blockstatement",
+		Statements: []ast.Node{
+			expStmt(&ast.Identifier{
+				"identifier",
+				"a",
+			}),
+			expStmt(&ast.Identifier{
+				"identifier",
+				"b",
+			}),
+		},
 	},
 
 }
 
-func TestFloats(t *testing.T) {
+func TestBlockStatement(t *testing.T) {
 
-	floatExpressions.test(t);
+	statementBlock.test(t);
 }
 

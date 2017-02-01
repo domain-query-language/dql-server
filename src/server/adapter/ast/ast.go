@@ -47,6 +47,20 @@ func (bs *BlockStatement) String() string {
 	return out.String()
 }
 
+type ExpressionStatement struct {
+	Type string
+	Expression Expression
+}
+
+func (es *ExpressionStatement) statementNode() {
+
+}
+
+func (es *ExpressionStatement) String() string {
+
+	return es.Expression.String()+";";
+}
+
 
 /** Expressions **/
 
@@ -148,4 +162,17 @@ func (f *FloatLiteral) expressionNode() {}
 func (f *FloatLiteral) String() string {
 
 	return strconv.FormatFloat(f.Value, 'E', -1, 64)
+}
+
+type String struct {
+	Type string
+	Value string
+}
+
+
+func (s *String) expressionNode() {}
+
+func (s *String) String() string {
+
+	return s.Value
 }
