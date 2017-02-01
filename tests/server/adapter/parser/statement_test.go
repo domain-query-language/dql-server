@@ -97,7 +97,7 @@ var prefixExpressions = testCases{
 				"a",
 			},
 		},
-	},{
+	}, {
 		"++a;",
 		&ast.Prefix{
 			"prefix",
@@ -107,7 +107,7 @@ var prefixExpressions = testCases{
 				"a",
 			},
 		},
-	},{
+	}, {
 		"!true;",
 		&ast.Prefix{
 			"prefix",
@@ -117,7 +117,7 @@ var prefixExpressions = testCases{
 				"true",
 			},
 		},
-	},{
+	}, {
 		"-15;",
 		&ast.Prefix{
 			"prefix",
@@ -284,5 +284,22 @@ func TestPredence(t *testing.T) {
 			t.Error("Got: "+node.String())
 		}
 	}
+}
+
+var floatExpressions = testCases{
+	{
+		"15.1;",
+		&ast.FloatLiteral{
+			"float",
+			15.1,
+		},
+
+	},
+
+}
+
+func TestFloats(t *testing.T) {
+
+	floatExpressions.test(t);
 }
 

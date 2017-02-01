@@ -63,6 +63,7 @@ func NewStatement(statements string) *statementParser {
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INTEGER, p.parseIntegerLiteral)
+	p.registerPrefix(token.FLOAT, p.parseFloatLiteral)
 	p.registerPrefix(token.BANG, p.parsePrefixExpression)
 	p.registerPrefix(token.PLUS, p.parsePrefixExpression)
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
@@ -296,4 +297,20 @@ func (p *statementParser) parseGroupedExpression() ast.Expression {
 	}
 
 	return exp
+}
+
+func (p *statementParser) parseFloatLiteral() ast.Expression {
+
+	lit := &ast.FloatLiteral{Type:"float"}
+
+	value, err := strconv.ParseFloat(p.curToken.Val, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as float", p.curToken.Val)
+		p.error = errors.New(msg)
+		return nil
+	}
+
+	lit.Value = value
+
+	return lit
 }

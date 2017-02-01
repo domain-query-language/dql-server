@@ -136,3 +136,16 @@ func (il *IntegerLiteral) String() string {
 	//return "["+il.Type+"]: "+strconv.FormatInt(il.Value, 10);
 	return strconv.FormatInt(il.Value, 10);
 }
+
+
+type FloatLiteral struct {
+	Type string
+	Value float64
+}
+
+func (f *FloatLiteral) expressionNode() {}
+
+func (f *FloatLiteral) String() string {
+
+	return strconv.FormatFloat(f.Value, 'E', -1, 64)
+}
