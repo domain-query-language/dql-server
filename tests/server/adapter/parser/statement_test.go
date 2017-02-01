@@ -74,10 +74,15 @@ func TestPrefixExpressions(t *testing.T) {
 			t.Error(err.Error());
 		}
 
-		if (actual != expected) {
+		if (!compareBlockStatements(actual, expected)) {
 			t.Error("Expected AST does not match actual");
 			t.Error("Expected: "+expected.String());
 			t.Error("Actual: "+actual.String());
 		}
 	}
+}
+
+func compareBlockStatements(a ast.BlockStatement, b ast.BlockStatement) bool {
+
+	return a.String() == b.String();
 }

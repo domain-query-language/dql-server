@@ -56,7 +56,9 @@ func NewStatement(statements string) *statementParser {
 
 	t := tokenizer.NewTokenizer(statements);
 
-	p := &statementParser{t}
+	p := &statementParser{
+		t: t,
+	};
 
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
@@ -127,32 +129,29 @@ func (p *statementParser) peekError(t token.TokenType) {
 }
 
 
-
 func (p *statementParser) ParseBlockStatement() (ast.BlockStatement, error) {
 
 	block := ast.BlockStatement{}
-	block.Statements = []ast.Statement{}
+	block.Statements = []ast.Node{}
 
-	p.nextToken()
-
-	for !p.curTokenIs(token.RBRACE) {
-		stmt := p.parseStatement()
-		if stmt != nil {
-			block.Statements = append(block.Statements, stmt)
-		}
-		p.nextToken()
+	stmt := p.parseStatement()
+	if stmt != nil {
+		block.Statements = append(block.Statements, stmt);
 	}
 
-	return block
+	return block, p.error
 }
+
 
 func (p *statementParser) parseStatement() ast.Node {
 
-	return p.parseExpression(LOWEST)
+	stmt := p.parseExpression(LOWEST)
 
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
+
+	return stmt;
 }
 
 func (p *statementParser) parseExpression(precedence int) ast.Expression {
@@ -216,9 +215,15 @@ func (p *statementParser) parseIntegerLiteral() ast.Expression {
 
 func (p *statementParser) parsePrefixExpression() ast.Expression {
 
+	operator := p.curToken.Val
+	if (p.isIncrementOrDecrement()) {
+		p.nextToken()
+		operator += p.curToken.Val
+	}
+
 	expression := ast.Prefix{
 		Type: "prefix",
-		Operator: p.curToken.Val,
+		Operator: operator,
 	}
 
 	p.nextToken()
@@ -226,6 +231,10 @@ func (p *statementParser) parsePrefixExpression() ast.Expression {
 	expression.Right = p.parseExpression(PREFIX)
 
 	return expression
+}
+
+func (p *statementParser) isIncrementOrDecrement() bool {
+	return (p.curToken.Type == token.PLUS || p.curToken.Type == token.MINUS) && p.curToken.Type == p.peekToken.Type
 }
 
 func (p *statementParser) parseBoolean() ast.Expression {

@@ -29,11 +29,11 @@ type BlockStatement struct {
 	Statements []Node
 }
 
-func (bs *BlockStatement) statementNode() {
+func (bs BlockStatement) statementNode() {
 
 }
 
-func (bs *BlockStatement) String() string {
+func (bs BlockStatement) String() string {
 
 	var out bytes.Buffer
 
@@ -53,9 +53,10 @@ type Prefix struct {
 	Right    Expression
 }
 
-func (pe *Prefix) expressionNode() {}
+func (pe Prefix) expressionNode() {}
 
-func (pe *Prefix) String() string {
+func (pe Prefix) String() string {
+
 	var out bytes.Buffer
 
 	out.WriteString("(")
@@ -71,9 +72,10 @@ type Identifier struct {
 	Value string
 }
 
-func (i *Identifier) expressionNode() {}
+func (i Identifier) expressionNode() {}
 
-func (i *Identifier) String() string {
+func (i Identifier) String() string {
+
 	return i.Value
 }
 
@@ -83,9 +85,10 @@ type Boolean struct {
 	Value bool
 }
 
-func (b *Boolean) expressionNode() {}
+func (b Boolean) expressionNode() {}
 
-func (b *Boolean) String() string {
+func (b Boolean) String() string {
+
 	return strconv.FormatBool(b.Value);
 }
 
@@ -95,8 +98,9 @@ type IntegerLiteral struct {
 	Value int64
 }
 
-func (il *IntegerLiteral) expressionNode() {}
+func (il IntegerLiteral) expressionNode() {}
 
-func (il *IntegerLiteral) String() string {
+func (il IntegerLiteral) String() string {
+
 	return strconv.FormatInt(il.Value, 10);
 }
