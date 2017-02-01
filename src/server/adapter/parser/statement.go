@@ -163,6 +163,7 @@ func (p *statementParser) parseStatement() ast.Node {
 }
 
 func (p *statementParser) parseExpression(precedence int) ast.Expression {
+
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
 
@@ -185,6 +186,7 @@ func (p *statementParser) parseExpression(precedence int) ast.Expression {
 }
 
 func (p *statementParser) peekPrecedence() int {
+
 	if p, ok := precedences[p.peekToken.Type]; ok {
 		return p
 	}
@@ -193,6 +195,7 @@ func (p *statementParser) peekPrecedence() int {
 }
 
 func (p *statementParser) curPrecedence() int {
+
 	if p, ok := precedences[p.curToken.Type]; ok {
 		return p
 	}
@@ -221,10 +224,12 @@ func (p *statementParser) parsePrefixExpression() ast.Expression {
 }
 
 func (p *statementParser) isIncrementOrDecrement() bool {
+
 	return (p.curToken.Type == token.PLUS || p.curToken.Type == token.MINUS) && p.curToken.Type == p.peekToken.Type
 }
 
 func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expression {
+	
 	expression := &ast.Infix{
 		Type: "infix",
 		Operator: p.curToken.Val,
