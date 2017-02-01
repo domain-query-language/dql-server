@@ -2,7 +2,7 @@ package token
 
 import (
 	"testing"
-	"github.com/domain-query-language/dql-server/src/server/adapter/token"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
 )
 
 func TestToString(t *testing.T) {

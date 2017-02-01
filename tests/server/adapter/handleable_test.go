@@ -38,9 +38,15 @@ func TestTypesAreCorrectForCommand(t *testing.T) {
 	}
 }
 
+type FakeQuery struct {}
+
+func (c *FakeQuery) String() string {
+	return "";
+}
+
 func TestTypesAreCorrectForQuery(t *testing.T) {
 
-	qry := &struct{}{};
+	qry := &FakeQuery{};
 	hndlr := adapter.NewQuery( qry );
 
 	if (hndlr.Typ != adapter.QRY) {
