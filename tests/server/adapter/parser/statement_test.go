@@ -6,6 +6,15 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
 )
 
+/*************************
+  Helper funcs for tests
+ ************************/
+
+func compareBlockStatements(a *ast.BlockStatement, b *ast.BlockStatement) bool {
+
+	return a.String() == b.String();
+}
+
 
 func stmtBlk(node ast.Node) *ast.BlockStatement {
 
@@ -15,17 +24,69 @@ func stmtBlk(node ast.Node) *ast.BlockStatement {
 	}
 }
 
-func compareBlockStatements(a *ast.BlockStatement, b *ast.BlockStatement) bool {
+func infixInt(a int64, op string, b int64) ast.Node {
 
-	return a.String() == b.String();
+	return &ast.Infix{
+		"infix",
+		&ast.IntegerLiteral{"integer",a},
+		op,
+		&ast.IntegerLiteral{"integer",b},
+	};
+}
+
+func infixIdent(a string, op string, b string) ast.Node {
+
+	return &ast.Infix{
+		"infix",
+		&ast.Identifier{"identifier",a},
+		op,
+		&ast.Identifier{"identifier",b},
+	};
+}
+
+func infixBool(a bool, op string, b bool) ast.Node {
+
+	return &ast.Infix{
+		"infix",
+		&ast.Boolean{"boolean",a},
+		op,
+		&ast.Boolean{"boolean",b},
+	};
+}
+
+type testCases []struct {
+	expression string
+	node ast.Node
 }
 
 
+func (testCases testCases) test(t *testing.T) {
 
-var prefixExpressions = []struct {
-	expression string
-	node ast.Node
-}{
+	for _, testCase := range testCases {
+
+		p := parser.NewStatement(testCase.expression);
+
+		actual, err := p.ParseBlockStatement();
+		expected := stmtBlk(testCase.node);
+
+		if (err != nil) {
+			t.Error("Got error on '"+testCase.expression+"'");
+			t.Error(err.Error());
+		}
+
+		if (!compareBlockStatements(actual, expected)) {
+			t.Error("Expected AST does not match actual");
+			t.Error("Expected: "+expected.String());
+			t.Error("Actual: "+actual.String());
+		}
+	}
+}
+
+/****************
+  Test cases
+ ***************/
+
+var prefixExpressions = testCases{
 	{
 		"--a;",
 		&ast.Prefix{
@@ -71,30 +132,10 @@ var prefixExpressions = []struct {
 
 func TestPrefixExpressions(t *testing.T) {
 
-	for _, testCase := range prefixExpressions {
-
-		p := parser.NewStatement(testCase.expression);
-
-		actual, err := p.ParseBlockStatement();
-		expected := stmtBlk(testCase.node);
-
-		if (err != nil) {
-			t.Error("Got error on '"+testCase.expression+"'");
-			t.Error(err.Error());
-		}
-
-		if (!compareBlockStatements(actual, expected)) {
-			t.Error("Expected AST does not match actual");
-			t.Error("Expected: "+expected.String());
-			t.Error("Actual: "+actual.String());
-		}
-	}
+	prefixExpressions.test(t)
 }
 
-var infixExpressions = []struct {
-	expression string
-	node ast.Node
-}{
+var infixExpressions = testCases{
 	{"5 + 5;", infixInt(5, "+", 5)},
 	{"5 - 5;", infixInt(5, "-", 5)},
 	{"5 * 5;", infixInt(5, "*", 5)},
@@ -118,52 +159,6 @@ var infixExpressions = []struct {
 
 func TestInfixExpressions(t *testing.T) {
 
-	for _, testCase := range infixExpressions {
-
-		p := parser.NewStatement(testCase.expression);
-
-		actual, err := p.ParseBlockStatement();
-		expected := stmtBlk(testCase.node);
-
-		if (err != nil) {
-			t.Error("Got error on '"+testCase.expression+"'");
-			t.Error(err.Error());
-		}
-
-		if (!compareBlockStatements(actual, expected)) {
-			t.Error("Expected AST does not match actual");
-			t.Error("Expected: "+expected.String());
-			t.Error("Actual: "+actual.String());
-		}
-	}
+	infixExpressions.test(t)
 }
 
-func infixInt(a int64, op string, b int64) ast.Node {
-
-	return &ast.Infix{
-		"infix",
-		&ast.IntegerLiteral{"integer",a},
-		op,
-		&ast.IntegerLiteral{"integer",b},
-	};
-}
-
-func infixIdent(a string, op string, b string) ast.Node {
-
-	return &ast.Infix{
-		"infix",
-		&ast.Identifier{"identifier",a},
-		op,
-		&ast.Identifier{"identifier",b},
-	};
-}
-
-func infixBool(a bool, op string, b bool) ast.Node {
-
-	return &ast.Infix{
-		"infix",
-		&ast.Boolean{"boolean",a},
-		op,
-		&ast.Boolean{"boolean",b},
-	};
-}
