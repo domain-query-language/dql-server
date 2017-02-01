@@ -164,6 +164,11 @@ func (p *statementParser) parseStatement() ast.Node {
 
 func (p *statementParser) parseExpression(precedence int) ast.Expression {
 
+	if (p.curToken == nil) {
+
+		return nil
+	}
+
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
 
@@ -172,8 +177,10 @@ func (p *statementParser) parseExpression(precedence int) ast.Expression {
 	leftExp := prefix()
 
 	for !p.peekTokenIs(token.SEMICOLON) && precedence < p.peekPrecedence() {
+
 		infix := p.infixParseFns[p.peekToken.Type]
 		if infix == nil {
+
 			return leftExp
 		}
 
@@ -187,6 +194,9 @@ func (p *statementParser) parseExpression(precedence int) ast.Expression {
 
 func (p *statementParser) peekPrecedence() int {
 
+	if (p.peekToken == nil) {
+		return LOWEST
+	}
 	if p, ok := precedences[p.peekToken.Type]; ok {
 		return p
 	}
@@ -229,7 +239,7 @@ func (p *statementParser) isIncrementOrDecrement() bool {
 }
 
 func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expression {
-	
+
 	expression := &ast.Infix{
 		Type: "infix",
 		Operator: p.curToken.Val,
@@ -239,6 +249,12 @@ func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expressi
 	precedence := p.curPrecedence()
 	p.nextToken()
 	expression.Right = p.parseExpression(precedence)
+
+	if (expression.Right== nil) {
+
+		p.error = errors.New("Expected expression, got nothing")
+		return nil
+	}
 
 	return expression
 }

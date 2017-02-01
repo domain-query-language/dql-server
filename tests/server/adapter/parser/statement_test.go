@@ -144,14 +144,14 @@ var infixExpressions = testCases{
 	{"5 < 5;", infixInt(5, "<", 5)},
 	{"5 == 5;", infixInt(5, "==", 5)},
 	{"5 != 5;", infixInt(5, "!=", 5)},
-	{"foobar + barfoo;", infixIdent("foobar", "+", "barfoo")},
-	{"foobar - barfoo;", infixIdent("foobar", "-", "barfoo")},
-	{"foobar * barfoo;", infixIdent("foobar", "*", "barfoo")},
-	{"foobar / barfoo;", infixIdent("foobar", "/", "barfoo")},
-	{"foobar > barfoo;", infixIdent("foobar", ">", "barfoo")},
-	{"foobar < barfoo;", infixIdent("foobar", "<", "barfoo")},
-	{"foobar == barfoo;", infixIdent("foobar", "==", "barfoo")},
-	{"foobar != barfoo;", infixIdent("foobar", "!=", "barfoo")},
+	{"a + b;", infixIdent("a", "+", "b")},
+	{"a - b;", infixIdent("a", "-", "b")},
+	{"a * b;", infixIdent("a", "*", "b")},
+	{"a / b;", infixIdent("a", "/", "b")},
+	{"a > b;", infixIdent("a", ">", "b")},
+	{"a < b;", infixIdent("a", "<", "b")},
+	{"a == b;", infixIdent("a", "==", "b")},
+	{"a != b;", infixIdent("a", "!=", "b")},
 	{"true == true;", infixBool(true, "==", true)},
 	{"true != false;", infixBool(true, "!=", false)},
 	{"false == false;", infixBool(false, "==", false)},
@@ -160,5 +160,26 @@ var infixExpressions = testCases{
 func TestInfixExpressions(t *testing.T) {
 
 	infixExpressions.test(t)
+}
+
+var invalidStatements = []struct{
+	statement string
+}{
+	{"a+"},
+	{"a a"},
+}
+
+func TestInvalidStatements(t *testing.T) {
+
+	for _, testCase := range invalidStatements {
+
+		p := parser.NewStatement(testCase.statement);
+
+		node, err := p.ParseBlockStatement()
+
+		if (err == nil) {
+			t.Error("Expected error for '"+testCase.statement+"', got "+node.String())
+		}
+	}
 }
 
