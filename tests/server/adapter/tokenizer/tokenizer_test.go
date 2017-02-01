@@ -731,7 +731,7 @@ func TestBadStatements(t *testing.T){
 		tkizer := tokenizer.NewTokenizer(statement.dql);
 
 		var errToken *tok.Token = tkizer.Next();
-		for errToken != nil && errToken.Typ != tok.ERROR{
+		for errToken != nil && errToken.Type != tok.ERROR{
 			errToken = tkizer.Next()
 		}
 

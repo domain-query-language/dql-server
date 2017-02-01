@@ -40,7 +40,7 @@ func (a *parser) nextToken() {
 
 func (a *parser) curTokenIs(t token.TokenType) bool {
 
-	return a.curToken.Typ == t
+	return a.curToken.Type == t
 }
 
 func (a *parser) peekTokenIs(t token.TokenType) bool {
@@ -49,7 +49,7 @@ func (a *parser) peekTokenIs(t token.TokenType) bool {
 		return false
 	}
 
-	return a.peekToken.Typ == t
+	return a.peekToken.Type == t
 }
 
 func (a *parser) expectPeek(t token.TokenType) bool {
