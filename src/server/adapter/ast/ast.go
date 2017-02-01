@@ -26,6 +26,7 @@ type Expression interface {
 /** Statements **/
 
 type BlockStatement struct {
+	Type string
 	Statements []Node
 }
 
@@ -36,6 +37,8 @@ func (bs *BlockStatement) statementNode() {
 func (bs *BlockStatement) String() string {
 
 	var out bytes.Buffer
+
+	out.WriteString(bs.Type+": ")
 
 	for _, s := range bs.Statements {
 		out.WriteString(s.String())
@@ -48,7 +51,7 @@ func (bs *BlockStatement) String() string {
 /** Expressions **/
 
 type Prefix struct {
-	Type string
+	Type 	 string
 	Operator string
 	Right    Expression
 }
@@ -59,9 +62,35 @@ func (pe *Prefix) String() string {
 
 	var out bytes.Buffer
 
+	out.WriteString(pe.Type+": ")
+
 	out.WriteString("(")
 	out.WriteString(pe.Operator)
 	out.WriteString(pe.Right.String())
+	out.WriteString(")")
+
+	return out.String()
+}
+
+type Infix struct {
+	Type 	 string
+	Left     Expression
+	Operator string
+	Right    Expression
+}
+
+func (oe *Infix) expressionNode() {}
+
+func (oe *Infix) String() string {
+
+	var out bytes.Buffer
+
+	out.WriteString(oe.Type+": ")
+
+	out.WriteString("(")
+	out.WriteString(oe.Left.String())
+	out.WriteString(" " + oe.Operator + " ")
+	out.WriteString(oe.Right.String())
 	out.WriteString(")")
 
 	return out.String()
@@ -76,7 +105,7 @@ func (i *Identifier) expressionNode() {}
 
 func (i *Identifier) String() string {
 
-	return i.Value
+	return i.Type+": "+i.Value
 }
 
 
@@ -89,7 +118,7 @@ func (b *Boolean) expressionNode() {}
 
 func (b *Boolean) String() string {
 
-	return strconv.FormatBool(b.Value);
+	return b.Type+": "+strconv.FormatBool(b.Value);
 }
 
 
@@ -102,5 +131,5 @@ func (il *IntegerLiteral) expressionNode() {}
 
 func (il *IntegerLiteral) String() string {
 
-	return strconv.FormatInt(il.Value, 10);
+	return il.Type+": "+strconv.FormatInt(il.Value, 10);
 }

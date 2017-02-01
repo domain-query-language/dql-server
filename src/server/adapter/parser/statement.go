@@ -69,6 +69,14 @@ func NewStatement(statements string) *statementParser {
 	p.registerPrefix(token.BOOLEAN, p.parseBoolean)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
+	p.registerInfix(token.PLUS, p.parseInfixExpression)
+	p.registerInfix(token.MINUS, p.parseInfixExpression)
+	p.registerInfix(token.SLASH, p.parseInfixExpression)
+	p.registerInfix(token.ASTERISK, p.parseInfixExpression)
+	p.registerInfix(token.EQ, p.parseInfixExpression)
+	p.registerInfix(token.NOTEQ, p.parseInfixExpression)
+	p.registerInfix(token.LT, p.parseInfixExpression)
+	p.registerInfix(token.GT, p.parseInfixExpression)
 
 	p.nextToken()
 	p.nextToken()
@@ -131,7 +139,7 @@ func (p *statementParser) peekError(t token.TokenType) {
 
 func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
-	block := &ast.BlockStatement{}
+	block := &ast.BlockStatement{Type:"blockstatement"}
 	block.Statements = []ast.Node{}
 
 	stmt := p.parseStatement()
@@ -192,27 +200,6 @@ func (p *statementParser) curPrecedence() int {
 	return LOWEST
 }
 
-func (p *statementParser) parseIdentifier() ast.Expression {
-
-	return &ast.Identifier{Value: p.curToken.Val}
-}
-
-func (p *statementParser) parseIntegerLiteral() ast.Expression {
-
-	lit := &ast.IntegerLiteral{}
-
-	value, err := strconv.ParseInt(p.curToken.Val, 0, 64)
-	if err != nil {
-		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Val)
-		p.error = errors.New(msg)
-		return nil
-	}
-
-	lit.Value = value
-
-	return lit
-}
-
 func (p *statementParser) parsePrefixExpression() ast.Expression {
 
 	operator := p.curToken.Val
@@ -237,7 +224,42 @@ func (p *statementParser) isIncrementOrDecrement() bool {
 	return (p.curToken.Type == token.PLUS || p.curToken.Type == token.MINUS) && p.curToken.Type == p.peekToken.Type
 }
 
+func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expression {
+	expression := &ast.Infix{
+		Type: "infix",
+		Operator: p.curToken.Val,
+		Left:     left,
+	}
+
+	precedence := p.curPrecedence()
+	p.nextToken()
+	expression.Right = p.parseExpression(precedence)
+
+	return expression
+}
+
+func (p *statementParser) parseIdentifier() ast.Expression {
+
+	return &ast.Identifier{Type:"identifier", Value: p.curToken.Val}
+}
+
+func (p *statementParser) parseIntegerLiteral() ast.Expression {
+
+	lit := &ast.IntegerLiteral{Type:"integer"}
+
+	value, err := strconv.ParseInt(p.curToken.Val, 0, 64)
+	if err != nil {
+		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Val)
+		p.error = errors.New(msg)
+		return nil
+	}
+
+	lit.Value = value
+
+	return lit
+}
+
 func (p *statementParser) parseBoolean() ast.Expression {
 
-	return &ast.Boolean{Value: p.curToken.Val == "true"}
+	return &ast.Boolean{Type:"boolean", Value: p.curToken.Val == "true"}
 }
