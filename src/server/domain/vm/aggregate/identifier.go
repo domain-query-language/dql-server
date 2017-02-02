@@ -1,14 +1,13 @@
 package aggregate
 
 import (
-	"github.com/satori/go.uuid"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 )
 
 type Identifier struct {
 
-	id uuid.UUID
-	typeId uuid.UUID
+	id vm.Identifier
+	typeId vm.Identifier
 
 }
 
@@ -18,7 +17,7 @@ func (self *Identifier) Bytes() []byte {
 
 func CreateIdentifier(id vm.Identifier, type_id vm.Identifier) *Identifier {
 
-	return &Identifier{
+	return &Identifier {
 		id: id,
 		typeId: type_id,
 	}

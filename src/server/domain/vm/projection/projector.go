@@ -62,3 +62,11 @@ func (self *Projector_) Projection() Projection {
 func (self *Projector_) Version() int {
 	return self.version
 }
+
+func NewProjector(projection Projection, handlers map[vm.Identifier]ProjectorHandler) *Projector_ {
+	return &Projector_ {
+		version: 0,
+		projection: projection,
+		handlers: handlers,
+	}
+}

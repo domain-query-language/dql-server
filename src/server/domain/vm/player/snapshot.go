@@ -21,5 +21,5 @@ func (self *Snapshot) Encode() []byte {
 }
 
 func (self *Snapshot) Decode([]byte) {
-	return []byte{}
+
 }
