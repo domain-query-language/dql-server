@@ -3,7 +3,7 @@ package tokenizer
 import (
 	"strings"
 	"unicode/utf8"
-	tok "github.com/domain-query-language/dql-server/src/server/adapter/token"
+	tok "github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
 	"fmt"
 )
 
@@ -16,7 +16,6 @@ type lexer struct {
 	pos   int       // current position in the input.
 	width int       // width of last rune read from input.
 	tokens []tok.Token
-	error *tok.Error
 }
 
 type stateFn func(*lexer) stateFn
@@ -37,6 +36,7 @@ func lex(name, input string) (*lexer) {
 
 	tokenToLexer = map[string]stateFn {
 		"create": lexCreate,
+		"list": lexList,
 		"using": lexUsingDatabase,
 		"for": lexForDomain,
 		"in": lexInContext,
@@ -258,12 +258,9 @@ func (l *lexer) peek() int {
 
 func (l *lexer) err(expected string, found string) stateFn {
 
-	l.error = &tok.Error {
-		l.input,
-		l.start,
-		expected,
-		found,
-	}
+	msg := "Parse error, expected "+expected+", found "+found;
+	l.tokens = append(l.tokens, tok.Token{tok.ERROR, msg, l.start});
+	l.start = l.pos
 
 	return nil
 }
@@ -430,6 +427,16 @@ func lexCreate(l *lexer) stateFn {
 func lexNSObjectType(l *lexer) stateFn {
 	l.skipWS()
 	return l.lexMatchingPrefix([]tok.TokenType{tok.DATABASE, tok.DOMAIN, tok.CONTEXT, tok.AGGREGATE})
+}
+
+func lexList(l *lexer) stateFn {
+	l.lexAsToken(tok.LIST);
+	return lexNSListObjectType
+}
+
+func lexNSListObjectType(l *lexer) stateFn {
+	l.skipWS()
+	return l.lexMatchingPrefix([]tok.TokenType{tok.DATABASES})
 }
 
 func lexNSObjectName(l *lexer) stateFn {

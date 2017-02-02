@@ -2,7 +2,7 @@ package repl
 
 import (
 	"testing"
-	"github.com/domain-query-language/dql-server/src/server/adapter/repl"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser/repl"
 	"os"
 )
 
