@@ -6,10 +6,10 @@ import (
 	"errors"
 )
 
-type QueryHandler func(query Query, projection projection.Projection) Result
+type QueryHandler func(query vm.Query, queryable Queryable) Result
 
 var (
-	QUERY_HANDLER_NOT_EXISTS = errors.New("Query handler does not exist.")
+	QUERY_HANDLER_NOT_EXISTS = errors.New("The query handler does not exist.")
 )
 
 type Handler interface {
@@ -17,17 +17,17 @@ type Handler interface {
 	Handle(query Query) (result Result, err error)
 }
 
-type SimpleHandler struct {
+type Handler_ struct {
 
 	handlers map[vm.Identifier]QueryHandler
 	repository_projection projection.Repository
 }
 
-func (self *SimpleHandler) Add(id vm.Identifier, query_handler QueryHandler) {
+func (self *Handler_) Add(id vm.Identifier, query_handler QueryHandler) {
 	self.handlers[id] = query_handler
 }
 
-func (self *SimpleHandler) Handle(query Query) (result Result, err error) {
+func (self *Handler_) Handle(query Query) (result Result, err error) {
 
 	handler, ok := self.handlers[query.Id()]
 
@@ -40,9 +40,9 @@ func (self *SimpleHandler) Handle(query Query) (result Result, err error) {
 	return handler(query, projection), nil
 }
 
-func CreateHandler(repository projection.Repository) Handler {
+func CreateHandler(repository projection.Repository) *Handler_ {
 
-	return &SimpleHandler {
+	return &Handler_ {
 		handlers: map[vm.Identifier]QueryHandler{},
 		repository_projection: repository,
 	}

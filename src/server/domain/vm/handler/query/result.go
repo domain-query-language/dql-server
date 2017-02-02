@@ -9,7 +9,7 @@ type Result interface {
 
 type Result_ struct {
 
-	Data struct{}
+	Data interface{}
 }
 
 func (self *Result_) MarshalJSON() ([]byte, error) {

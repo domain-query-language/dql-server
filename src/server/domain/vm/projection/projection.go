@@ -15,9 +15,3 @@ type Projection interface {
 	*/
 }
 
-type SimpleProjecton struct {
-
-	values map[string]vm.Value
-	entities map[vm.Identifier]vm.Entity
-	indexes map[string]vm.Index
-}

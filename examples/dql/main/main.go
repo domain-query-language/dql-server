@@ -2,33 +2,66 @@ package main
 
 import (
 	"log"
-	"fmt"
 	"net/http"
+	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/adapter"
+	"github.com/domain-query-language/dql-server/examples/dql/application/query/list-databases"
+	"github.com/domain-query-language/dql-server/examples/dql/application"
+	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/application/projection"
 	"strings"
 )
 
-func sayhelloName(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()  // parse arguments, you have to call this by yourself
-	fmt.Println(r.Form)  // print form information in server side
-	fmt.Println("path", r.URL.Path)
-	fmt.Println("scheme", r.URL.Scheme)
-	fmt.Println(r.Form["url_long"])
-	for k, v := range r.Form {
-		fmt.Println("key:", k)
-		fmt.Println("val:", strings.Join(v, ""))
-	}
-	fmt.Fprintf(w, "Hello astaxie!") // send data to client side
-}
-
 func schema(w http.ResponseWriter, r *http.Request) {
 
+	r.ParseForm()
 
+	statements := strings.TrimSpace(
+		r.FormValue("statements"),
+	)
 
+	adapter := adapter.NewMockAdapter(statements)
+
+	handleable, err := adapter.Next()
+
+	if err != nil {
+		w.Header().Add("error", err.Error())
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if(handleable.Typ == "query") {
+
+		result, handle_err := application.QueryHandler.Handle(
+			handleable.Query,
+		)
+
+		if handle_err != nil {
+			w.Header().Add("error", handle_err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+
+			return
+		}
+
+		response, _ := result.MarshalJSON()
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(response)
+
+		return
+	}
 }
 
 func main() {
 
-	http.HandleFunc("/", sayhelloName)
+	application.ProjectionsRepository.Save(
+		projection.ListDatabasesProjection,
+	)
+
+	application.QueryHandler.Add(
+		projection.ListDatabasesProjectionID,
+		list_databases.Handler,
+	)
+
 	http.HandleFunc("/schema", schema)
 
 	err := http.ListenAndServe(":4242", nil)
