@@ -61,6 +61,20 @@ func (es *ExpressionStatement) String() string {
 	return es.Expression.String()+";";
 }
 
+type Return struct {
+	Type string
+	Expression Expression
+}
+
+func (r *Return) statementNode() {
+
+}
+
+func (r *Return) String() string {
+
+	return "return "+r.Expression.String()
+}
+
 
 /** Expressions **/
 

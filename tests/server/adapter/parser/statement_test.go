@@ -16,11 +16,11 @@ func compareBlockStatements(a *ast.BlockStatement, b *ast.BlockStatement) bool {
 }
 
 
-func blkStmt(node ast.Node) *ast.BlockStatement {
+func blkStmt(nodes []ast.Node) *ast.BlockStatement {
 
 	return &ast.BlockStatement{
 		Type: "blockstatement",
-		Statements: []ast.Node{node},
+		Statements: nodes,
 	}
 }
 
@@ -83,7 +83,7 @@ func (testCase testCase) test(t *testing.T) {
 	p := parser.NewStatement(testCase.expression);
 
 	actual, err := p.ParseBlockStatement();
-	expected := blkStmt(testCase.node);
+	expected := blkStmt([]ast.Node{testCase.node});
 
 	if (err != nil) {
 		t.Error("Got error on '" + testCase.expression + "'");
@@ -328,19 +328,16 @@ var statementBlock = testCase{
 	a;
 	b;
 	`,
-	&ast.BlockStatement{
-		Type: "blockstatement",
-		Statements: []ast.Node{
-			expStmt(&ast.Identifier{
-				"identifier",
-				"a",
-			}),
-			expStmt(&ast.Identifier{
-				"identifier",
-				"b",
-			}),
-		},
-	},
+	blkStmt([]ast.Node{
+		expStmt(&ast.Identifier{
+			"identifier",
+			"a",
+		}),
+		expStmt(&ast.Identifier{
+			"identifier",
+			"b",
+		}),
+	}),
 
 }
 
@@ -348,4 +345,21 @@ func TestBlockStatement(t *testing.T) {
 
 	statementBlock.test(t);
 }
+
+var statemments = testCase {
+	"return a;",
+	&ast.Return{
+		"return",
+		&ast.Identifier{
+			"identifier",
+			"a",
+		},
+	},
+}
+
+func TestStatements(t *testing.T) {
+
+	statemments.test(t);
+}
+
 

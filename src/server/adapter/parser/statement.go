@@ -159,14 +159,35 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
 func (p *statementParser) parseStatement() ast.Node {
 
-	stmt := p.parseExpressionStatement()
+	switch p.curToken.Type {
 
-	return stmt;
+		case token.RETURN:
+			return p.parseReturnStatement()
+
+		default:
+			return p.parseExpressionStatement()
+	}
 }
 
 func (p *statementParser) parseExpressionStatement() ast.Node {
 
 	stmt := &ast.ExpressionStatement{Type:"expressionstatement"}
+
+	stmt.Expression = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return stmt
+}
+
+
+func (p *statementParser) parseReturnStatement() *ast.Return {
+
+	stmt := &ast.Return{Type:"return"}
+
+	p.nextToken()
 
 	stmt.Expression = p.parseExpression(LOWEST)
 
