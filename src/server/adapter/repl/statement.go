@@ -9,7 +9,7 @@ import (
 
 func StartStatementRepl(in io.Reader, out io.Writer) {
 
-	io.WriteString(out, LOGO)
+	io.WriteString(out, STATEMENT_LOGO)
 
 	scanner := bufio.NewScanner(in)
 
@@ -41,3 +41,11 @@ func StartStatementRepl(in io.Reader, out io.Writer) {
 		io.WriteString(out, "\n")
 	}
 }
+
+const STATEMENT_LOGO = `    ____  ____    __
+   / __ \/ __ \  / /
+  / / / / / / / / /
+ / /_/ / /_/ / / /___
+/_____/\___\_\/_____/  StatementParser
+
+`

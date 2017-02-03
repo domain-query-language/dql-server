@@ -11,7 +11,7 @@ const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
 
-	io.WriteString(out, LOGO)
+	io.WriteString(out, QUERY_LOGO)
 
 	scanner := bufio.NewScanner(in)
 
@@ -44,11 +44,11 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
-const LOGO = `    ____  ____    __
+const QUERY_LOGO = `    ____  ____    __
    / __ \/ __ \  / /
   / / / / / / / / /
  / /_/ / /_/ / / /___
-/_____/\___\_\/_____/
+/_____/\___\_\/_____/  QueryRepl
 
 `
 
