@@ -14,7 +14,7 @@ var (
 
 type Handler interface {
 
-	Handle(query Query) (result Result, err error)
+	Handle(query vm.Query) (result Result, err error)
 }
 
 type Handler_ struct {
@@ -27,7 +27,7 @@ func (self *Handler_) Add(id vm.Identifier, query_handler QueryHandler) {
 	self.handlers[id] = query_handler
 }
 
-func (self *Handler_) Handle(query Query) (result Result, err error) {
+func (self *Handler_) Handle(query vm.Query) (result Result, err error) {
 
 	handler, ok := self.handlers[query.Id()]
 
