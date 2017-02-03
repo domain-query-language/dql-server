@@ -90,6 +90,10 @@ func (testCase testCase) test(t *testing.T) {
 		t.Error(err.Error());
 	}
 
+	if (actual!= nil && actual.Type != "blockstatement") {
+		t.Error("Parser did not return blocsktatement");
+	}
+
 	if (!compareBlockStatements(actual, expected)) {
 		t.Error("Expected AST does not match actual");
 		t.Error("Expected: " + expected.String());
@@ -348,13 +352,15 @@ func TestBlockStatement(t *testing.T) {
 
 var statemments = testCase {
 	"return a;",
-	&ast.Return{
-		"return",
-		&ast.Identifier{
-			"identifier",
-			"a",
+	blkStmt([]ast.Node{
+		&ast.Return{
+			"return",
+			&ast.Identifier{
+				"identifier",
+				"a",
+			},
 		},
-	},
+	}),
 }
 
 func TestStatements(t *testing.T) {
