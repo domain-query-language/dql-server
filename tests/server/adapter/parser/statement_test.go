@@ -171,9 +171,11 @@ var infixExpressions = testCases{
 	{"a < b;", infixIdent("a", "<", "b")},
 	{"a == b;", infixIdent("a", "==", "b")},
 	{"a != b;", infixIdent("a", "!=", "b")},
+	{"a->b;", infixIdent("a", "->", "b")},
 	{"true == true;", infixBool(true, "==", true)},
 	{"true != false;", infixBool(true, "!=", false)},
 	{"false == false;", infixBool(false, "==", false)},
+
 }
 
 func TestInfixExpressions(t *testing.T) {
@@ -282,6 +284,10 @@ var precedenceTests = []struct {
 		"!(true == true);",
 		"(!(true == true));",
 	},
+	{
+		"a->b->c->d;",
+		"(((a -> b) -> c) -> d);",
+	},
 }
 
 func TestPredence(t *testing.T) {
@@ -366,6 +372,12 @@ var statemments = testCase {
 func TestStatements(t *testing.T) {
 
 	statemments.test(t);
+}
+
+var invalidObjectAccess = struct {
+	expression string
+}{
+	"a->1",
 }
 
 

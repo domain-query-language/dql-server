@@ -18,6 +18,7 @@ const (
 	PRODUCT     // *
 	PREFIX      // -X or !X
 	CALL        // myFunction(X)
+	OBJECT	    // object->key
 	INDEX       // array[index]
 )
 
@@ -31,6 +32,7 @@ var precedences = map[token.TokenType]int{
 	token.SLASH:    PRODUCT,
 	token.ASTERISK: PRODUCT,
 	token.LPAREN:   CALL,
+	token.ARROW:	OBJECT,
 	token.LBRACKET: INDEX,
 }
 
@@ -80,6 +82,7 @@ func NewStatement(statements string) *statementParser {
 	p.registerInfix(token.NOTEQ, p.parseInfixExpression)
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
+	p.registerInfix(token.ARROW, p.parseInfixExpression)
 
 	p.nextToken()
 	p.nextToken()
@@ -177,6 +180,9 @@ func (p *statementParser) parseExpressionStatement() ast.Node {
 
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
+	} else {
+		msg := fmt.Sprintf("Expected %v, got %v", token.SEMICOLON, p.peekToken);
+		p.error = errors.New(msg);
 	}
 
 	return stmt

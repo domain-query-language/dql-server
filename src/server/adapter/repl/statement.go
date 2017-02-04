@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
 )
 
@@ -32,9 +33,16 @@ func StartStatementRepl(in io.Reader, out io.Writer) {
 		blkStmt, err := p.ParseBlockStatement()
 
 		if (err != nil) {
+			io.WriteString(out, "\n")
 			io.WriteString(out, "Error: "+err.Error());
+			io.WriteString(out, "\n")
 		} else {
-			io.WriteString(out, blkStmt.String())
+			spew.Config.DisableMethods = true;
+			spew.Config.DisablePointerAddresses = true;
+			io.WriteString(out, "\n")
+			io.WriteString(out, "Formatted: "+ blkStmt.String()+"\n")
+			io.WriteString(out, "\n")
+			io.WriteString(out, spew.Sdump(blkStmt))
 
 		}
 
