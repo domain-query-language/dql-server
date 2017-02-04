@@ -12,6 +12,7 @@ import (
 const (
 	_ int = iota
 	LOWEST
+	ASSIGN	    // =
 	EQUALS      // ==
 	LESSGREATER // > or <
 	SUM         // +
@@ -20,7 +21,7 @@ const (
 	CALL        // myFunction(X)
 	OBJECT	    // object->key
 	INDEX       // array[index]
-	ASSIGN	    // =
+
 )
 
 var precedences = map[token.TokenType]int{
@@ -170,6 +171,9 @@ func (p *statementParser) parseStatement() ast.Node {
 		case token.RETURN:
 			return p.parseReturnStatement()
 
+		case token.IF:
+			return p.parseIfStatement()
+
 		default:
 			return p.parseExpressionStatement()
 	}
@@ -202,6 +206,30 @@ func (p *statementParser) parseReturnStatement() *ast.Return {
 
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
+	}
+
+	return stmt
+}
+
+func (p *statementParser) parseIfStatement() ast.Statement {
+
+	stmt := &ast.If{Type:"if"}
+
+	stmt.Test = p.parseExpression(LOWEST)
+
+	panic(stmt.Test)
+
+	if !p.expectPeek(token.LBRACE) {
+		return nil
+	}
+
+	stmt.Consequent, _ = p.ParseBlockStatement()
+
+	if p.peekTokenIs(token.ELSE) {
+
+		p.nextToken()
+
+		stmt.Alternate, _ = p.ParseBlockStatement()
 	}
 
 	return stmt

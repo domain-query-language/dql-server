@@ -289,10 +289,10 @@ var precedenceTests = []struct {
 		"a->b->c->d;",
 		"(((a -> b) -> c) -> d);",
 	},
-	//{
-	//	"a->b->c = 34 - 1;",
-	//	"(((a -> b) -> c) = (34 - 1));",
-	//},
+	{
+		"a->b->c = 34 - 1;",
+		"(((a -> b) -> c) = (34 - 1));",
+	},
 }
 
 func TestPredence(t *testing.T) {
@@ -361,28 +361,74 @@ func TestBlockStatement(t *testing.T) {
 	statementBlock.test(t);
 }
 
-var statemments = testCase {
-	"return a;",
-	blkStmt([]ast.Node{
-		&ast.Return{
-			"return",
-			&ast.Identifier{
-				"identifier",
-				"a",
+var statements = testCases {
+	{
+		"return a;",
+		blkStmt([]ast.Node{
+			&ast.Return{
+				"return",
+				&ast.Identifier{
+					"identifier",
+					"a",
+				},
 			},
-		},
-	}),
+		}),
+	},
+	/*{
+		`if a {
+			b;
+		}`,
+		blkStmt([]ast.Node{
+			&ast.If{
+				"if",
+				&ast.Identifier{
+					"identifier",
+					"a",
+				},
+				blkStmt([]ast.Node{
+					expStmt(&ast.Identifier{
+						"identifier",
+						"b",
+					}),
+				}),
+				nil,
+			},
+		}),
+	},
+	{
+		`if a {
+			b;
+		} else {
+			c;
+		}`,
+		blkStmt([]ast.Node{
+			&ast.If{
+				"if",
+				&ast.Identifier{
+					"identifier",
+					"a",
+				},
+				blkStmt([]ast.Node{
+					expStmt(&ast.Identifier{
+						"identifier",
+						"b",
+					}),
+				}),
+				blkStmt([]ast.Node{
+					expStmt(&ast.Identifier{
+						"identifier",
+						"c",
+					}),
+				}),
+			},
+		}),
+	},*/
 }
 
 func TestStatements(t *testing.T) {
 
-	statemments.test(t);
+	statements.test(t);
 }
 
-var invalidObjectAccess = struct {
-	expression string
-}{
-	"a->1",
-}
 
 

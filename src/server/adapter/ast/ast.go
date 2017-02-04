@@ -30,9 +30,7 @@ type BlockStatement struct {
 	Statements []Node
 }
 
-func (bs *BlockStatement) statementNode() {
-
-}
+func (bs *BlockStatement) statementNode() {}
 
 func (bs *BlockStatement) String() string {
 
@@ -52,27 +50,44 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
-func (es *ExpressionStatement) statementNode() {
-
-}
+func (es *ExpressionStatement) statementNode() {}
 
 func (es *ExpressionStatement) String() string {
 
 	return es.Expression.String()+";";
 }
 
+
 type Return struct {
 	Type string
 	Expression Expression
 }
 
-func (r *Return) statementNode() {
-
-}
+func (r *Return) statementNode() {}
 
 func (r *Return) String() string {
 
 	return "return "+r.Expression.String()
+}
+
+
+type If struct {
+	Type 	   string
+	Test       Expression
+	Consequent Statement
+	Alternate  Statement
+}
+
+func (i *If) statementNode() {}
+
+func (i *If) String() string {
+
+	str := "if "+i.Test.String()+"{\n    "+i.Consequent.String()+"\n}";
+
+	if (i.Alternate != nil) {
+		str += " else {\n    "+i.Alternate.String()+"\n}";
+	}
+	return str;
 }
 
 
