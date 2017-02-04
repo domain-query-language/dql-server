@@ -172,6 +172,7 @@ var infixExpressions = testCases{
 	{"a == b;", infixIdent("a", "==", "b")},
 	{"a != b;", infixIdent("a", "!=", "b")},
 	{"a->b;", infixIdent("a", "->", "b")},
+	{"a = b;", infixIdent("a", "=", "b")},
 	{"true == true;", infixBool(true, "==", true)},
 	{"true != false;", infixBool(true, "!=", false)},
 	{"false == false;", infixBool(false, "==", false)},
@@ -288,6 +289,10 @@ var precedenceTests = []struct {
 		"a->b->c->d;",
 		"(((a -> b) -> c) -> d);",
 	},
+	//{
+	//	"a->b->c = 34 - 1;",
+	//	"(((a -> b) -> c) = (34 - 1));",
+	//},
 }
 
 func TestPredence(t *testing.T) {

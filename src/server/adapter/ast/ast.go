@@ -190,16 +190,3 @@ func (s *String) String() string {
 
 	return s.Value
 }
-
-type ObjectAccess struct {
-	Type 	string
-	Left    *Identifier
-	Right   *Identifier
-}
-
-func (o *ObjectAccess) expressionNode() {}
-
-func (o *ObjectAccess) String() string {
-
-	return o.Left.String()+"->"+o.Right.String();
-}

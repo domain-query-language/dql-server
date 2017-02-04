@@ -20,6 +20,7 @@ const (
 	CALL        // myFunction(X)
 	OBJECT	    // object->key
 	INDEX       // array[index]
+	ASSIGN	    // =
 )
 
 var precedences = map[token.TokenType]int{
@@ -34,6 +35,7 @@ var precedences = map[token.TokenType]int{
 	token.LPAREN:   CALL,
 	token.ARROW:	OBJECT,
 	token.LBRACKET: INDEX,
+	token.ASSIGN: 	ASSIGN,
 }
 
 type (
@@ -83,6 +85,7 @@ func NewStatement(statements string) *statementParser {
 	p.registerInfix(token.LT, p.parseInfixExpression)
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.ARROW, p.parseInfixExpression)
+	p.registerInfix(token.ASSIGN, p.parseInfixExpression)
 
 	p.nextToken()
 	p.nextToken()
