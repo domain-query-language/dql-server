@@ -214,6 +214,10 @@ var precedenceTests = []struct {
 		"((-a) * b);",
 	},
 	{
+		"(a);",
+		"a;",
+	},
+	{
 		"!-a;",
 		"(!(-a));",
 	},
@@ -375,7 +379,7 @@ var statements = testCases {
 		}),
 	},
 	/*{
-		`if a {
+		`if (a) {
 			b;
 		}`,
 		blkStmt([]ast.Node{

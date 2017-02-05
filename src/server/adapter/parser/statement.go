@@ -215,13 +215,15 @@ func (p *statementParser) parseIfStatement() ast.Statement {
 
 	stmt := &ast.If{Type:"if"}
 
-	stmt.Test = p.parseExpression(LOWEST)
+	p.nextToken()
 
-	panic(stmt.Test)
+	stmt.Test = p.parseExpression(LOWEST)
 
 	if !p.expectPeek(token.LBRACE) {
 		return nil
 	}
+
+	p.nextToken()
 
 	stmt.Consequent, _ = p.ParseBlockStatement()
 
