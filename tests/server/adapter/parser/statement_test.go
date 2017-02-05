@@ -80,7 +80,9 @@ func (testCases testCases) test(t *testing.T) {
 
 func (testCase testCase) test(t *testing.T) {
 
-	p := parser.NewStatement(testCase.expression);
+	statementBlockStr := "{ "+testCase.expression+" }";
+
+	p := parser.NewStatement(statementBlockStr);
 
 	actual, err := p.ParseBlockStatement();
 	expected := blkStmt([]ast.Node{testCase.node});
@@ -183,7 +185,7 @@ func TestInfixExpressions(t *testing.T) {
 
 	infixExpressions.test(t)
 }
-
+/*
 var invalidStatements = []struct{
 	statement string
 }{
@@ -204,6 +206,7 @@ func TestInvalidStatements(t *testing.T) {
 		}
 	}
 }
+*/
 
 var precedenceTests = []struct {
 	statement string
@@ -303,7 +306,9 @@ func TestPredence(t *testing.T) {
 
 	for _, testCase := range precedenceTests {
 
-		p := parser.NewStatement(testCase.statement);
+		statementBlockStr := "{ "+testCase.statement+" }";
+
+		p := parser.NewStatement(statementBlockStr);
 
 		node, err := p.ParseBlockStatement()
 
@@ -342,6 +347,7 @@ func TestBasicTypes(t *testing.T) {
 	basicTypes.test(t);
 }
 
+
 var statementBlock = testCase{
 	`
 	a;
@@ -357,7 +363,6 @@ var statementBlock = testCase{
 			"b",
 		}),
 	}),
-
 }
 
 func TestBlockStatement(t *testing.T) {
@@ -379,11 +384,9 @@ var statements = testCases {
 		}),
 	},
 	/*{
-		`if (a) {
-			b;
-		}`,
+		`if (a) { b; }`,
 		blkStmt([]ast.Node{
-			&ast.If{
+			&ast.IfStatement{
 				"if",
 				&ast.Identifier{
 					"identifier",
@@ -426,7 +429,8 @@ var statements = testCases {
 				}),
 			},
 		}),
-	},*/
+	},
+	*/
 }
 
 func TestStatements(t *testing.T) {

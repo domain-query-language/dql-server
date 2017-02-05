@@ -149,20 +149,29 @@ func (p *statementParser) peekError(t token.TokenType) {
 
 func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
+	if (!p.curTokenIs(token.LBRACE) ) {
+		return nil, p.error
+	}
+
+	p.nextToken()
+
 	block := &ast.BlockStatement{Type:"blockstatement"}
 	block.Statements = []ast.Node{}
 
-	for p.curToken != nil {
+	for !p.curTokenIs(token.RBRACE)  {
 		stmt := p.parseStatement()
 		if stmt != nil {
-			block.Statements  = append(block.Statements, stmt)
+			block.Statements = append(block.Statements, stmt)
+			/*switch stmt.(type) {
+			case ast.IfStatement:
+				panic(stmt.String());
+			}*/
 		}
 		p.nextToken()
 	}
 
 	return block, p.error
 }
-
 
 func (p *statementParser) parseStatement() ast.Node {
 
@@ -213,7 +222,7 @@ func (p *statementParser) parseReturnStatement() *ast.Return {
 
 func (p *statementParser) parseIfStatement() ast.Statement {
 
-	stmt := &ast.If{Type:"if"}
+	stmt := &ast.IfStatement{Type:"if"}
 
 	p.nextToken()
 
@@ -361,6 +370,7 @@ func (p *statementParser) parseBoolean() ast.Expression {
 }
 
 func (p *statementParser) parseGroupedExpression() ast.Expression {
+
 	p.nextToken()
 
 	exp := p.parseExpression(LOWEST)

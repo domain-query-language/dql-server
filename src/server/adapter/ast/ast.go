@@ -71,16 +71,16 @@ func (r *Return) String() string {
 }
 
 
-type If struct {
+type IfStatement struct {
 	Type 	   string
 	Test       Expression
 	Consequent Statement
 	Alternate  Statement
 }
 
-func (i *If) statementNode() {}
+func (i *IfStatement) statementNode() {}
 
-func (i *If) String() string {
+func (i *IfStatement) String() string {
 
 	str := "if "+i.Test.String()+"{\n    "+i.Consequent.String()+"\n}";
 
