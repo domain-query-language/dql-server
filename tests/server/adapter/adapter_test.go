@@ -89,7 +89,7 @@ func TestCreateStatements(t *testing.T){
 	}
 }
 
-var invalidStatments = []struct{
+var invalidStatements = []struct{
 	statement string
 	error error
 }{
@@ -101,11 +101,15 @@ var invalidStatments = []struct{
 		"LIST BANANAS;",
 		errors.New("Expected next token to be 'databases', got 'Parse error, expected databases, found BANANAS' instead"),
 	},
+	{
+		"CREATE BANANAS;",
+		errors.New("Expected next token to be 'database', got 'Parse error, expected database, domain, context, aggregate, found BANANAS' instead"),
+	},
 }
 
 func TestInvalidStatement(t *testing.T) {
 
-	for _, testCase := range invalidStatments {
+	for _, testCase := range invalidStatements {
 
 		adptr := parser.New(testCase.statement);
 
