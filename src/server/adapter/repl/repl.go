@@ -4,14 +4,14 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
 )
 
 const PROMPT = ">> "
 
 func Start(in io.Reader, out io.Writer) {
 
-	io.WriteString(out, LOGO)
+	io.WriteString(out, QUERY_LOGO)
 
 	scanner := bufio.NewScanner(in)
 
@@ -29,22 +29,26 @@ func Start(in io.Reader, out io.Writer) {
 			break;
 		}
 
-		t := tokenizer.NewTokenizer(line)
+		p := parser.New(line)
 
-		tokens := t.Tokens()
+		handleable, err := p.Next()
 
-		for _, tok := range tokens {
-			io.WriteString(out, tok.String()+"\n")
+		if (err != nil) {
+			io.WriteString(out, "Error: "+err.Error());
+		} else {
+			io.WriteString(out, handleable.String())
+
 		}
+
 		io.WriteString(out, "\n")
 	}
 }
 
-const LOGO = `    ____  ____    __
+const QUERY_LOGO = `    ____  ____    __
    / __ \/ __ \  / /
   / / / / / / / / /
  / /_/ / /_/ / / /___
-/_____/\___\_\/_____/
+/_____/\___\_\/_____/  QueryRepl
 
 `
 
