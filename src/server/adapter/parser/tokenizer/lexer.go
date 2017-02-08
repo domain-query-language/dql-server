@@ -197,6 +197,7 @@ func (l *lexer) skipWS() {
 
 //Move past the white space but don't skip it
 func (l *lexer) consumeWS() {
+
 	for {
 		if !contains(whitespace, l.next()) {
 			l.backup()
@@ -207,6 +208,7 @@ func (l *lexer) consumeWS() {
 
 //Get the next rune in the input.
 func (l *lexer) next() int {
+
 	r, width := l.runeAtPos(l.pos)
 	if r == EOF {
 		l.width = 0
@@ -219,6 +221,7 @@ func (l *lexer) next() int {
 
 //Get the rune at this position
 func (l *lexer) runeAtPos(pos int) (rn int, width int) {
+
 	if pos >= len(l.input) {
 		rn = EOF
 		width = 0
@@ -232,25 +235,30 @@ func (l *lexer) runeAtPos(pos int) (rn int, width int) {
 
 //Skip the next token
 func (l *lexer) skip() {
+
 	l.next()
 	l.ignore()
 }
 
 //Skip a string of tokens
 func (l *lexer) skipStr(string string) {
+
 	l.pos += len(string)
 	l.skipWS()
 }
 
 func (l *lexer) ignore() {
+
 	l.start = l.pos
 }
 
 func (l *lexer) backup() {
+
 	l.pos -= l.width
 }
 
 func (l *lexer) peek() int {
+
 	r := l.next()
 	l.backup()
 	return r
@@ -267,6 +275,7 @@ func (l *lexer) err(expected string, found string) stateFn {
 
 //Scan until next space or non identifier character
 func (l *lexer) scanWord() string {
+
 	for {
 		if (!isLetter(l.peek()) && !isDigit(l.peek())) {
 			break;
@@ -311,6 +320,7 @@ var objectTypes = []string {
 }
 
 func (l *lexer) isTypeRefence() bool {
+
 	if (l.isKeyWordAndNotIdentifier(tok.STRING)) {
 		return true;
 	}
@@ -360,14 +370,14 @@ func lexToken(l *lexer) stateFn {
 		}
 	}
 
-	// Is keyword, then lex
+	// If keyword, then lex
 	for _, token := range easyLexKeywords {
 		if l.isKeyWordAndNotIdentifier(string(token)) {
 			return l.lexAsToken(token)
 		}
 	}
 
-	//Is match, then lex
+	// If match, then lex
 	for _, token := range easyLexTokens {
 		if l.isNextPrefix(string(token)) {
 			return l.lexAsToken(token)
@@ -385,6 +395,7 @@ func lexToken(l *lexer) stateFn {
 }
 
 func (l *lexer) lexQuotedStringAsToken(tokenType tok.TokenType) stateFn {
+
 	l.skipWS()
 	nxt := l.next()
 	if (nxt == EOF) {
@@ -414,36 +425,43 @@ func (l *lexer) lexQuotedStringAsToken(tokenType tok.TokenType) stateFn {
 }
 
 func (l *lexer) lexAsToken(tokenType tok.TokenType) stateFn {
+
 	l.pos += len(tokenType)
 	l.emit(tokenType)
 	return lexToken
 }
 
 func lexCreate(l *lexer) stateFn {
+
 	l.lexAsToken(tok.CREATE);
 	return lexNSObjectType
 }
 
 func lexNSObjectType(l *lexer) stateFn {
+
 	l.skipWS()
 	return l.lexMatchingPrefix([]tok.TokenType{tok.DATABASE, tok.DOMAIN, tok.CONTEXT, tok.AGGREGATE})
 }
 
 func lexList(l *lexer) stateFn {
+
 	l.lexAsToken(tok.LIST);
 	return lexNSListObjectType
 }
 
 func lexNSListObjectType(l *lexer) stateFn {
+
 	l.skipWS()
 	return l.lexMatchingPrefix([]tok.TokenType{tok.DATABASES})
 }
 
 func lexNSObjectName(l *lexer) stateFn {
+
 	return l.lexQuotedStringAsToken(tok.OBJECTNAME)
 }
 
 func lexUsingDatabase(l *lexer) stateFn {
+
 	l.skipStr("using")
 	l.skipWS()
 	if (!l.isKeyWordAndNotIdentifier(tok.DATABASE)) {
@@ -456,6 +474,7 @@ func lexUsingDatabase(l *lexer) stateFn {
 }
 
 func lexForDomain (l *lexer) stateFn {
+
 	l.skipStr("for")
 
 	if (!l.isKeyWordAndNotIdentifier(tok.DOMAIN)) {
@@ -468,6 +487,7 @@ func lexForDomain (l *lexer) stateFn {
 }
 
 func lexInContext (l *lexer) stateFn {
+
 	l.skipStr("in")
 
 	if (!l.isKeyWordAndNotIdentifier(tok.CONTEXT)) {
@@ -480,6 +500,7 @@ func lexInContext (l *lexer) stateFn {
 }
 
 func lexWithinAggregate(l *lexer) stateFn {
+
 	l.skipStr("within")
 
 	if (!l.isKeyWordAndNotIdentifier(tok.AGGREGATE)) {
@@ -492,6 +513,7 @@ func lexWithinAggregate(l *lexer) stateFn {
 }
 
 func lexWhenEvent(l *lexer) stateFn {
+
 	l.skipStr("when")
 
 	if (!l.isKeyWordAndNotIdentifier(tok.EVENT)) {
@@ -503,6 +525,7 @@ func lexWhenEvent(l *lexer) stateFn {
 }
 
 func lexAssertInvariant(l *lexer) stateFn {
+
 	l.pos += len("assert")
 	l.consumeWS()
 
@@ -523,6 +546,7 @@ func lexAssertInvariant(l *lexer) stateFn {
 }
 
 func lexRunQuery(l *lexer) stateFn {
+
 	l.pos += len("run")
 	l.consumeWS()
 
@@ -538,6 +562,7 @@ func lexRunQuery(l *lexer) stateFn {
 }
 
 func lexApplyEvent(l *lexer) stateFn {
+
 	l.pos += len("apply")
 	l.consumeWS()
 
@@ -553,10 +578,12 @@ func lexApplyEvent(l *lexer) stateFn {
 }
 
 func lexClass(l *lexer) stateFn {
+
 	return l.lexMatchingPrefix([]tok.TokenType{tok.VALUE, tok.ENTITY, tok.EVENT, tok.COMMAND, tok.QUERY, tok.INVARIANT, tok.PROJECTION})
 }
 
 func lexTypeRef(l *lexer) stateFn {
+
 	for {
 		if (contains(whitespace, l.peek()) || l.peek() == EOF) {
 			break;
@@ -570,6 +597,7 @@ func lexTypeRef(l *lexer) stateFn {
 }
 
 func lexIdentifier(l *lexer) stateFn {
+
 	word := l.scanWord()
 	if (word == "true" || word == "false") {
 		l.emit(tok.BOOLEAN)
@@ -582,6 +610,7 @@ func lexIdentifier(l *lexer) stateFn {
 }
 
 func lexString(l *lexer) stateFn {
+
 	l.skip()
 	for {
 		if l.next() == '"' {
@@ -597,6 +626,7 @@ func lexString(l *lexer) stateFn {
 }
 
 func lexNumber(l *lexer) stateFn {
+
 	hasDot := false;
 	for {
 		if (l.peek() == '.') {
@@ -617,15 +647,18 @@ func lexNumber(l *lexer) stateFn {
 }
 
 func lexClassOpen(l *lexer) stateFn {
+
 	l.lexAsToken(tok.CLASSOPEN);
 	l.skipWS()
 	return lexClass;
 }
 
 func isLetter(ch int) bool {
+
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
 
 func isDigit(ch int) bool {
+
 	return '0' <= ch && ch <= '9'
 }

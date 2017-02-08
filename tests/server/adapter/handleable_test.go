@@ -3,16 +3,24 @@ package adapter
 import (
 	"testing"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
-	"github.com/domain-query-language/dql-server/src/server/vm/handler"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 )
 
 type FakeCommand struct {}
 
-func (c *FakeCommand) Id() handler.Identifier {
+func (c *FakeCommand) Id() vm.Identifier {
 	return nil
 }
 
-func (c *FakeCommand) TypeId() handler.Identifier {
+func (c *FakeCommand) TypeId() vm.Identifier {
+	return nil
+}
+
+func (c *FakeCommand) AggregateId() vm.Identifier {
+	return nil
+}
+
+func (c *FakeCommand) ContextId() vm.Identifier {
 	return nil
 }
 
@@ -42,6 +50,10 @@ type FakeQuery struct {}
 
 func (c *FakeQuery) String() string {
 	return "";
+}
+
+func (c *FakeQuery) Id() vm.Identifier {
+	return nil;
 }
 
 func TestTypesAreCorrectForQuery(t *testing.T) {

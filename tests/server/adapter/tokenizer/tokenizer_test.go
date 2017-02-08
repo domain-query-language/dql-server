@@ -350,14 +350,14 @@ var classComponents = testStatements{
 	},
 	{
 		`
-		command
+		handler
 		{
 			assert  invariant not 'is-started';
 			revision = run query 'next-revision-number' (agency_id, quote_number);
 			apply event 'started' (agency_id, brand_id, quote_number, revision);
 		}`,
 		[]tok.Token{
-			tk(tok.HANDLER, "command"),
+			tk(tok.HANDLER, "handler"),
 			tk(tok.LBRACE, "{"),
 			tk(tok.ASSERTINVARIANT, "assert  invariant"),
 			tk(tok.NOT, "not"),
@@ -588,8 +588,9 @@ func TestStatements(t *testing.T) {
 	statements.test(t)
 }
 
-// These keywords should be seen as expressions, NOT keywords, dependent on context
-var keyWordsAsExpressions = testStatements{
+
+// These keywords should be seen as identifiers, NOT keywords, dependent on context
+var keyWordsAsIdentifiers = testStatements{
 	{
 		`
 		database
@@ -620,8 +621,9 @@ var keyWordsAsExpressions = testStatements{
 	},
 }
 
+
 func TestKeywordsAsExpressions(t *testing.T) {
-	keyWordsAsExpressions.test(t)
+	keyWordsAsIdentifiers.test(t)
 }
 
 // These keywords can be used in expressions only if they're part of an IDENTIFIER
@@ -768,17 +770,20 @@ func (statements testStatements) test(t *testing.T) {
 
 func compareTokenLists(expected, actual []tok.Token, dql string, t *testing.T) {
 	if (len(expected) != len(actual)) {
-		t.Error("Error with AST produced from '"+dql+"'");
+		t.Error("Error with Tokens produced from '"+dql+"'");
 		t.Error("Number of tokens are mismtached, expected "+strconv.Itoa(len(expected))+", got "+strconv.Itoa(len(actual)));
+		return;
 	}
 
 	for i, token := range expected {
 		if i == len(actual) {
+			t.Error("Error with Tokens produced from '"+dql+"'");
 			t.Error("Expected: "+token.String())
 			t.Error("Got: Nothing")
 			return
 		}
 		if (!token.Compare(actual[i])) {
+			t.Error("Error with Tokens produced from '"+dql+"'");
 			t.Error("Expected: "+token.String())
 			t.Error("Got: "+actual[i].String())
 			return

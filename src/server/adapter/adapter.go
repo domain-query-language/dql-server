@@ -17,13 +17,6 @@ type Handleable struct {
 	Query vm.Query
 }
 
-/*
-func (h *Handleable) String() string {
-	typ := fmt.Sprintf("%v", h.Typ)
-	return typ+": "+ string(h.Query.Id().Bytes());
-}
-*/
-
 type HandleableType string
 
 const (
@@ -40,4 +33,8 @@ func NewCommand(cmd vm.Command) *Handleable {
 func NewQuery(qry vm.Query) *Handleable {
 
 	return &Handleable{QRY, nil, qry}
+}
+
+func (h *Handleable) String() string {
+	return string(h.Typ)
 }
