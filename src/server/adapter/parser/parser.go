@@ -145,7 +145,7 @@ func (a *parser) parseCommand() vm.Command {
 	return a.parseCreateCommand()
 }
 
-func (a *parser) parseCreateCommand() vm.Query {
+func (a *parser) parseCreateCommand() vm.Command {
 
 	cmd := &command.CreateDatabase{};
 
@@ -167,5 +167,4 @@ func (a *parser) parseCreateCommand() vm.Query {
 	}
 
 	return cmd;
-}
 }
