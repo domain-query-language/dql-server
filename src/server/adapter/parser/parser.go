@@ -32,7 +32,9 @@ func (e *UnexpectedIdentifierError) Error() string {
 	return fmt.Sprintf("Error at char %d, expected '%s', got '%s' instead", e.Actual.Pos, e.Expected, e.Actual.Val)
 }
 
-/** Implementation of the adapter, written using the tokenizer, parser pattern */
+/**
+ * Implementation of the adapter, written using the tokenizer, parser pattern
+ */
 type parser struct {
 
 	t tokenizer.Tokenizer
@@ -116,6 +118,14 @@ func (a *parser) currValueError(value string) {
 	a.error = &UnexpectedIdentifierError{value, a.curToken}
 }
 
+var queryStartTokens = []token.TokenType {
+	token.LIST,
+}
+
+var commandStartTokens = []token.TokenType {
+	token.CREATE,
+}
+
 // Return the next handlable object
 func (a *parser) Next() (*adapter.Handleable, error) {
 
@@ -144,17 +154,40 @@ func (a *parser) Next() (*adapter.Handleable, error) {
 		return adapter.NewCommand(cmd), nil;
 	}
 
-	return nil, &UnexpectedTokenError{string(token.CREATE+"/"+token.LIST), a.curToken}
+	return nil, a.cantFindMatchingStartTokenError()
 }
 
 func (a *parser) isQuery() bool {
 
-	return a.curTokenIs(token.LIST);
+	for _, tok := range queryStartTokens {
+		if a.curTokenIs(tok) {
+			return true
+		}
+	}
+	return false
 }
 
 func (a *parser) isCommand() bool {
 
-	return a.curTokenIs(token.CREATE);
+	for _, tok := range commandStartTokens {
+		if a.curTokenIs(tok) {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *parser) cantFindMatchingStartTokenError() *UnexpectedTokenError {
+
+	startTokens := append(commandStartTokens, queryStartTokens...);
+
+	startTokenStrs := make([]string, len(startTokens))
+
+	for i, typ := range startTokens {
+		startTokenStrs[i] = string(typ)
+	}
+
+	return &UnexpectedTokenError{strings.Join(startTokenStrs, "/"), a.curToken}
 }
 
 func (a *parser) parseQuery() vm.Query {
