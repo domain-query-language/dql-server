@@ -1,8 +1,7 @@
 package adapter
 
 import (
-	"github.com/domain-query-language/dql-server/src/server/vm/handler"
-	"fmt"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 )
 
 type Adapter interface {
@@ -14,14 +13,16 @@ type Adapter interface {
 type Handleable struct {
 
 	Typ HandleableType
-	Command handler.Command
-	Query handler.Query
+	Command vm.Command
+	Query vm.Query
 }
 
+/*
 func (h *Handleable) String() string {
 	typ := fmt.Sprintf("%v", h.Typ)
-	return typ+": "+h.Query.String();
+	return typ+": "+ string(h.Query.Id().Bytes());
 }
+*/
 
 type HandleableType string
 
@@ -31,13 +32,12 @@ const (
 )
 
 // Helper methods to make creating it easier
-func NewCommand(cmd handler.Command) *Handleable {
+func NewCommand(cmd vm.Command) *Handleable {
 
 	return &Handleable{CMD, cmd, nil}
 }
 
-func NewQuery(qry handler.Query) *Handleable {
+func NewQuery(qry vm.Query) *Handleable {
 
 	return &Handleable{QRY, nil, qry}
 }
-

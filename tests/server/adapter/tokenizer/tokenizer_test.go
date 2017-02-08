@@ -350,14 +350,14 @@ var classComponents = testStatements{
 	},
 	{
 		`
-		handler
+		command
 		{
 			assert  invariant not 'is-started';
 			revision = run query 'next-revision-number' (agency_id, quote_number);
 			apply event 'started' (agency_id, brand_id, quote_number, revision);
 		}`,
 		[]tok.Token{
-			tk(tok.HANDLER, "handler"),
+			tk(tok.HANDLER, "command"),
 			tk(tok.LBRACE, "{"),
 			tk(tok.ASSERTINVARIANT, "assert  invariant"),
 			tk(tok.NOT, "not"),
