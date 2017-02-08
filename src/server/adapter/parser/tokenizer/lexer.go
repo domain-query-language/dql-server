@@ -306,15 +306,15 @@ func (l *lexer) scanQuotedName() (found string, isEOF bool) {
 	return
 }
 
-var objectTypes = []string {
-	"value",
-	"entity",
-	"event",
-	"command",
-	"invariant",
-	"projection",
-	"query",
-}
+const (
+	VALUE string = "value"
+	ENTITY = "entity"
+	EVENT = "event"
+	COMMAND = "command"
+	INVARIANT = "invariant"
+	PROJECTION = "projection"
+	QUERY = "query"
+)
 
 func (l *lexer) isTypeRefence() bool {
 
@@ -330,7 +330,7 @@ func (l *lexer) isTypeRefence() bool {
 	if (l.isKeyWordAndNotIdentifier(tok.BOOLEAN)) {
 		return true;
 	}
-	for _, objectType := range objectTypes {
+	for _, objectType := range []string{VALUE, ENTITY, EVENT, COMMAND, INVARIANT, PROJECTION, QUERY} {
 		if (l.isNextPrefix(objectType+"\\")) {
 			return true;
 		}

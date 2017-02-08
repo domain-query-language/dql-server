@@ -9,6 +9,7 @@ import (
 	query "github.com/domain-query-language/dql-server/src/server/query/schema"
 	command "github.com/domain-query-language/dql-server/src/server/command/schema"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
+	"strings"
 )
 
 /** Implementation of the adapter, written using the tokenizer, parser pattern */
@@ -66,6 +67,20 @@ func (a *parser) expectPeek(t token.TokenType) bool {
 	}
 }
 
+func (a *parser) expectPeekIdentifier(value string) bool {
+
+	if (!a.expectPeek(token.IDENT)) {
+		return false
+	}
+
+	if (strings.ToLower(a.curToken.Val) != value) {
+		a.currValueError(value)
+		return false
+	}
+
+	return true
+}
+
 func (a *parser) peekError(t token.TokenType) {
 
 	if (a.peekToken == nil) {
@@ -73,7 +88,13 @@ func (a *parser) peekError(t token.TokenType) {
 		a.error = errors.New(msg);
 		return;
 	}
-	msg := fmt.Sprintf("Expected next token to be '%s', got '%s' instead", t, a.peekToken.Val)
+	msg := fmt.Sprintf("Expected [%s], got '%s' instead", t, a.peekToken.Type)
+	a.error = errors.New(msg);
+}
+
+func (a *parser) currValueError(value string) {
+
+	msg := fmt.Sprintf("Expected '%s', got '%s' instead", value, a.curToken.Val)
 	a.error = errors.New(msg);
 }
 
@@ -127,7 +148,7 @@ func (a *parser) parseListQuery() vm.Query {
 
 	qry := &query.ListDatabases{};
 
-	if (!a.expectPeek(token.DATABASES)) {
+	if (!a.expectPeekIdentifier("databases")) {
 
 		return nil;
 	}
@@ -149,7 +170,7 @@ func (a *parser) parseCreateCommand() vm.Command {
 
 	cmd := &command.CreateDatabase{};
 
-	if (!a.expectPeek(token.DATABASE)) {
+	if (!a.expectPeekIdentifier("database")) {
 
 		return nil;
 	}

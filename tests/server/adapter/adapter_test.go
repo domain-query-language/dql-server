@@ -99,11 +99,11 @@ var invalidStatements = []struct{
 	},
 	{
 		"LIST BANANAS;",
-		errors.New("Expected next token to be 'databases', got 'Parse error, expected databases, found BANANAS' instead"),
+		errors.New("Expected 'databases', got 'BANANAS' instead"),
 	},
 	{
 		"CREATE BANANAS;",
-		errors.New("Expected next token to be 'database', got 'Parse error, expected database, domain, context, aggregate, found BANANAS' instead"),
+		errors.New("Expected 'database', got 'BANANAS' instead"),
 	},
 }
 
