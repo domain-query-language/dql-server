@@ -142,6 +142,11 @@ func (a *parser) parseListQuery() vm.Query {
 
 func (a *parser) parseCommand() vm.Command {
 
+	return a.parseCreateCommand()
+}
+
+func (a *parser) parseCreateCommand() vm.Query {
+
 	cmd := &command.CreateDatabase{};
 
 	if (!a.expectPeek(token.DATABASE)) {
@@ -162,4 +167,5 @@ func (a *parser) parseCommand() vm.Command {
 	}
 
 	return cmd;
+}
 }
