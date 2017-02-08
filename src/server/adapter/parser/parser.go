@@ -12,8 +12,8 @@ import (
 )
 
 type UnexpectedTokenError struct {
-	Actual *token.Token
 	Expected string
+	Actual *token.Token
 }
 
 func (e *UnexpectedTokenError) Error() string {
@@ -23,8 +23,8 @@ func (e *UnexpectedTokenError) Error() string {
 
 
 type UnexpectedIdentifierError struct {
-	Actual *token.Token
 	Expected string
+	Actual *token.Token
 }
 
 func (e *UnexpectedIdentifierError) Error() string {
@@ -103,12 +103,17 @@ func (a *parser) expectPeekIdentifier(value string) bool {
 
 func (a *parser) peekError(t token.TokenType) {
 
-	a.error = &UnexpectedTokenError{a.peekToken, t}
+	actual := a.peekToken
+	if (a.peekToken == nil) {
+		actual = &token.Token{token.EOF, "eof", a.curToken.Pos + len(a.curToken.Val)}
+	}
+
+	a.error = &UnexpectedTokenError{string(t), actual}
 }
 
 func (a *parser) currValueError(value string) {
 
-	a.error = &UnexpectedIdentifierError{a.curToken, value}
+	a.error = &UnexpectedIdentifierError{value, a.curToken}
 }
 
 // Return the next handlable object
@@ -139,7 +144,7 @@ func (a *parser) Next() (*adapter.Handleable, error) {
 		return adapter.NewCommand(cmd), nil;
 	}
 
-	return nil, nil
+	return nil, &UnexpectedTokenError{string(token.CREATE+"/"+token.LIST), a.curToken}
 }
 
 func (a *parser) isQuery() bool {

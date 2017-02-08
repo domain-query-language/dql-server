@@ -1,13 +1,12 @@
 package adapter
 
 import (
-
+	"github.com/davecgh/go-spew/spew"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
 	query "github.com/domain-query-language/dql-server/src/server/query/schema"
 	command "github.com/domain-query-language/dql-server/src/server/command/schema"
 	"testing"
-	"github.com/davecgh/go-spew/spew"
 )
 
 var listStatements = []struct{
@@ -92,11 +91,10 @@ var invalidStatements = []struct{
 	statement string
 	error string
 }{
-	/*{
+	{
 		"LIST DATABASES",
-
-		errors.New("Expected next token to be ';', got EOF instead"),
-	},*/
+		"Error at char 14, expected [;], got [eof] instead",
+	},
 	{
 		"LIST BANANAS;",
 		"Error at char 5, expected 'databases', got 'BANANAS' instead",
@@ -104,6 +102,10 @@ var invalidStatements = []struct{
 	{
 		"CREATE DATABASE tim;",
 		"Error at char 16, expected [objectName], got [identifier] instead",
+	},
+	{
+		"DATABASE",
+		"Error at char 0, expected [create/list], got [identifier] instead",
 	},
 }
 
