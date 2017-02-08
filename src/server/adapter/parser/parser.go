@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
@@ -140,7 +139,7 @@ func (a *parser) Next() (*adapter.Handleable, error) {
 		return adapter.NewCommand(cmd), nil;
 	}
 
-	return nil, errors.New("Unexpected token '"+a.curToken.Val+"'");
+	return nil, nil
 }
 
 func (a *parser) isQuery() bool {

@@ -101,6 +101,10 @@ var invalidStatements = []struct{
 		"LIST BANANAS;",
 		"Error at char 5, expected 'databases', got 'BANANAS' instead",
 	},
+	{
+		"CREATE DATABASE tim;",
+		"Error at char 16, expected [objectName], got [identifier] instead",
+	},
 }
 
 func TestInvalidStatement(t *testing.T) {
