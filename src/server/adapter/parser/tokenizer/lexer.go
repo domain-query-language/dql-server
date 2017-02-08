@@ -20,7 +20,6 @@ type lexer struct {
 
 type stateFn func(*lexer) stateFn
 
-var tokenToLexer = map[string]stateFn {}
 var easyLexKeywords = []tok.TokenType{}
 var easyLexTokens = []tok.TokenType{}
 
@@ -34,20 +33,18 @@ func lex(name, input string) (*lexer) {
 		length: len(input),
 	}
 
-	tokenToLexer = map[string]stateFn {
-		"create": lexCreate,
-		"list": lexList,
-		"using": lexUsingDatabase,
-		"for": lexForDomain,
-		"in": lexInContext,
-		"within": lexWithinAggregate,
-		"assert": lexAssertInvariant,
-		"run": lexRunQuery,
-		"apply": lexApplyEvent,
-		"when": lexWhenEvent,
-	}
-
 	easyLexKeywords = []tok.TokenType {
+		tok.CREATE,
+		tok.LIST,
+		tok.USING,
+		tok.FOR,
+		tok.IN,
+		tok.WITHIN,
+		tok.ASSERT,
+		tok.RUN,
+		tok.APPLY,
+		tok.WHEN,
+		tok.NOT,
 		tok.AND,
 		tok.OR,
 		tok.PROPERTIES,
@@ -310,13 +307,13 @@ func (l *lexer) scanQuotedName() (found string, isEOF bool) {
 }
 
 var objectTypes = []string {
-	tok.VALUE,
-	tok.ENTITY,
-	tok.EVENT,
-	tok.COMMAND,
-	tok.INVARIANT,
-	tok.PROJECTION,
-	tok.QUERY,
+	"value",
+	"entity",
+	"event",
+	"command",
+	"invariant",
+	"projection",
+	"query",
 }
 
 func (l *lexer) isTypeRefence() bool {
@@ -361,13 +358,6 @@ func lexToken(l *lexer) stateFn {
 	}
 	if (l.isNextPrefix(tok.CLASSOPEN)) {
 		return lexClassOpen;
-	}
-
-	// Basic check, special rule
-	for token, stateFn := range tokenToLexer {
-		if l.isKeyWordAndNotIdentifier(token) {
-			return stateFn
-		}
 	}
 
 	// If keyword, then lex
@@ -431,155 +421,9 @@ func (l *lexer) lexAsToken(tokenType tok.TokenType) stateFn {
 	return lexToken
 }
 
-func lexCreate(l *lexer) stateFn {
-
-	l.lexAsToken(tok.CREATE);
-	return lexNSObjectType
-}
-
-func lexNSObjectType(l *lexer) stateFn {
-
-	l.skipWS()
-	return l.lexMatchingPrefix([]tok.TokenType{tok.DATABASE, tok.DOMAIN, tok.CONTEXT, tok.AGGREGATE})
-}
-
-func lexList(l *lexer) stateFn {
-
-	l.lexAsToken(tok.LIST);
-	return lexNSListObjectType
-}
-
-func lexNSListObjectType(l *lexer) stateFn {
-
-	l.skipWS()
-	return l.lexMatchingPrefix([]tok.TokenType{tok.DATABASES})
-}
-
 func lexNSObjectName(l *lexer) stateFn {
 
 	return l.lexQuotedStringAsToken(tok.OBJECTNAME)
-}
-
-func lexUsingDatabase(l *lexer) stateFn {
-
-	l.skipStr("using")
-	l.skipWS()
-	if (!l.isKeyWordAndNotIdentifier(tok.DATABASE)) {
-		return l.err(tok.DATABASE, l.scanWord())
-	}
-
-	l.skipStr(tok.DATABASE)
-
-	return l.lexQuotedStringAsToken(tok.USINGDATABASE)
-}
-
-func lexForDomain (l *lexer) stateFn {
-
-	l.skipStr("for")
-
-	if (!l.isKeyWordAndNotIdentifier(tok.DOMAIN)) {
-		return l.err(tok.DOMAIN, l.scanWord())
-	}
-
-	l.skipStr(tok.DOMAIN)
-
-	return l.lexQuotedStringAsToken(tok.FORDOMAIN)
-}
-
-func lexInContext (l *lexer) stateFn {
-
-	l.skipStr("in")
-
-	if (!l.isKeyWordAndNotIdentifier(tok.CONTEXT)) {
-		return l.err(tok.CONTEXT, l.scanWord())
-	}
-
-	l.skipStr(tok.CONTEXT)
-
-	return l.lexQuotedStringAsToken(tok.INCONTEXT)
-}
-
-func lexWithinAggregate(l *lexer) stateFn {
-
-	l.skipStr("within")
-
-	if (!l.isKeyWordAndNotIdentifier(tok.AGGREGATE)) {
-		return l.err(tok.AGGREGATE, l.scanWord())
-	}
-
-	l.skipStr(tok.AGGREGATE)
-
-	return l.lexQuotedStringAsToken(tok.WITHINAGGREGATE)
-}
-
-func lexWhenEvent(l *lexer) stateFn {
-
-	l.skipStr("when")
-
-	if (!l.isKeyWordAndNotIdentifier(tok.EVENT)) {
-		return l.err(tok.EVENT, l.scanWord())
-	}
-	l.skipStr(tok.EVENT)
-
-	return l.lexQuotedStringAsToken(tok.WHENEVENT)
-}
-
-func lexAssertInvariant(l *lexer) stateFn {
-
-	l.pos += len("assert")
-	l.consumeWS()
-
-	if (!l.isKeyWordAndNotIdentifier(tok.INVARIANT)) {
-		return l.err(tok.ASSERTINVARIANT, l.scanWord())
-	}
-
-	l.pos += len(tok.INVARIANT)
-
-	l.emit(tok.ASSERTINVARIANT)
-	l.skipWS()
-
-	if (l.isNextPrefix(tok.NOT)) {
-		l.lexAsToken(tok.NOT)
-	}
-
-	return lexToken
-}
-
-func lexRunQuery(l *lexer) stateFn {
-
-	l.pos += len("run")
-	l.consumeWS()
-
-	if (!l.isKeyWordAndNotIdentifier(tok.QUERY)) {
-		return l.err(tok.RUNQUERY, l.scanWord())
-	}
-
-	l.pos += len(tok.QUERY)
-	l.emit(tok.RUNQUERY)
-	l.skipWS()
-
-	return lexToken
-}
-
-func lexApplyEvent(l *lexer) stateFn {
-
-	l.pos += len("apply")
-	l.consumeWS()
-
-	if (!l.isKeyWordAndNotIdentifier(tok.EVENT)) {
-		return l.err(tok.APPLYEVENT, l.scanWord())
-	}
-
-	l.pos += len(tok.EVENT)
-	l.emit(tok.APPLYEVENT)
-	l.skipWS()
-
-	return lexToken
-}
-
-func lexClass(l *lexer) stateFn {
-
-	return l.lexMatchingPrefix([]tok.TokenType{tok.VALUE, tok.ENTITY, tok.EVENT, tok.COMMAND, tok.QUERY, tok.INVARIANT, tok.PROJECTION})
 }
 
 func lexTypeRef(l *lexer) stateFn {
@@ -650,7 +494,7 @@ func lexClassOpen(l *lexer) stateFn {
 
 	l.lexAsToken(tok.CLASSOPEN);
 	l.skipWS()
-	return lexClass;
+	return lexToken;
 }
 
 func isLetter(ch int) bool {

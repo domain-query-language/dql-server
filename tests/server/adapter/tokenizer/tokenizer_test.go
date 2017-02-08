@@ -30,10 +30,10 @@ type testStatements []testStatement
 var dbStatements = testStatements {
 	{
 		"create database 'db1';",
-		[]tok.Token{tok.NewToken(tok.CREATE, "create", 0), tok.NewToken(tok.DATABASE, "database", 7), tok.NewToken(tok.OBJECTNAME, "db1", 17), tok.Semicolon(21)},
+		[]tok.Token{tok.NewToken(tok.CREATE, "create", 0), tok.NewToken(tok.IDENT, "database", 7), tok.NewToken(tok.OBJECTNAME, "db1", 17), tok.Semicolon(21)},
 	}, {
 		"create DATABASE 'db2' ;",
-		[]tok.Token{tok.NewToken(tok.CREATE, "create", 0), tok.NewToken(tok.DATABASE, "DATABASE", 7), tok.NewToken(tok.OBJECTNAME, "db2", 17), tok.Semicolon(22)},
+		[]tok.Token{tok.NewToken(tok.CREATE, "create", 0), tok.NewToken(tok.IDENT, "DATABASE", 7), tok.NewToken(tok.OBJECTNAME, "db2", 17), tok.Semicolon(22)},
 	},
 };
 
@@ -44,7 +44,7 @@ func TestCreateDatabase(t *testing.T) {
 var multipleStatements = testStatements{
 	{
 		"create database 'db1'; create database 'db1';",
-		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.DATABASE, "database"), tk(tok.OBJECTNAME, "db1"), semi(), tk(tok.CREATE, "create"), tk(tok.DATABASE, "database"), tk(tok.OBJECTNAME, "db1"), semi()},
+		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.IDENT, "database"), tk(tok.OBJECTNAME, "db1"), semi(), tk(tok.CREATE, "create"), tk(tok.IDENT, "database"), tk(tok.OBJECTNAME, "db1"), semi()},
 	},
 }
 
@@ -55,7 +55,7 @@ func TestMultipeStatements(t *testing.T) {
 var listStatements = testStatements{
 	{
 		"list databases;",
-		[]tok.Token{tk(tok.LIST, "list"), tk(tok.DATABASES, "databases"), semi()},
+		[]tok.Token{tk(tok.LIST, "list"), tk(tok.IDENT, "databases"), semi()},
 	},
 }
 
@@ -66,12 +66,7 @@ func TestListStatements(t *testing.T) {
 var domainStatements = testStatements{
 	{
 		"create domain 'dmn' using database 'db';",
-		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.DOMAIN, "domain"), tk(tok.OBJECTNAME, "dmn"), tk(tok.USINGDATABASE, "db"), semi()},
-
-	},
-	{
-		"create domain 'dmn' using database 'db'",
-		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.DOMAIN, "domain"), tk(tok.OBJECTNAME, "dmn"), tk(tok.USINGDATABASE, "db")},
+		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.IDENT, "domain"), tk(tok.OBJECTNAME, "dmn"), tk(tok.USING, "using"), tk(tok.IDENT, "database"), tk(tok.OBJECTNAME, "db"), semi()},
 
 	},
 };
@@ -83,8 +78,8 @@ func TestCreateDomain(t *testing.T) {
 
 var contextStatements = testStatements {
 	{
-		"create context 'ctx' using database 'db' for domain 'dmn';",
-		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.CONTEXT, "context"), tk(tok.OBJECTNAME, "ctx"), tk(tok.USINGDATABASE, "db"), tk(tok.FORDOMAIN, "dmn"), semi()},
+		"create context 'ctx' for domain 'dmn';",
+		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.IDENT, "context"), tk(tok.OBJECTNAME, "ctx"), tk(tok.FOR, "for"), tk(tok.IDENT, "domain"), tk(tok.OBJECTNAME, "dmn"), semi()},
 	},
 };
 
@@ -94,8 +89,8 @@ func TestCreateContext(t *testing.T) {
 
 var valueStatements = testStatements {
 	{
-		"<| value 'address' using database 'db' for domain 'dmn' in context 'ctx' |>",
-		[]tok.Token{clsOpen(), tk(tok.VALUE, "value"), tk(tok.OBJECTNAME, "address"), tk(tok.USINGDATABASE, "db"), tk(tok.FORDOMAIN, "dmn"), tk(tok.INCONTEXT, "ctx"), clsClose()},
+		"<| value 'address' in context 'ctx' |>",
+		[]tok.Token{clsOpen(), tk(tok.IDENT, "value"), tk(tok.OBJECTNAME, "address"), tk(tok.IN, "in"), tk(tok.IDENT, "context"), tk(tok.OBJECTNAME, "ctx"), clsClose()},
 	},
 }
 
@@ -113,8 +108,8 @@ func TestCreateValue(t *testing.T) {
 
 var aggregateStatements = testStatements{
 	{
-		"create aggregate 'ag' using database 'db' for domain 'dmn' in context 'ctx';",
-		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.AGGREGATE, "aggregate"),tk(tok.OBJECTNAME, "ag"), tk(tok.USINGDATABASE, "db"), tk(tok.FORDOMAIN, "dmn"), tk(tok.INCONTEXT, "ctx"), semi()},
+		"create aggregate;",
+		[]tok.Token{tk(tok.CREATE, "create"), tk(tok.IDENT, "aggregate"), semi()},
 	},
 }
 
@@ -125,8 +120,8 @@ func TestAggregateStatements (t *testing.T) {
 
 var eventStatements = testStatements{
 	{
-		"<| event 'start' using database 'db' for domain 'dmn' in context 'ctx' within aggregate 'ag' |>",
-		[]tok.Token{clsOpen(), tk(tok.EVENT, "event"), tk(tok.OBJECTNAME, "start"), tk(tok.USINGDATABASE, "db"), tk(tok.FORDOMAIN, "dmn"), tk(tok.INCONTEXT, "ctx"), tk(tok.WITHINAGGREGATE, "ag"), clsClose()},
+		"<| event 'start' |>",
+		[]tok.Token{clsOpen(), tk(tok.IDENT, "event"), tk(tok.OBJECTNAME, "start"), clsClose()},
 	},
 }
 
@@ -134,39 +129,16 @@ func TestEventStatements (t *testing.T) {
 	eventStatements.test(t)
 }
 
-var statementsWithGloballySetNamespaces = testStatements {
-	{
-		"using database 'db'; create domain 'dmn';",
-		[]tok.Token{tk(tok.USINGDATABASE, "db"), semi(), tk(tok.CREATE, "create"), tk(tok.DOMAIN, "domain"), tk(tok.OBJECTNAME, "dmn"), semi()},
-	},
-	{
-		"for domain 'dmn'; create context 'ctx';",
-		[]tok.Token{tk(tok.FORDOMAIN, "dmn"), semi(), tk(tok.CREATE, "create"), tk(tok.CONTEXT, "context"), tk(tok.OBJECTNAME, "ctx"), semi()},
-	},
-	{
-		"in context 'ctx'; <| value 'address' |>",
-		[]tok.Token{tk(tok.INCONTEXT, "ctx"), semi(), clsOpen(), tk(tok.VALUE, "value"), tk(tok.OBJECTNAME, "address"), clsClose()},
-	},
-	{
-		"within aggregate 'agg'; <| event 'start' |>",
-		[]tok.Token{tk(tok.WITHINAGGREGATE, "agg"), semi(), clsOpen(), tk(tok.EVENT, "event"), tk(tok.OBJECTNAME, "start"), clsClose()},
-	},
-};
-
-func TestGloballySetNamespace (t *testing.T) {
-	statementsWithGloballySetNamespaces.test(t)
-}
-
 var createObjectTypes = testStatements {
 	{
 		"<| entity 'ent' |>",
-		[]tok.Token{clsOpen(), tk(tok.ENTITY, "entity"), tk(tok.OBJECTNAME, "ent"), clsClose()},
+		[]tok.Token{clsOpen(), tk(tok.IDENT, "entity"), tk(tok.OBJECTNAME, "ent"), clsClose()},
 	},
 	{
 		"<| entity 'ent' CHECK ( return value != 0;) |>",
 		[]tok.Token{
 			clsOpen(),
-			tk(tok.ENTITY, "entity"),
+			tk(tok.IDENT, "entity"),
 			tk(tok.OBJECTNAME, "ent"),
 
 			tk(tok.CHECK, "CHECK"),
@@ -184,19 +156,19 @@ var createObjectTypes = testStatements {
 	},
 	{
 		"<| projection 'proj' |>",
-		[]tok.Token{clsOpen(), tk(tok.PROJECTION, "projection"), tk(tok.OBJECTNAME, "proj"), clsClose()},
+		[]tok.Token{clsOpen(), tk(tok.IDENT, "projection"), tk(tok.OBJECTNAME, "proj"), clsClose()},
 	},
 	{
 		"<| invariant 'invar' on 'projection\\quote' |>",
-		[]tok.Token{clsOpen(), tk(tok.INVARIANT, "invariant"), tk(tok.OBJECTNAME, "invar"), tk(tok.ON, "on"), tk(tok.OBJECTNAME, "projection\\quote"), clsClose()},
+		[]tok.Token{clsOpen(), tk(tok.IDENT, "invariant"), tk(tok.OBJECTNAME, "invar"), tk(tok.ON, "on"), tk(tok.OBJECTNAME, "projection\\quote"), clsClose()},
 	},
 	{
 		"<| command 'cmd' |>",
-		[]tok.Token{clsOpen(), tk(tok.COMMAND, "command"), tk(tok.OBJECTNAME, "cmd"), clsClose()},
+		[]tok.Token{clsOpen(), tk(tok.IDENT, "command"), tk(tok.OBJECTNAME, "cmd"), clsClose()},
 	},
 	{
 		"<| query 'qry' |>",
-		[]tok.Token{clsOpen(), tk(tok.QUERY, "query"), tk(tok.OBJECTNAME, "qry"), clsClose()},
+		[]tok.Token{clsOpen(), tk(tok.IDENT, "query"), tk(tok.OBJECTNAME, "qry"), clsClose()},
 	},
 
 }
@@ -207,33 +179,33 @@ func TestObjectTypes(t *testing.T) {
 
 var namespaceBlocks= testStatements {
 	{
-		`using database 'database1' for domain 'domain1' in context 'context1':{
+		`in context 'context1':{
 			create aggregate 'aggregate1';
 
-			using database 'database2' for domain 'domain2' in context 'context2':{
+			in context 'context2':{
 				create aggregate 'aggregate2';
 			}
 		}`,
 		[]tok.Token{
-			tk(tok.USINGDATABASE, "database1"),
-			tk(tok.FORDOMAIN, "domain1"),
-			tk(tok.INCONTEXT, "context1"),
+			tk(tok.IN, "in"),
+			tk(tok.IDENT, "context"),
+			tk(tok.OBJECTNAME, "context1"),
 			tk(tok.COLON, ":"),
 			tk(tok.LBRACE, "{"),
 
 			tk(tok.CREATE, "create"),
-			tk(tok.AGGREGATE, "aggregate"),
+			tk(tok.IDENT, "aggregate"),
 			tk(tok.OBJECTNAME, "aggregate1"),
 			tk(tok.SEMICOLON, ";"),
 
-			tk(tok.USINGDATABASE, "database2"),
-			tk(tok.FORDOMAIN, "domain2"),
-			tk(tok.INCONTEXT, "context2"),
+			tk(tok.IN, "in"),
+			tk(tok.IDENT, "context"),
+			tk(tok.OBJECTNAME, "context2"),
 			tk(tok.COLON, ":"),
 			tk(tok.LBRACE, "{"),
 
 			tk(tok.CREATE, "create"),
-			tk(tok.AGGREGATE, "aggregate"),
+			tk(tok.IDENT, "aggregate"),
 			tk(tok.OBJECTNAME, "aggregate2"),
 			tk(tok.SEMICOLON, ";"),
 
@@ -359,13 +331,15 @@ var classComponents = testStatements{
 		[]tok.Token{
 			tk(tok.HANDLER, "handler"),
 			tk(tok.LBRACE, "{"),
-			tk(tok.ASSERTINVARIANT, "assert  invariant"),
+			tk(tok.ASSERT, "assert"),
+			tk(tok.IDENT, "invariant"),
 			tk(tok.NOT, "not"),
 			tk(tok.OBJECTNAME, "is-started"),
 			tk(tok.SEMICOLON, ";"),
 			tk(tok.IDENT, "revision"),
 			tk(tok.ASSIGN, "="),
-			tk(tok.RUNQUERY, "run query"),
+			tk(tok.RUN, "run"),
+			tk(tok.IDENT, "query"),
 			tk(tok.OBJECTNAME, "next-revision-number"),
 			tk(tok.LPAREN, "("),
 			tk(tok.IDENT, "agency_id"),
@@ -373,7 +347,8 @@ var classComponents = testStatements{
 			tk(tok.IDENT, "quote_number"),
 			tk(tok.RPAREN, ")"),
 			tk(tok.SEMICOLON, ";"),
-			tk(tok.APPLYEVENT, "apply event"),
+			tk(tok.APPLY, "apply"),
+			tk(tok.IDENT, "event"),
 			tk(tok.OBJECTNAME, "started"),
 			tk(tok.LPAREN, "("),
 			tk(tok.IDENT, "agency_id"),
@@ -397,7 +372,9 @@ var classComponents = testStatements{
 			is_started = true;
 		}`,
 		[]tok.Token{
-			tk(tok.WHENEVENT, "started"),
+			tk(tok.WHEN, "WHEN"),
+			tk(tok.IDENT, "event"),
+			tk(tok.OBJECTNAME, "started"),
 			tk(tok.LBRACE, "{"),
 			tk(tok.IDENT, "agency_id"),
 			tk(tok.ASSIGN, "="),
@@ -672,56 +649,8 @@ var badStatements = []struct{
 	err tok.Token
 }{
 	{
-		"create dbase",
-		tkErr("database, domain, context, aggregate", "dbase"),
-	},{
-		"create database1",
-		tkErr("database, domain, context, aggregate", "database1"),
-	},{
-		"create dmain",
-		tkErr("database, domain, context, aggregate", "dmain"),
-	},{
-		"create cntext",
-		tkErr("database, domain, context, aggregate", "cntext"),
-	},{
-		"create aggrege",
-		tkErr("database, domain, context, aggregate", "aggrege"),
-	},{
-		"using dbase",
-		tkErr("database", "dbase"),
-	},{
-		"for dom",
-		tkErr("domain", "dom"),
-	},{
-		"in cntext",
-		tkErr("context", "cntext"),
-	},{
-		"within agg",
-		tkErr("aggregate", "agg"),
-	},{
-		"assert invar",
-		tkErr("assert invariant", "assert invar"),
-	},{
-		"run qry",
-		tkErr("run query", "run qry"),
-	},{
-		"apply evt",
-		tkErr("apply event", "apply evt"),
-	},{
-		"when evt",
-		tkErr("event", "evt"),
-	},{
-		"<| valu ",
-		tkErr("value, entity, event, command, query, invariant, projection", "valu"),
-	},{
-		"for domain ",
-		tkErr("'", "EOF"),
-	},{
 		"for domain '",
 		tkErr("'", "EOF"),
-	},{
-		"<| value ''",
-		tkErr("value name", "empty name"),
 	},{
 		"~",
 		tkErr("keyword", "~"),
@@ -769,11 +698,6 @@ func (statements testStatements) test(t *testing.T) {
 }
 
 func compareTokenLists(expected, actual []tok.Token, dql string, t *testing.T) {
-	if (len(expected) != len(actual)) {
-		t.Error("Error with Tokens produced from '"+dql+"'");
-		t.Error("Number of tokens are mismtached, expected "+strconv.Itoa(len(expected))+", got "+strconv.Itoa(len(actual)));
-		return;
-	}
 
 	for i, token := range expected {
 		if i == len(actual) {
@@ -788,5 +712,10 @@ func compareTokenLists(expected, actual []tok.Token, dql string, t *testing.T) {
 			t.Error("Got: "+actual[i].String())
 			return
 		}
+	}
+
+	if (len(expected) != len(actual)) {
+		t.Error("Error with Tokens produced from '"+dql+"'");
+		t.Error("Number of tokens are mismtached, expected "+strconv.Itoa(len(expected))+", got "+strconv.Itoa(len(actual)));
 	}
 }
