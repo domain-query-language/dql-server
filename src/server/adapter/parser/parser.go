@@ -13,7 +13,7 @@ import (
 
 type UnexpectedTokenError struct {
 	Actual *token.Token
-	Expected token.TokenType
+	Expected string
 }
 
 func (e *UnexpectedTokenError) Error() string {
