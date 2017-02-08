@@ -15,7 +15,7 @@ func (q QueryID) Bytes() []byte {
  * Query IDs
  */
 const (
-	LISTDATABASES QueryID = "aa31cf30-f33e-4267-ade6-ee914d907c8c"
+	LIST_DATABASES QueryID = "aa31cf30-f33e-4267-ade6-ee914d907c8c"
 )
 
 
@@ -33,5 +33,5 @@ func (q *ListDatabases) String () string {
 
 func (q *ListDatabases) Id () vm.Identifier {
 
-	return LISTDATABASES;
+	return LIST_DATABASES;
 }

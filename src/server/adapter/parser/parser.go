@@ -6,8 +6,9 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/adapter"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
-	"github.com/domain-query-language/dql-server/src/server/query/schema"
-	"github.com/domain-query-language/dql-server/src/server/vm/handler"
+	query "github.com/domain-query-language/dql-server/src/server/query/schema"
+	command "github.com/domain-query-language/dql-server/src/server/command/schema"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 )
 
 /** Implementation of the adapter, written using the tokenizer, parser pattern */
@@ -84,31 +85,47 @@ func (a *parser) Next() (*adapter.Handleable, error) {
 		return nil, nil;
 	}
 
-	qry := a.parseQuery();
+	if (a.isQuery()) {
 
-	if (qry == nil) {
-
-		return nil, a.error
+		qry := a.parseQuery();
+		if (qry == nil) {
+			return nil, a.error
+		}
+		return adapter.NewQuery(qry), nil;
 	}
 
-	return adapter.NewQuery(qry), nil;
-}
+	if (a.isCommand()) {
 
-func (a *parser) parseQuery() handler.Query {
+		cmd := a.parseCommand();
 
-	// This is where the type of object to be parsed is figured out
-	if (a.curTokenIs(token.LIST)) {
+		if (cmd == nil) {
+			return nil, a.error
+		}
 
-		return a.parseListQuery();
+		return adapter.NewCommand(cmd), nil;
 	}
 
-	a.error = errors.New("Unexpected token '"+a.curToken.Val+"'")
-	return nil;
+	return nil, errors.New("Unexpected token '"+a.curToken.Val+"'");
 }
 
-func (a *parser) parseListQuery() handler.Query {
+func (a *parser) isQuery() bool {
 
-	qry := &schema.ListDatabases{};
+	return a.curTokenIs(token.LIST);
+}
+
+func (a *parser) isCommand() bool {
+
+	return a.curTokenIs(token.CREATE);
+}
+
+func (a *parser) parseQuery() vm.Query {
+
+	return a.parseListQuery();
+}
+
+func (a *parser) parseListQuery() vm.Query {
+
+	qry := &query.ListDatabases{};
 
 	if (!a.expectPeek(token.DATABASES)) {
 
@@ -121,4 +138,28 @@ func (a *parser) parseListQuery() handler.Query {
 	}
 
 	return qry;
+}
+
+func (a *parser) parseCommand() vm.Command {
+
+	cmd := &command.CreateDatabase{};
+
+	if (!a.expectPeek(token.DATABASE)) {
+
+		return nil;
+	}
+
+	if (!a.expectPeek(token.OBJECTNAME)) {
+
+		return nil;
+	}
+
+	cmd.Name = a.curToken.Val
+
+	if (!a.expectPeek(token.SEMICOLON)) {
+
+		return nil;
+	}
+
+	return cmd;
 }
