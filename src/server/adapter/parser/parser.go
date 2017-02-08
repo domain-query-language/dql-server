@@ -12,6 +12,27 @@ import (
 	"strings"
 )
 
+type UnexpectedTokenError struct {
+	Actual *token.Token
+	Expected token.TokenType
+}
+
+func (e *UnexpectedTokenError) Error() string {
+
+	return fmt.Sprintf("Error at char %d, expected [%s], got [%s] instead", e.Actual.Pos, e.Expected, e.Actual.Type)
+}
+
+
+type UnexpectedIdentifierError struct {
+	Actual *token.Token
+	Expected string
+}
+
+func (e *UnexpectedIdentifierError) Error() string {
+
+	return fmt.Sprintf("Error at char %d, expected '%s', got '%s' instead", e.Actual.Pos, e.Expected, e.Actual.Val)
+}
+
 /** Implementation of the adapter, written using the tokenizer, parser pattern */
 type parser struct {
 
@@ -83,19 +104,12 @@ func (a *parser) expectPeekIdentifier(value string) bool {
 
 func (a *parser) peekError(t token.TokenType) {
 
-	if (a.peekToken == nil) {
-		msg := fmt.Sprintf("Expected next token to be '%s', got EOF instead", t)
-		a.error = errors.New(msg);
-		return;
-	}
-	msg := fmt.Sprintf("Expected [%s], got '%s' instead", t, a.peekToken.Type)
-	a.error = errors.New(msg);
+	a.error = &UnexpectedTokenError{a.peekToken, t}
 }
 
 func (a *parser) currValueError(value string) {
 
-	msg := fmt.Sprintf("Expected '%s', got '%s' instead", value, a.curToken.Val)
-	a.error = errors.New(msg);
+	a.error = &UnexpectedIdentifierError{a.curToken, value}
 }
 
 // Return the next handlable object
