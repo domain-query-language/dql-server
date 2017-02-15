@@ -2,7 +2,8 @@ package main
 
 import (
 	"net/http"
-	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/adapter"
+	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
+	infraParser "github.com/domain-query-language/dql-server/src/server/infrastructure/adapter/parser"
 	"strings"
 	"encoding/json"
 	"log"
@@ -17,7 +18,7 @@ func schema(w http.ResponseWriter, r *http.Request) {
 		r.FormValue("statements"),
 	)
 
-	adapter := adapter.NewMockAdapter(statements)
+	adapter := parser.New(infraParser.NewUuidGenerator(), statements)
 
 	handleable, err := adapter.Next()
 
