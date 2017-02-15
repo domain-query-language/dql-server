@@ -5,10 +5,10 @@ import (
 	"strings"
 	"errors"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
-	"github.com/domain-query-language/dql-server/examples/dql/application/query/list-databases"
 	"regexp"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
 	"github.com/satori/go.uuid"
+	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 )
 
 var CREATE_DATABASE_REGEX = regexp.MustCompile("^create database \\'([a-zA-Z0-9-]{1,256})\\'$")
@@ -34,8 +34,8 @@ func (self *MockAdapter) Next() (*adapter.Handleable, error) {
 
 		return adapter.NewQuery(
 			vm.NewQuery(
-				list_databases.QueryId,
-				list_databases.ListDatabases{},
+				list_databases.Identifier,
+				list_databases.Query{},
 			),
 		), nil
 	}

@@ -3,15 +3,14 @@ package main
 import (
 	"net/http"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/adapter"
-	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/application"
 	"strings"
 	"encoding/json"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"github.com/satori/go.uuid"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
-	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +33,7 @@ func schema(w http.ResponseWriter, r *http.Request) {
 
 	if(handleable.Typ == "query") {
 
-		result, handle_err := application.QueryHandler.Handle(
+		result, handle_err := infrastructure.QueryHandler.Handle(
 			handleable.Query,
 		)
 
@@ -56,7 +55,7 @@ func schema(w http.ResponseWriter, r *http.Request) {
 
 	if(handleable.Typ == "command") {
 
-		events, handle_err := application.CommandHandler.Handle(
+		events, handle_err := infrastructure.CommandHandler.Handle(
 			handleable.Command,
 		)
 
@@ -81,7 +80,7 @@ func main() {
 
 	infrastructure.Boot()
 
-	spew.Dump(application.CommandHandler.Handle(
+	spew.Dump(infrastructure.CommandHandler.Handle(
 		vm.NewCommand(
 			vm.NewAggregateIdentifier(
 				uuid.NewV4(),
