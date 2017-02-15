@@ -91,6 +91,28 @@ func (i *IfStatement) String() string {
 }
 
 
+type ForeachStatement struct {
+	Type 	   string
+	Collection Expression
+	Key 	   *Identifier
+	Value      *Identifier
+	Body 	   Statement
+}
+
+func (f *ForeachStatement) statementNode() {}
+
+func (f *ForeachStatement) String() string {
+
+	as := "";
+	if (f.Key != nil) {
+		as = "as "+f.Key.String()+" "
+	}
+
+	str := "foreach ("+f.Collection.String()+" "+as+f.Value.String()+") {\n    "+f.Body.String()+"\n}";
+
+	return str;
+}
+
 /** Expressions **/
 
 type Prefix struct {

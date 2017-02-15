@@ -470,6 +470,29 @@ var statements = testCases {
 			},
 		}),
 	},
+	{
+		`foreach (things as thing) { a; }`,
+		blkStmt([]ast.Node{
+			&ast.ForeachStatement{
+				"foreach",
+				&ast.Identifier{
+					"identifier",
+					"things",
+				},
+				nil,
+				&ast.Identifier{
+					"identifier",
+					"thing",
+				},
+				blkStmt([]ast.Node{
+					expStmt(&ast.Identifier{
+						"identifier",
+						"a",
+					}),
+				}),
+			},
+		}),
+	},
 }
 
 func TestStatements(t *testing.T) {

@@ -194,6 +194,9 @@ func (p *statementParser) parseStatement() ast.Node {
 		case token.IF:
 			return p.parseIfStatement()
 
+		case token.FOREACH:
+			return p.parseForeachStatement()
+
 		default:
 			return p.parseExpressionStatement()
 	}
@@ -227,6 +230,22 @@ func (p *statementParser) parseReturnStatement() *ast.Return {
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
+
+	return stmt
+}
+
+func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
+
+	stmt := &ast.ForeachStatement{Type:"foreach"}
+
+	p.nextToken()
+	/*
+	stmt.Expression = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+	*/
 
 	return stmt
 }
