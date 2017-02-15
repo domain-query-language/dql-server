@@ -5,8 +5,14 @@ import (
 	"strings"
 	"errors"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
-	"github.com/domain-query-language/dql-server/examples/dql/application/query/list-databases"
+	"regexp"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
+	"github.com/satori/go.uuid"
+	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
 )
+
+var CREATE_DATABASE_REGEX = regexp.MustCompile("^create database \\'([a-zA-Z0-9-]{1,256})\\'$")
 
 type MockAdapter struct {
 
@@ -29,13 +35,32 @@ func (self *MockAdapter) Next() (*adapter.Handleable, error) {
 
 		return adapter.NewQuery(
 			vm.NewQuery(
-				list_databases.QueryId,
-				list_databases.ListDatabases{},
+				list_databases.Identifier,
+				list_databases.Query{
+
+				},
 			),
 		), nil
 	}
 
-	return nil, errors.New("The query given does not exist.")
+	if CREATE_DATABASE_REGEX.MatchString(statement) {
+
+		self.index++
+
+		return adapter.NewCommand(
+			vm.NewCommand(
+				vm.NewAggregateIdentifier(
+					uuid.NewV4(),
+					database.Identifier,
+				),
+				command.Create {
+					Name: CREATE_DATABASE_REGEX.FindStringSubmatch(statement)[1],
+				},
+			),
+		), nil
+	}
+
+	return nil, errors.New("The command/query given does not exist.")
 }
 
 func NewMockAdapter(input string) *MockAdapter {

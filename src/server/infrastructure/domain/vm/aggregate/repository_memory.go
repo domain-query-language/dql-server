@@ -2,20 +2,34 @@ package aggregate
 
 import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/aggregate"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"errors"
+	"github.com/domain-query-language/dql-server/src/server/domain/store"
 )
 
 type MemoryRepository struct {
 
-	aggregates map[[]byte]aggregate.Aggregate
+	event_log store.Log
+	aggregates map[vm.Identifier]aggregate.Aggregate
+	aggregate_instances map[*vm.AggregateIdentifier]aggregate.Aggregate
 }
 
-func (self *MemoryRepository) Get(id aggregate.Identifier) (aggregate.Aggregate, error) {
+func (self *MemoryRepository) Add(aggregate aggregate.Aggregate) {
+	self.aggregates[aggregate.Id().TypeId] = aggregate
+}
 
-	aggregate, ok := self.aggregates[id.Bytes()]
+func (self *MemoryRepository) Get(id *vm.AggregateIdentifier) (aggregate.Aggregate, error) {
+
+	aggregate, ok := self.aggregate_instances[id]
 
 	if !ok {
-		return nil, errors.New("Aggregate does not exist.")
+		aggregate, aggregate_found := self.aggregates[id.TypeId]
+
+		if !aggregate_found {
+			return nil, errors.New("The aggregate type does not exist.")
+		}
+
+		return aggregate.Copy(id.Id), nil
 	}
 
 	return aggregate, nil
@@ -23,16 +37,18 @@ func (self *MemoryRepository) Get(id aggregate.Identifier) (aggregate.Aggregate,
 
 func (self *MemoryRepository) Save(aggregate aggregate.Aggregate) error {
 
-	self.aggregates[aggregate.Id().Bytes()] = aggregate
+	self.aggregate_instances[aggregate.Id()] = aggregate
+
+	self.event_log.Append(aggregate.Events())
 
 	return nil
 }
 
-func CreateMemoryRepository() *MemoryRepository {
+func CreateMemoryRepository(event_log store.Log) *MemoryRepository {
 
 	return &MemoryRepository {
-		map[[]byte]aggregate.Aggregate {
-
-		},
+		event_log: event_log,
+		aggregates: map[vm.Identifier]aggregate.Aggregate{},
+		aggregate_instances: map[*vm.AggregateIdentifier]aggregate.Aggregate{},
 	}
 }

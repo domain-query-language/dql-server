@@ -11,32 +11,46 @@ type Command interface {
 
 	TypeId() Identifier
 
-	AggregateId() Identifier
+	AggregateId() *AggregateIdentifier
 
-	ContextId() Identifier
+	Payload() Payload
 }
 
 type Command_  struct {
 
 	id Identifier
 	typeId Identifier
-	aggregateId Identifier
-	contextId Identifier
+	aggregateId *AggregateIdentifier
 
 	occurredAt time.Time
 
-	Payload Payload
+	payload Payload
 }
 
 
-func NewCommand(type_id Identifier, aggregate_id Identifier, context_id Identifier, payload Payload) *Command_ {
+func (self *Command_) Id() Identifier {
+	return self.id
+}
+
+func (self *Command_) TypeId() Identifier {
+	return self.typeId
+}
+
+func (self *Command_) AggregateId() *AggregateIdentifier {
+	return self.aggregateId
+}
+
+func (self *Command_) Payload() Payload {
+	return self.payload
+}
+
+func NewCommand(aggregate_id *AggregateIdentifier, payload Payload) *Command_ {
 
 	return &Command_ {
 		id: uuid.NewV4(),
-		typeId: type_id,
+		typeId: payload.TypeId(),
 		aggregateId: aggregate_id,
-		contextId: context_id,
 		occurredAt: time.Now(),
-		Payload: payload,
+		payload: payload,
 	}
 }

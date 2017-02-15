@@ -7,23 +7,27 @@ import (
 
 type MemoryRepository struct {
 
-	cache map[[]byte]*player.Player
+	cache map[vm.Identifier][]*player.Player
+}
+
+func (self *MemoryRepository) Add(player *player.Player) {
+	self.cache[player.ContextId()] = append(self.cache[player.ContextId()], player)
 }
 
 func (self *MemoryRepository) Reset() error {
 
-	self.cache = map[[]byte]*player.Player{}
+	self.cache = map[vm.Identifier][]*player.Player{}
 
 	return nil
 }
 
-func (self *MemoryRepository) Get(id vm.Identifier) (*player.Player, error) {
-	return self.cache[id.Bytes()]
+func (self *MemoryRepository) Get(id vm.Identifier) ([]*player.Player, error) {
+	return self.cache[id], nil
 }
 
 func (self *MemoryRepository) Save(player *player.Player) error {
 
-	self.cache[player.] = player
+	// Do nothing, cause, ya know, pointers are great.
 
 	return nil
 }
@@ -31,6 +35,6 @@ func (self *MemoryRepository) Save(player *player.Player) error {
 func CreateMemoryRepository() *MemoryRepository {
 
 	return &MemoryRepository {
-		cache: map[[]byte]*player.Player{},
+		cache: map[vm.Identifier][]*player.Player{},
 	}
 }

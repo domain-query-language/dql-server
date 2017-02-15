@@ -1,10 +1,13 @@
 package aggregate
 
-import "time"
+import (
+	"time"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
+)
 
 type Snapshot struct {
 
-	Id Identifier
+	Id vm.Identifier
 
 	OccurredAt time.Time
 

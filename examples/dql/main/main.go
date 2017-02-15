@@ -1,13 +1,12 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/adapter"
-	"github.com/domain-query-language/dql-server/examples/dql/application/query/list-databases"
-	"github.com/domain-query-language/dql-server/examples/dql/application"
-	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/application/projection"
 	"strings"
+	"encoding/json"
+	"log"
+	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -30,7 +29,7 @@ func schema(w http.ResponseWriter, r *http.Request) {
 
 	if(handleable.Typ == "query") {
 
-		result, handle_err := application.QueryHandler.Handle(
+		result, handle_err := infrastructure.QueryHandler.Handle(
 			handleable.Query,
 		)
 
@@ -49,18 +48,33 @@ func schema(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	if(handleable.Typ == "command") {
+
+		events, handle_err := infrastructure.CommandHandler.Handle(
+			handleable.Command,
+		)
+
+		if handle_err != nil {
+			w.Header().Add("error", handle_err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+
+			return
+		}
+
+		json_events, _ := json.Marshal(events)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(json_events)
+
+		return
+	}
 }
 
 func main() {
 
-	application.ProjectionsRepository.Save(
-		projection.ListDatabasesProjection,
-	)
-
-	application.QueryHandler.Add(
-		projection.ListDatabasesProjectionID,
-		list_databases.Handler,
-	)
+	infrastructure.Boot()
 
 	http.HandleFunc("/schema", schema)
 

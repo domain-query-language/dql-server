@@ -1,5 +1,6 @@
 package player
 
+/*
 import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/player"
@@ -69,3 +70,4 @@ func (self *BoltRepository) Save(snapshot player.Snapshot) error {
 
 	return err
 }
+*/
