@@ -35,7 +35,6 @@ func (self *MemoryRepository) Get(id *vm.AggregateIdentifier) (aggregate.Aggrega
 
 func (self *MemoryRepository) Save(aggregate aggregate.Aggregate) error {
 
-	aggregate.Flush()
 	self.aggregate_instances[aggregate.Id()] = aggregate
 
 	return nil

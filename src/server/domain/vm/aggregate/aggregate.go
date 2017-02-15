@@ -71,11 +71,12 @@ func (self *Aggregate_) Apply(event vm.Event) error {
 
 	error := self.projector.Apply(event)
 
-	if error == nil {
+	if error != nil {
 		return error
 	}
 
 	self.events = append(self.events, event)
+
 	return nil
 }
 
@@ -130,6 +131,7 @@ func (self *Aggregate_) Copy(id vm.Identifier) Aggregate {
 
 	aggregate := *self
 	aggregate.id.Id = id
+	aggregate.projector = aggregate.projector.Copy()
 
 	return &aggregate
 }

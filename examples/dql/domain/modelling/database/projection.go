@@ -1,6 +1,8 @@
 package database
 
-import "github.com/domain-query-language/dql-server/src/server/domain/vm"
+import (
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
+)
 
 type Projection struct {
 
@@ -17,7 +19,7 @@ func (self Projection) Reset() {
 	self.IsCreated = false
 }
 
-func (self Projection) Create() {
+func (self *Projection) Create() {
 	self.IsCreated = true
 }
 

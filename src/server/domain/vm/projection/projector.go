@@ -21,6 +21,8 @@ type Projector interface {
 	Projection() Projection
 
 	Version() int
+
+	Copy() Projector
 }
 
 /*
@@ -45,11 +47,12 @@ func (self *Projector_) Apply(event vm.Event) error {
 
 	handler, ok := (*self.handlers)[event.TypeId()]
 
-	if(!ok) {
+	if !ok {
 		return PROJECTOR_HANDLER_NOT_EXISTS
 	}
 
 	handler(self.projection, event)
+
 	self.version++
 
 	return nil
@@ -61,6 +64,13 @@ func (self *Projector_) Projection() Projection {
 
 func (self *Projector_) Version() int {
 	return self.version
+}
+
+func (self *Projector_) Copy() Projector {
+
+	projector := *self
+
+	return &projector
 }
 
 func NewProjector(projection Projection, handlers *map[vm.Identifier]ProjectorHandler) *Projector_ {

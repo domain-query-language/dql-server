@@ -4,13 +4,18 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/projection"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/event"
+	"github.com/davecgh/go-spew/spew"
 )
 
 var ProjectorHandlers = &map[vm.Identifier]projection.ProjectorHandler {
 
-	event.TypeCreated: func(projection projection.Projection, event vm.Event) {
+	event.TypeCreated: func(p projection.Projection, e vm.Event) {
 
-		projection.(Projection).Create()
+		projection := p.(Projection)
+
+		projection.Create()
+
+		spew.Dump(projection)
 	},
 }
 
