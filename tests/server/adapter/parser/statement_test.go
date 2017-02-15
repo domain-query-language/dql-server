@@ -403,9 +403,11 @@ var statements = testCases {
 		}),
 	},
 	{
-		`if (a) {
+		`if a {
 			b;
-		} `,
+		} else {
+			c;
+		}`,
 		blkStmt([]ast.Node{
 			&ast.IfStatement{
 				"if",

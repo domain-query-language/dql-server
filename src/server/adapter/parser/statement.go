@@ -249,8 +249,9 @@ func (p *statementParser) parseIfStatement() ast.Statement {
 
 	stmt.Consequent = consequent
 
-	if p.curTokenIs(token.ELSE) {
+	if p.peekTokenIs(token.ELSE) {
 
+		p.nextToken()
 		p.nextToken()
 
 		stmt.Alternate, _ = p.ParseBlockStatement()
