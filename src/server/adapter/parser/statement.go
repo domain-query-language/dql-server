@@ -239,6 +239,16 @@ func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
 	stmt := &ast.ForeachStatement{Type:"foreach"}
 
 	p.nextToken()
+
+	if !p.curTokenIs(token.LPAREN) {
+		return nil
+	}
+
+	stmt.Collection = p.parseExpression(LOWEST)
+
+	panic (p.curToken.String())
+
+
 	/*
 	stmt.Expression = p.parseExpression(LOWEST)
 
