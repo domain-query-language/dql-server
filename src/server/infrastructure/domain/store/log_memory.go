@@ -32,9 +32,7 @@ func (self *MemoryLog) Append(events []vm.Event) {
 }
 
 func (self *MemoryLog) Stream() store.Stream {
-	return store.Stream(
-		NewMemoryStream(self),
-	)
+	return NewMemoryStream(self)
 }
 
 func NewMemoryLog() *MemoryLog {

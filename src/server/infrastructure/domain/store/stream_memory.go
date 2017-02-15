@@ -39,19 +39,19 @@ func (self *MemoryStream) Seek(identifier vm.Identifier) {
 		return
 	}
 
-	self.current = len(self.log.events)
+	self.current = len(self.log.events) - 1
 	self.current_event = nil
 }
 
 func (self *MemoryStream) Next() bool {
 
-	self.current++
-
-	if(self.current >= len(self.log.events)) {
+	if(self.current >= (len(self.log.events) - 1)) {
 		return false
 	}
 
+	self.current++
 	self.current_event = self.log.events[self.current]
+
 	return true
 }
 

@@ -81,14 +81,40 @@ func main() {
 
 	infrastructure.Boot()
 
+	aggregate_id := uuid.NewV4()
+
 	infrastructure.CommandHandler.Handle(
 		vm.NewCommand(
 			vm.NewAggregateIdentifier(
-				uuid.NewV4(),
+				aggregate_id,
 				database.Identifier,
 			),
 			command.Create {
 				Name: "dql",
+			},
+		),
+	)
+
+	infrastructure.CommandHandler.Handle(
+		vm.NewCommand(
+			vm.NewAggregateIdentifier(
+				aggregate_id,
+				database.Identifier,
+			),
+			command.Rename {
+				Name: "dql-lol",
+			},
+		),
+	)
+
+	infrastructure.CommandHandler.Handle(
+		vm.NewCommand(
+			vm.NewAggregateIdentifier(
+				aggregate_id,
+				database.Identifier,
+			),
+			command.Rename {
+				Name: "dql-rofl",
 			},
 		),
 	)
