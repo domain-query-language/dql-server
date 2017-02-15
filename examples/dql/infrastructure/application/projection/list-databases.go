@@ -4,6 +4,8 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"sort"
 	"github.com/satori/go.uuid"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm/projection"
+	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 )
 
 type ListDatabases struct {
@@ -50,3 +52,8 @@ var ListDatabasesProjection = &ListDatabases {
 		"schema",
 	},
 }
+
+var ListDatabasesProjector = projection.NewProjector(
+	ListDatabasesProjection,
+	list_databases.ProjectorHandlers,
+)

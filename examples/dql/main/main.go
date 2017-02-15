@@ -3,15 +3,15 @@ package main
 import (
 	"net/http"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/adapter"
-	"github.com/domain-query-language/dql-server/examples/dql/application/query/list-databases"
-	"github.com/domain-query-language/dql-server/examples/dql/application"
-	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/application/projection"
+	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/application"
 	"strings"
 	"encoding/json"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"github.com/satori/go.uuid"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
+	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
+	"github.com/davecgh/go-spew/spew"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -79,21 +79,9 @@ func schema(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	application.ProjectionsRepository.Save(
-		projection.ListDatabasesProjection,
-	)
+	infrastructure.Boot()
 
-	application.QueryHandler.Add(
-		projection.ListDatabasesProjectionID,
-		list_databases.Handler,
-	)
-
-	application.AggregatesRepository.Add(
-		database.Identifier,
-		database.Aggregate,
-	)
-
-	application.CommandHandler.Handle(
+	spew.Dump(application.CommandHandler.Handle(
 		vm.NewCommand(
 			vm.NewAggregateIdentifier(
 				uuid.NewV4(),
@@ -103,7 +91,7 @@ func main() {
 				Name: "dql",
 			},
 		),
-	)
+	))
 
 	/*
 	http.HandleFunc("/schema", schema)

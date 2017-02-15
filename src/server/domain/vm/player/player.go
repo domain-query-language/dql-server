@@ -3,6 +3,7 @@ package player
 import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"time"
+	"github.com/domain-query-language/dql-server/src/server/domain/store"
 )
 
 type Player struct {
@@ -10,7 +11,7 @@ type Player struct {
 	id vm.Identifier
 	context_id vm.Identifier
 
-	stream Stream
+	stream store.Stream
 	projector Projector
 }
 
@@ -34,7 +35,6 @@ func (self *Player) Load(snapshot Snapshot) {
 
 func (self *Player) Play(limit int) error {
 
-	play := true
 	unlimited := false
 
 	if(limit == 0) {
@@ -43,13 +43,9 @@ func (self *Player) Play(limit int) error {
 
 	play_count := 0
 
-	for play == true {
+	for self.stream.Next() {
 
-		event, stream_err := self.stream.Next()
-
-		if stream_err != nil {
-			return stream_err
-		}
+		event := self.stream.Value()
 
 		proj_err := self.projector.Apply(
 			event,
@@ -60,7 +56,7 @@ func (self *Player) Play(limit int) error {
 		}
 
 		if(!unlimited && play_count >= limit) {
-			play = false
+			return nil
 		}
 	}
 
@@ -77,7 +73,7 @@ func (self *Player) Snapshot() *Snapshot {
 	}
 }
 
-func NewPlayer(id vm.Identifier, context_id vm.Identifier, stream Stream, projector Projector) *Player {
+func NewPlayer(id vm.Identifier, context_id vm.Identifier, stream store.Stream, projector Projector) *Player {
 
 	return &Player {
 		id: id,
