@@ -9,6 +9,7 @@ type Projection struct {
 	Identifier vm.Identifier
 
 	IsCreated bool
+	IsDeleted bool
 }
 
 func (self Projection) Id() vm.Identifier {
@@ -23,7 +24,12 @@ func (self *Projection) Create() {
 	self.IsCreated = true
 }
 
+func (self *Projection) Delete() {
+	self.IsDeleted = true
+}
+
 var State = Projection {
 	Identifier: Identifier,
 	IsCreated: false,
+	IsDeleted: false,
 }

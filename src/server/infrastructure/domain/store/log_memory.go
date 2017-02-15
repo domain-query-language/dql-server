@@ -27,7 +27,7 @@ func (self *MemoryLog) Append(events []vm.Event) {
 
 		self.events = append(self.events, event)
 		self.events_index[event.Id()] = len(self.events) - 1
-		self.aggregates[event.AggregateTypeId()] = append(self.aggregates[event.AggregateTypeId()], event)
+		self.aggregates[event.AggregateId().TypeId] = append(self.aggregates[event.AggregateId().TypeId], event)
 	}
 }
 

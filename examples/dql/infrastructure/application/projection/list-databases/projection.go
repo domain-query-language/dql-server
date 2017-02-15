@@ -4,12 +4,13 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"sort"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
+	"github.com/satori/go.uuid"
 )
 
 type ListDatabases struct {
 
 	Pid vm.Identifier
-	Databases []string
+	Databases map[vm.Identifier]string
 }
 
 func (self *ListDatabases) Id() vm.Identifier {
@@ -17,34 +18,40 @@ func (self *ListDatabases) Id() vm.Identifier {
 }
 
 func (self *ListDatabases) Reset() {
-	self.Databases = []string{}
+	self.Databases = map[vm.Identifier]string{}
 }
 
-func (self *ListDatabases) Add(name string) {
-	self.Databases = append(self.Databases, name)
+func (self *ListDatabases) Add(id vm.Identifier, name string) {
+	self.Databases[id] = name
 }
 
-func (self *ListDatabases) Remove(name string) {
-	for i := range self.Databases {
-		if self.Databases[i] == name {
-			self.Databases = append(self.Databases[:i], self.Databases[i+1:]...)
-		}
-	}
+func (self *ListDatabases) Rename(id vm.Identifier, name string) {
+	self.Databases[id] = name
+}
+
+func (self *ListDatabases) Remove(id vm.Identifier) {
+	delete(self.Databases, id)
 }
 
 func (self *ListDatabases) List() []string {
 
-	sort.Strings(self.Databases)
+	names := []string{}
 
-	return self.Databases
+	for _, v := range self.Databases {
+		names = append(names, v)
+	}
+
+	sort.Strings(names)
+
+	return names
 }
 
 var Projection = &ListDatabases{
 	Pid: list_databases.Identifier,
-	Databases: []string {
-		"master-0.0.1",
-		"master-0.0.3",
-		"master-0.0.2",
-		"schema",
+	Databases: map[vm.Identifier]string {
+		uuid.NewV4(): "master-0.0.1",
+		uuid.NewV4(): "master-0.0.3",
+		uuid.NewV4(): "master-0.0.2",
+		uuid.NewV4(): "schema",
 	},
 }

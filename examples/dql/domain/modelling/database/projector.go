@@ -14,6 +14,17 @@ var ProjectorHandlers = &map[vm.Identifier]projection.ProjectorHandler {
 
 		projection.Create()
 	},
+
+	event.TypeRenamed: func(p projection.Projection, e vm.Event) {
+
+	},
+
+	event.TypeDeleted: func(p projection.Projection, e vm.Event) {
+
+		projection := p.(Projection)
+
+		projection.Delete()
+	},
 }
 
 var Projector = projection.NewProjector(

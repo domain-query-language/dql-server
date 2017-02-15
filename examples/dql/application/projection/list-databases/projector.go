@@ -16,6 +16,15 @@ var ProjectorHandlers = &map[vm.Identifier]projection.ProjectorHandler {
 		projection := p.(Projection)
 		event := e.Payload().(event.Created)
 
-		projection.Add(event.Name)
+		projection.Add(e.AggregateId().Id, event.Name)
 	},
+
+	event.TypeRenamed: func(p projection.Projection, e vm.Event) {
+
+		projection := p.(Projection)
+		event := e.Payload().(event.Renamed)
+
+		projection.Rename(e.AggregateId().Id, event.Name)
+	},
+
 }

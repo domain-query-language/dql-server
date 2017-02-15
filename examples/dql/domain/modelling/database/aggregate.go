@@ -22,9 +22,44 @@ var Handlers = 	&map[vm.Identifier]aggregate.AggregateHandler {
 		aggregate.Apply(
 			vm.NewEvent(
 				cmd.AggregateId(),
+				cmd.Id(),
 				event.Created {
 					payload.Name,
 				},
+			),
+		)
+
+		return nil
+	},
+
+	command.TypeRename: func(aggregate aggregate.Aggregate, cmd vm.Command) error  {
+
+		payload := cmd.Payload().(command.Rename)
+
+		// Assert Invariant 'Created'
+
+		aggregate.Apply(
+			vm.NewEvent(
+				cmd.AggregateId(),
+				cmd.Id(),
+				event.Renamed {
+					payload.Name,
+				},
+			),
+		)
+
+		return nil
+	},
+
+	command.TypeDelete: func(aggregate aggregate.Aggregate, cmd vm.Command) error  {
+
+		// Assert Invariant 'Created'
+
+		aggregate.Apply(
+			vm.NewEvent(
+				cmd.AggregateId(),
+				cmd.Id(),
+				event.Deleted {},
 			),
 		)
 
