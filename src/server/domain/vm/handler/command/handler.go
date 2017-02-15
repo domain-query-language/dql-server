@@ -15,7 +15,7 @@ type Handler interface {
 	SimpleHandler Implementation
  */
 
-type SimpleHandler struct {
+type Handler_ struct {
 
 	context_map map[vm.Identifier][]vm.Identifier
 
@@ -23,13 +23,13 @@ type SimpleHandler struct {
 	repository_players player.Repository
 }
 
-func (self *SimpleHandler) Handle(command vm.Command) ([]vm.Event, error) {
+func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 
 	// Get Aggregate from Repository
 	agg, _ := self.repository_aggregates.Get(
 		aggregate.CreateIdentifier(
 			command.AggregateId(),
-			command.ContextId(),
+			command.AggregateTypeId(),
 		),
 	)
 
@@ -46,7 +46,7 @@ func (self *SimpleHandler) Handle(command vm.Command) ([]vm.Event, error) {
 	/*
 		Play Domain Projectors
 	 */
-	players_index := self.context_map[command.ContextId()]
+	players_index := self.context_map[command.AggregateTypeId()]
 
 	for player_id := range players_index {
 		player, _ := self.repository_players.Get(player_id)
@@ -57,9 +57,13 @@ func (self *SimpleHandler) Handle(command vm.Command) ([]vm.Event, error) {
 	return events, nil
 }
 
-func NewSimpleHandler(context_map map[vm.Identifier]vm.Identifier, repository_aggregates aggregate.Repository, repository_players player.Repository) *SimpleHandler {
+func NewHandler(
+	context_map map[vm.Identifier]vm.Identifier,
+	repository_aggregates aggregate.Repository,
+	repository_players player.Repository,
+) *Handler_ {
 
-	return &SimpleHandler{
+	return &Handler_{
 		context_map: context_map,
 		repository_aggregates: repository_aggregates,
 		repository_players: repository_players,

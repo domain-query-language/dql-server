@@ -1,5 +1,6 @@
 package player
 
+/*
 import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/player"
@@ -8,7 +9,7 @@ import (
 
 type BoltRepositoryCached struct {
 
-	cache map[[]byte]*player.Player
+	cache map[vm.Identifier]*player.Player
 
 	repository BoltRepository
 }
@@ -36,7 +37,10 @@ func (self *BoltRepositoryCached) Open() error {
 
 			snapshot.Decode(v)
 
-			self.cache[k] = snapshot
+			self.cache[k] = player.CreatePlayer(
+				snapshot.Id,
+
+			)
 
 			return nil
 		})
@@ -48,12 +52,13 @@ func (self *BoltRepositoryCached) Close() error {
 }
 
 func (self *BoltRepositoryCached) Get(id vm.Identifier) (player.Player, error) {
-	return self.cache[id.Bytes()]
+	return self.cache[id], nil
 }
 
 func (self *BoltRepositoryCached) Save(snapshot player.Snapshot) error {
 
-	self.cache[snapshot.Id.Bytes()] = snapshot
+	self.cache[snapshot.Id] = snapshot
 
 	return self.repository.Save(snapshot)
 }
+*/

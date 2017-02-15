@@ -3,6 +3,7 @@ package vm
 import (
 	"github.com/satori/go.uuid"
 	"time"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm/aggregate"
 )
 
 type Command interface {
@@ -13,7 +14,7 @@ type Command interface {
 
 	AggregateId() Identifier
 
-	ContextId() Identifier
+	AggregateTypeId() Identifier
 }
 
 type Command_  struct {
@@ -21,7 +22,7 @@ type Command_  struct {
 	id Identifier
 	typeId Identifier
 	aggregateId Identifier
-	contextId Identifier
+	aggregateTypeId Identifier
 
 	occurredAt time.Time
 
@@ -29,13 +30,29 @@ type Command_  struct {
 }
 
 
-func NewCommand(type_id Identifier, aggregate_id Identifier, context_id Identifier, payload Payload) *Command_ {
+func (self *Command_) Id() Identifier {
+	return self.id
+}
+
+func (self *Command_) TypeId() Identifier {
+	return self.typeId
+}
+
+func (self *Command_) AggregateId() Identifier {
+	return self.aggregateId
+}
+
+func (self *Command_) AggregateTypeId() Identifier {
+	return self.aggregateTypeId
+}
+
+func NewCommand(aggregate_id aggregate.Identifier, payload Payload) *Command_ {
 
 	return &Command_ {
 		id: uuid.NewV4(),
-		typeId: type_id,
-		aggregateId: aggregate_id,
-		contextId: context_id,
+		typeId: payload.TypeId(),
+		aggregateId: aggregate_id.Id(),
+		aggregateTypeId: aggregate_id.TypeId(),
 		occurredAt: time.Now(),
 		Payload: payload,
 	}

@@ -11,6 +11,14 @@ type Identifier struct {
 
 }
 
+func (self *Identifier) Id() vm.Identifier {
+	return self.id
+}
+
+func (self *Identifier) TypeId() vm.Identifier {
+	return self.typeId
+}
+
 func (self *Identifier) Bytes() []byte {
 	return append(self.id.Bytes(), self.typeId.Bytes()...)
 }

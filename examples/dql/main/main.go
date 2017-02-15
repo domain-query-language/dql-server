@@ -8,6 +8,8 @@ import (
 	"github.com/domain-query-language/dql-server/examples/dql/application"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/application/projection"
 	"strings"
+	"encoding/json"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -49,6 +51,28 @@ func schema(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	if(handleable.Typ == "command") {
+
+		events, handle_err := application.CommandHandler.Handle(
+			handleable.Command,
+		)
+
+		if handle_err != nil {
+			w.Header().Add("error", handle_err.Error())
+			w.WriteHeader(http.StatusBadRequest)
+
+			return
+		}
+
+		json_events, _ := json.Marshal(events)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(json_events)
+
+		return
+	}
 }
 
 func main() {
@@ -60,6 +84,11 @@ func main() {
 	application.QueryHandler.Add(
 		projection.ListDatabasesProjectionID,
 		list_databases.Handler,
+	)
+
+	application.AggregatesRepository.Add(
+		database.Identifier,
+		database.Aggregate,
 	)
 
 	http.HandleFunc("/schema", schema)

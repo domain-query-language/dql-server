@@ -33,7 +33,7 @@ type Projector_ struct {
 
 	projection Projection
 
-	handlers map[vm.Identifier]ProjectorHandler
+	handlers *map[vm.Identifier]ProjectorHandler
 }
 
 func (self *Projector_) Reset() {
@@ -43,7 +43,7 @@ func (self *Projector_) Reset() {
 
 func (self *Projector_) Apply(event vm.Event) error {
 
-	handler, ok := self.handlers[event.TypeId()]
+	handler, ok := (*self.handlers)[event.TypeId()]
 
 	if(!ok) {
 		return PROJECTOR_HANDLER_NOT_EXISTS
@@ -63,8 +63,8 @@ func (self *Projector_) Version() int {
 	return self.version
 }
 
-func NewProjector(projection Projection, handlers map[vm.Identifier]ProjectorHandler) *Projector_ {
-	return &Projector_ {
+func NewProjector(projection Projection, handlers *map[vm.Identifier]ProjectorHandler) Projector_ {
+	return Projector_ {
 		version: 0,
 		projection: projection,
 		handlers: handlers,

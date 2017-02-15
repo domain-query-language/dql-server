@@ -7,23 +7,23 @@ import (
 
 type MemoryRepository struct {
 
-	cache map[[]byte]*player.Player
+	cache map[vm.Identifier]*player.Player
 }
 
 func (self *MemoryRepository) Reset() error {
 
-	self.cache = map[[]byte]*player.Player{}
+	self.cache = map[vm.Identifier]*player.Player{}
 
 	return nil
 }
 
 func (self *MemoryRepository) Get(id vm.Identifier) (*player.Player, error) {
-	return self.cache[id.Bytes()]
+	return self.cache[id], nil
 }
 
 func (self *MemoryRepository) Save(player *player.Player) error {
 
-	self.cache[player.] = player
+	self.cache[player.Id()] = player
 
 	return nil
 }
@@ -31,6 +31,6 @@ func (self *MemoryRepository) Save(player *player.Player) error {
 func CreateMemoryRepository() *MemoryRepository {
 
 	return &MemoryRepository {
-		cache: map[[]byte]*player.Player{},
+		cache: map[vm.Identifier]*player.Player{},
 	}
 }

@@ -13,6 +13,10 @@ type Player struct {
 	projector Projector
 }
 
+func (self *Player) Id() vm.Identifier {
+	return self.id
+}
+
 func (self *Player) Reset() {
 
 	self.projector.Reset()

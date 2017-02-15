@@ -11,13 +11,17 @@ var (
 	AGGREGATE_HANDLER_NOT_EXISTS = errors.New("Aggregate command does not exist.")
 )
 
-type AggregateHandler func(projector projection.Projector, command vm.Command) ([]vm.Event, error)
+type AggregateHandler func(aggregate Aggregate, command vm.Command) error
 
 type Aggregate interface {
 
-	Id() Identifier
+	Id() *Identifier
+
+	//TypeId() vm.Identifier
 
 	Reset()
+
+	Apply(event vm.Event) error
 
 	Flush()
 
@@ -25,9 +29,13 @@ type Aggregate interface {
 
 	Events() []vm.Event
 
+	Projector() projection.Projector
+
 	Snapshot() Snapshot
 
 	Handle(command vm.Command) ([]vm.Event, error)
+
+	Copy(id vm.Identifier) Aggregate
 }
 
 /**
@@ -38,9 +46,10 @@ type Aggregate interface {
 
 type Aggregate_ struct {
 
-	id Identifier
+	id vm.Identifier
+	type_id vm.Identifier
 
-	handlers map[vm.Identifier]AggregateHandler
+	handlers *map[vm.Identifier]AggregateHandler
 
 	projector projection.Projector
 
@@ -48,8 +57,15 @@ type Aggregate_ struct {
 	events []vm.Event
 }
 
-func (self *Aggregate_) Id() Identifier {
-	return self.id
+func (self *Aggregate_) Id() *Identifier {
+	return &Identifier{
+		id: self.id,
+		typeId: self.type_id,
+	}
+}
+
+func (self *Aggregate_) TypeId() vm.Identifier {
+	return self.type_id
 }
 
 func (self *Aggregate_) Reset() {
@@ -58,6 +74,18 @@ func (self *Aggregate_) Reset() {
 
 	self.commands = []vm.Command{}
 	self.events = []vm.Event{}
+}
+
+func (self *Aggregate_) Apply(event vm.Event) error {
+
+	error := self.projector.Apply(event)
+
+	if error == nil {
+		return error
+	}
+
+	self.events = append(self.events, event)
+	return nil
 }
 
 func (self *Aggregate_) Flush() {
@@ -74,6 +102,10 @@ func (self *Aggregate_) Events() []vm.Event {
 	return self.events
 }
 
+func (self *Aggregate_) Projector() projection.Projector {
+	return self.projector
+}
+
 func (self *Aggregate_) Snapshot() Snapshot {
 
 	return Snapshot {
@@ -86,25 +118,32 @@ func (self *Aggregate_) Snapshot() Snapshot {
 
 func (self *Aggregate_) Handle(command vm.Command) ([]vm.Event, error) {
 
-	handler, handler_exists := self.handlers[command.TypeId()]
+	handler, handler_exists := (*self.handlers)[command.TypeId()]
 
 	if(!handler_exists) {
 		return nil, AGGREGATE_HANDLER_NOT_EXISTS
 	}
 
-	events, handling_err := handler(self.projector, command)
+	handling_err := handler(self, command)
 
 	if handling_err != nil {
 		return nil, handling_err
 	}
 
 	self.commands = append(self.commands, command)
-	self.events = append(self.events, events...)
 
-	return events, nil
+	return self.events, nil
 }
 
-func CreateAggregate(id vm.Identifier, projector projection.Projector, handlers map[vm.Identifier]AggregateHandler) *Aggregate_ {
+func (self *Aggregate_) Copy(id vm.Identifier) Aggregate {
+
+	aggregate := *self
+	aggregate.id = id
+
+	return &aggregate
+}
+
+func NewAggregate(id vm.Identifier, projector projection.Projector, handlers *map[vm.Identifier]AggregateHandler) *Aggregate_ {
 
 	return &Aggregate_ {
 		id: id,

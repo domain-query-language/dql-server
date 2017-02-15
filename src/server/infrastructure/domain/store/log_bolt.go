@@ -1,12 +1,13 @@
 package store
 
 import (
-	"encoding/binary"
-	"github.com/boltdb/bolt"
-	"log"
-	"github.com/domain-query-language/dql-server/src/server/domain/store"
+	//"encoding/binary"
+	//"github.com/boltdb/bolt"
+	//"log"
+	//"github.com/domain-query-language/dql-server/src/server/domain/store"
 )
 
+/*
 type BoltLog_ struct {
 
 	db *bolt.DB
@@ -61,9 +62,9 @@ func (self *BoltLog_) Append(events []store.Event) {
 				event_key,
 			)
 
-			/*
-				Associate with Aggregate
-			 */
+			//
+			//	Associate with Aggregate
+			//
 
 			aggregate_id = append(event.AggregateTypeId().Bytes(), event.AggregateId().Bytes()...)
 
@@ -102,3 +103,4 @@ func BoltLog(path string) *BoltLog_ {
 		db: db,
 	}
 }
+*/
