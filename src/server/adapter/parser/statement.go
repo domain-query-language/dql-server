@@ -260,6 +260,7 @@ func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
 		stmt.Key = p.parseIdentifier().(*ast.Identifier)
 
 		p.nextToken()
+		p.nextToken()
 	}
 
 	stmt.Value =  p.parseIdentifier().(*ast.Identifier)
