@@ -10,6 +10,4 @@ var ProjectionsRepository = projection.CreateMemoryRepository()
 
 var PlayersRepository = player.CreateMemoryRepository()
 
-var AggregatesRepository = aggregate.CreateMemoryRepository(
-	EventLog,
-)
+var AggregatesRepository = aggregate.CreateMemoryRepository(EventLog)

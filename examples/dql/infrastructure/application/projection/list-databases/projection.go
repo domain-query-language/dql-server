@@ -1,10 +1,8 @@
-package projection
+package list_databases
 
 import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"sort"
-	"github.com/satori/go.uuid"
-	"github.com/domain-query-language/dql-server/src/server/domain/vm/projection"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 )
 
@@ -41,10 +39,8 @@ func (self *ListDatabases) List() []string {
 	return self.Databases
 }
 
-var ListDatabasesProjectionID, _ = uuid.FromString("c50d6791-3fc5-4be8-91fc-c01f20526872")
-
-var ListDatabasesProjection = &ListDatabases {
-	Pid: ListDatabasesProjectionID,
+var Projection = &ListDatabases{
+	Pid: list_databases.Identifier,
 	Databases: []string {
 		"master-0.0.1",
 		"master-0.0.3",
@@ -52,8 +48,3 @@ var ListDatabasesProjection = &ListDatabases {
 		"schema",
 	},
 }
-
-var ListDatabasesProjector = projection.NewProjector(
-	ListDatabasesProjection,
-	list_databases.ProjectorHandlers,
-)

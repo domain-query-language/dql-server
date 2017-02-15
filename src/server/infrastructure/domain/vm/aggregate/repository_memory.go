@@ -14,8 +14,8 @@ type MemoryRepository struct {
 	aggregate_instances map[*vm.AggregateIdentifier]aggregate.Aggregate
 }
 
-func (self *MemoryRepository) Add(id vm.Identifier, aggregate aggregate.Aggregate) {
-	self.aggregates[id] = aggregate
+func (self *MemoryRepository) Add(aggregate aggregate.Aggregate) {
+	self.aggregates[aggregate.Id().TypeId] = aggregate
 }
 
 func (self *MemoryRepository) Get(id *vm.AggregateIdentifier) (aggregate.Aggregate, error) {

@@ -2,34 +2,28 @@ package infrastructure
 
 import (
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
-	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/application/projection"
+	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/application/projection/list-databases"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/player"
-	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 )
 
 func Boot() {
 
-	ProjectionsRepository.Save(
-		projection.ListDatabasesProjection,
-	)
+	AggregatesRepository.Add(database.Aggregate)
 
-	QueryHandler.Add(
-		list_databases.Identifier,
-		list_databases.QueryHandler,
-	)
-
-	AggregatesRepository.Add(
-		database.Identifier,
-		database.Aggregate,
-	)
+	ProjectionsRepository.Add(list_databases.Projection)
 
 	PlayersRepository.Add(
 		player.NewPlayer(
 			list_databases.Identifier,
 			modelling.Identifier,
 			EventLog.Stream(),
-			projection.ListDatabasesProjector,
+			list_databases.Projector,
 		),
+	)
+
+	QueryHandler.Add(
+		list_databases.Identifier,
+		list_databases.QueryHandler,
 	)
 }

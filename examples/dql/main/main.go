@@ -87,7 +87,7 @@ func main() {
 				uuid.NewV4(),
 				database.Identifier,
 			),
-			command.Create{
+			command.Create {
 				Name: "dql",
 			},
 		),
@@ -96,7 +96,9 @@ func main() {
 	result, _ := infrastructure.QueryHandler.Handle(
 		vm.NewQuery(
 			list_databases.Identifier,
-			list_databases.Query{},
+			list_databases.Query {
+
+			},
 		),
 	)
 

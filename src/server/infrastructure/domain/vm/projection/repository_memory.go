@@ -10,6 +10,10 @@ type MemoryRepository struct {
 	projections map[vm.Identifier]projection.Projection
 }
 
+func (self *MemoryRepository) Add(projection projection.Projection) {
+	self.projections[projection.Id()] = projection
+}
+
 func (self *MemoryRepository) Get(id vm.Identifier) (projection projection.Projection, err error) {
 	return self.projections[id], nil
 }
