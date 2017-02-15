@@ -58,13 +58,13 @@ func (self *Event_) Payload() Payload {
 	return self.payload
 }
 
-func NewEvent(command Command, payload Payload) *Event_ {
+func NewEvent(id *AggregateIdentifier, payload Payload) *Event_ {
 
 	return &Event_ {
 		id: uuid.NewV4(),
-		command_id: command.Id(),
+		command_id: id.Id,
 		type_id: payload.TypeId(),
-		aggregate_type_id: command.AggregateTypeId(),
+		aggregate_type_id: id.TypeId,
 		occurred_at: time.Now(),
 		payload: payload,
 	}

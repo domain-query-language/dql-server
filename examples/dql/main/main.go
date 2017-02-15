@@ -91,6 +91,7 @@ func main() {
 		database.Aggregate,
 	)
 
+	
 	http.HandleFunc("/schema", schema)
 
 	err := http.ListenAndServe(":4242", nil)

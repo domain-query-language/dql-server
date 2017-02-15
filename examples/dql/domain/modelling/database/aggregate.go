@@ -12,18 +12,20 @@ var Identifier = uuid.FromStringOrNil("655bdd1e-8deb-4e08-9bbf-14496e148e2e")
 
 var Handlers = 	&map[vm.Identifier]aggregate.AggregateHandler {
 
-	command.TypeCreate: func(aggregate aggregate.Aggregate, command vm.Command) error  {
+	command.TypeCreate: func(aggregate aggregate.Aggregate, cmd vm.Command) error  {
 
-		cmd := command.(command.Create)
+		payload := cmd.Payload().(command.Create)
 
 		// Assert Invariant 'Created'
 
-		aggregate.Apply(vm.NewEvent(
-			command,
-			event.Created {
-				cmd.Name,
-			},
-		))
+		aggregate.Apply(
+			vm.NewEvent(
+				cmd.AggregateId(),
+				event.Created {
+					payload.Name,
+				},
+			),
+		)
 
 		return nil
 	},

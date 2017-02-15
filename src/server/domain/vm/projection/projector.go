@@ -10,7 +10,7 @@ var (
 	PROJECTOR_HANDLER_NOT_EXISTS = errors.New("Projector command does not exist.")
 )
 
-type ProjectorHandler func(projection Projection, event vm.Event) Projection
+type ProjectorHandler func(projection Projection, event vm.Event)
 
 type Projector interface {
 
@@ -49,7 +49,7 @@ func (self *Projector_) Apply(event vm.Event) error {
 		return PROJECTOR_HANDLER_NOT_EXISTS
 	}
 
-	self.projection = handler(self.projection, event)
+	handler(self.projection, event)
 	self.version++
 
 	return nil
@@ -63,8 +63,8 @@ func (self *Projector_) Version() int {
 	return self.version
 }
 
-func NewProjector(projection Projection, handlers *map[vm.Identifier]ProjectorHandler) Projector_ {
-	return Projector_ {
+func NewProjector(projection Projection, handlers *map[vm.Identifier]ProjectorHandler) *Projector_ {
+	return &Projector_ {
 		version: 0,
 		projection: projection,
 		handlers: handlers,

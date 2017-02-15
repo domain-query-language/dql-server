@@ -8,13 +8,13 @@ import (
 
 var ProjectorHandlers = &map[vm.Identifier]projection.ProjectorHandler {
 
-	event.TypeCreated: func(projection Projection, event vm.Event) {
+	event.TypeCreated: func(projection projection.Projection, event vm.Event) {
 
-		projection.Create()
+		projection.(Projection).Create()
 	},
 }
 
 var Projector = projection.NewProjector(
-	Projection,
+	State,
 	ProjectorHandlers,
 )

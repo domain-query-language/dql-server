@@ -13,6 +13,10 @@ type ListDatabases struct {
 
 }
 
+func (self ListDatabases) TypeId() vm.Identifier {
+	return QueryId
+}
+
 var Handler = func(q vm.Query, queryable query.Queryable) query.Result {
 
 	return &query.Result_ {

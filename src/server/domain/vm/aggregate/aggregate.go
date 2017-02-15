@@ -15,9 +15,7 @@ type AggregateHandler func(aggregate Aggregate, command vm.Command) error
 
 type Aggregate interface {
 
-	Id() *Identifier
-
-	//TypeId() vm.Identifier
+	Id() *vm.AggregateIdentifier
 
 	Reset()
 
@@ -46,7 +44,7 @@ type Aggregate interface {
 
 type Aggregate_ struct {
 
-	id vm.Identifier
+	id *vm.AggregateIdentifier
 	type_id vm.Identifier
 
 	handlers *map[vm.Identifier]AggregateHandler
@@ -57,15 +55,8 @@ type Aggregate_ struct {
 	events []vm.Event
 }
 
-func (self *Aggregate_) Id() *Identifier {
-	return &Identifier{
-		id: self.id,
-		typeId: self.type_id,
-	}
-}
-
-func (self *Aggregate_) TypeId() vm.Identifier {
-	return self.type_id
+func (self *Aggregate_) Id() *vm.AggregateIdentifier {
+	return self.id
 }
 
 func (self *Aggregate_) Reset() {
@@ -138,7 +129,7 @@ func (self *Aggregate_) Handle(command vm.Command) ([]vm.Event, error) {
 func (self *Aggregate_) Copy(id vm.Identifier) Aggregate {
 
 	aggregate := *self
-	aggregate.id = id
+	aggregate.id.Id = id
 
 	return &aggregate
 }
@@ -146,7 +137,10 @@ func (self *Aggregate_) Copy(id vm.Identifier) Aggregate {
 func NewAggregate(id vm.Identifier, projector projection.Projector, handlers *map[vm.Identifier]AggregateHandler) *Aggregate_ {
 
 	return &Aggregate_ {
-		id: id,
+		id: vm.NewAggregateIdentifier(
+			nil,
+			id,
+		),
 		projector: projector,
 		handlers: handlers,
 	}

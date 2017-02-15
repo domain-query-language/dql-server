@@ -17,8 +17,6 @@ type Handler interface {
 
 type Handler_ struct {
 
-	context_map map[vm.Identifier][]vm.Identifier
-
 	repository_aggregates aggregate.Repository
 	repository_players player.Repository
 }
@@ -26,17 +24,12 @@ type Handler_ struct {
 func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 
 	// Get Aggregate from Repository
-	agg, _ := self.repository_aggregates.Get(
-		aggregate.CreateIdentifier(
-			command.AggregateId(),
-			command.AggregateTypeId(),
-		),
-	)
+	agg, _ := self.repository_aggregates.Get(command.AggregateId())
 
 	// Handle Command
 	events, handling_error := agg.Handle(command)
 
-	if(handling_error) {
+	if handling_error != nil {
 		return nil, handling_error
 	}
 
@@ -44,8 +37,6 @@ func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 	self.repository_aggregates.Save(agg)
 
 	/*
-		Play Domain Projectors
-	 */
 	players_index := self.context_map[command.AggregateTypeId()]
 
 	for player_id := range players_index {
@@ -54,17 +45,17 @@ func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 		player.Play(1000)
 	}
 
+	*/
+
 	return events, nil
 }
 
 func NewHandler(
-	context_map map[vm.Identifier]vm.Identifier,
 	repository_aggregates aggregate.Repository,
 	repository_players player.Repository,
 ) *Handler_ {
 
 	return &Handler_{
-		context_map: context_map,
 		repository_aggregates: repository_aggregates,
 		repository_players: repository_players,
 	}

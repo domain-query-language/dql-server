@@ -4,24 +4,24 @@ import "github.com/domain-query-language/dql-server/src/server/domain/vm"
 
 type Projection struct {
 
-	Id vm.Identifier
+	Identifier vm.Identifier
 
 	IsCreated bool
 }
 
-func (self *Projection) Id() vm.Identifier {
-	return self.Id
+func (self Projection) Id() vm.Identifier {
+	return self.Identifier
 }
 
-func (self *Projection) Reset() {
+func (self Projection) Reset() {
 	self.IsCreated = false
 }
 
-func (self *Projection) Create() {
+func (self Projection) Create() {
 	self.IsCreated = true
 }
 
-var Projection = Projection {
-	Id: Identifier,
+var State = Projection {
+	Identifier: Identifier,
 	IsCreated: false,
 }

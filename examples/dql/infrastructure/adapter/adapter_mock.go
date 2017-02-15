@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
 	"github.com/satori/go.uuid"
-	"github.com/domain-query-language/dql-server/src/server/domain/vm/aggregate"
 )
 
 var CREATE_DATABASE_REGEX = regexp.MustCompile("^create database \\'([a-zA-Z0-9-]{1,256})\\'$")
@@ -47,7 +46,7 @@ func (self *MockAdapter) Next() (*adapter.Handleable, error) {
 
 		return adapter.NewCommand(
 			vm.NewCommand(
-				aggregate.CreateIdentifier(
+				vm.NewAggregateIdentifier(
 					uuid.NewV4(),
 					uuid.NewV4(),
 				),
