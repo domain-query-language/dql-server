@@ -1,26 +1,24 @@
 package main
 
 import (
-	"net/http"
-	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
+	adapter "github.com/domain-query-language/dql-server/src/server/adapter/parser"
 	infraParser "github.com/domain-query-language/dql-server/src/server/infrastructure/adapter/parser"
-	"strings"
 	"encoding/json"
 	"log"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
+	"net/http"
+	"io/ioutil"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
 
 	r.ParseForm()
 
-	statements := strings.TrimSpace(
-		r.FormValue("statements"),
-	)
+	statements, _ := ioutil.ReadAll(r.Body)
 
-	adapter := parser.New(infraParser.NewUuidGenerator(), statements)
+	adptr := adapter.New(infraParser.NewUuidGenerator(), string(statements))
 
-	handleable, err := adapter.Next()
+	handleable, err := adptr.Next()
 
 	if err != nil {
 		w.Header().Add("error", err.Error())

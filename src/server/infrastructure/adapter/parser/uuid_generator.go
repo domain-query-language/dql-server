@@ -9,7 +9,7 @@ type UuidGenerator struct {
 
 }
 
-func (u *UuidGenerator) Generator() vm.Identifier {
+func (u *UuidGenerator) Generate() vm.Identifier {
 
 	return uuid.NewV4()
 }
