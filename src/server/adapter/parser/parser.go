@@ -2,12 +2,14 @@ package parser
 
 import (
 	"fmt"
+	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
-	query "github.com/domain-query-language/dql-server/src/server/query/schema"
-	command "github.com/domain-query-language/dql-server/src/server/command/schema"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
+	"github.com/satori/go.uuid"
 	"strings"
 )
 
@@ -197,8 +199,6 @@ func (a *parser) parseQuery() vm.Query {
 
 func (a *parser) parseListQuery() vm.Query {
 
-	qry := &query.ListDatabases{};
-
 	if (!a.expectPeekIdentifier("databases")) {
 
 		return nil;
@@ -209,7 +209,10 @@ func (a *parser) parseListQuery() vm.Query {
 		return nil;
 	}
 
-	return qry;
+	return vm.NewQuery(
+		list_databases.Identifier,
+		list_databases.Query{},
+	);
 }
 
 func (a *parser) parseCommand() vm.Command {
@@ -219,24 +222,26 @@ func (a *parser) parseCommand() vm.Command {
 
 func (a *parser) parseCreateCommand() vm.Command {
 
-	cmd := &command.CreateDatabase{};
-
 	if (!a.expectPeekIdentifier("database")) {
-
 		return nil;
 	}
 
 	if (!a.expectPeek(token.OBJECTNAME)) {
-
 		return nil;
 	}
 
-	cmd.Name = a.curToken.Val
+	name := a.curToken.Val
 
 	if (!a.expectPeek(token.SEMICOLON)) {
-
 		return nil;
 	}
 
-	return cmd;
+	id, _ := uuid.FromString("2bdecde9-a3a2-43cd-a1b6-234855e5399a")
+
+	aggId := vm.NewAggregateIdentifier(id, database.Identifier)
+
+	payload := command.Create{name}
+
+	return 	vm.NewCommand(aggId, payload)
+
 }

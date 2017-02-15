@@ -2,10 +2,13 @@ package adapter
 
 import (
 	"github.com/davecgh/go-spew/spew"
+	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
-	query "github.com/domain-query-language/dql-server/src/server/query/schema"
-	command "github.com/domain-query-language/dql-server/src/server/command/schema"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
+	"github.com/satori/go.uuid"
 	"testing"
 )
 
@@ -15,7 +18,10 @@ var listStatements = []struct{
 }{
 	{
 		"LIST DATABASES;",
-		adapter.NewQuery( &query.ListDatabases{} ),
+		adapter.NewQuery( vm.NewQuery(
+			list_databases.Identifier,
+			list_databases.Query{},
+		), ),
 	},
 }
 
@@ -37,7 +43,7 @@ func TestStatementToListQuery(t *testing.T){
 
 			t.Error("Query cannot be nil, expected valid query object")
 
-		} else if (testCase.expected.Query != actual.Query) {
+		} else if (testCase.expected.Query.Id() != actual.Query.Id()) {
 			t.Error("Expected query cases to match");
 			t.Error("Expected: "+testCase.expected.Query.String())
 			t.Error("Got: "+actual.Query.String())
@@ -45,13 +51,21 @@ func TestStatementToListQuery(t *testing.T){
 	}
 }
 
+var id, _ = uuid.FromString("2bdecde9-a3a2-43cd-a1b6-234855e5399a")
+
 var createStatements = []struct{
 	statement string
 	expected *adapter.Handleable
 }{
 	{
 		"CREATE DATABASE 'db';",
-		adapter.NewCommand(&command.CreateDatabase{"db"}),
+		adapter.NewCommand(
+			vm.NewCommand(
+				vm.NewAggregateIdentifier(id, database.Identifier),
+				command.Create {"db"},
+			),
+
+		),
 	},
 }
 
@@ -72,19 +86,39 @@ func TestCreateStatements(t *testing.T){
 			t.Error(err);
 		}
 
-		expectedAsStr := spew.Sdump(testCase.expected)
-		actualAsStr := spew.Sdump(actual)
+		same, errMsg := commandsAreSame(actual.Command, testCase.expected.Command)
 
-		if (actual == nil) {
+		if (!same) {
 
-			t.Error("Command cannot be nil, expected valid command object")
+			expectedAsStr := spew.Sdump(testCase.expected)
+			actualAsStr := spew.Sdump(actual)
 
-		} else if (expectedAsStr != actualAsStr) {
-			t.Error("Expected query cases to match");
+			t.Error("Commands do not match: "+errMsg);
 			t.Error("Expected: "+expectedAsStr)
 			t.Error("Got: "+actualAsStr)
 		}
 	}
+}
+
+func commandsAreSame(actual vm.Command, expected vm.Command) (result bool, error string) {
+
+	if (actual == nil || expected == nil) {
+		return false, "Command objects are missing"
+	}
+
+	if (actual.TypeId() != expected.TypeId()) {
+		return false, "Types of commands do not match."
+	}
+
+	if (string(actual.AggregateId().Bytes()) != string(expected.AggregateId().Bytes())) {
+		return false, "Not referencing the same aggregate ID/Type"
+	}
+
+	if (actual.Payload() != expected.Payload()) {
+		return false, "Command Payloads do not match"
+	}
+
+	return true, ""
 }
 
 var invalidStatements = []struct{

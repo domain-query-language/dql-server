@@ -16,11 +16,11 @@ func (c *FakeCommand) TypeId() vm.Identifier {
 	return nil
 }
 
-func (c *FakeCommand) AggregateId() vm.Identifier {
+func (c *FakeCommand) AggregateId() *vm.AggregateIdentifier {
 	return nil
 }
 
-func (c *FakeCommand) ContextId() vm.Identifier {
+func (c *FakeCommand) Payload() vm.Payload {
 	return nil
 }
 
