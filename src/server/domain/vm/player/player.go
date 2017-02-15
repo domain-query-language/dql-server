@@ -8,6 +8,7 @@ import (
 type Player struct {
 
 	id vm.Identifier
+	context_id vm.Identifier
 
 	stream Stream
 	projector Projector
@@ -15,6 +16,10 @@ type Player struct {
 
 func (self *Player) Id() vm.Identifier {
 	return self.id
+}
+
+func (self *Player) ContextId() vm.Identifier {
+	return self.context_id
 }
 
 func (self *Player) Reset() {
@@ -72,10 +77,11 @@ func (self *Player) Snapshot() *Snapshot {
 	}
 }
 
-func CreatePlayer(id vm.Identifier, stream Stream, projector Projector) *Player {
+func NewPlayer(id vm.Identifier, context_id vm.Identifier, stream Stream, projector Projector) *Player {
 
 	return &Player {
 		id: id,
+		context_id: context_id,
 		stream: stream,
 		projector: projector,
 	}

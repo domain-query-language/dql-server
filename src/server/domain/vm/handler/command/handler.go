@@ -27,8 +27,6 @@ func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 	// Get Aggregate from Repository
 	agg, _ := self.repository_aggregates.Get(command.AggregateId())
 
-	spew.Dump(agg)
-
 	// Handle Command
 	events, handling_error := agg.Handle(command)
 
@@ -38,7 +36,7 @@ func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 
 	self.repository_aggregates.Save(agg)
 
-	spew.Dump(self.repository_aggregates)
+	spew.Dump(self.repository_players)
 
 	/*
 	players_index := self.context_map[command.AggregateTypeId()]
