@@ -36,7 +36,6 @@ func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 		return nil, handling_error
 	}
 
-	// Save Aggregate to Repository
 	self.repository_aggregates.Save(agg)
 
 	spew.Dump(self.repository_aggregates)

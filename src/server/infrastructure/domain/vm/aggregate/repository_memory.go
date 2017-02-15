@@ -4,10 +4,12 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/aggregate"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"errors"
+	"github.com/domain-query-language/dql-server/src/server/domain/store"
 )
 
 type MemoryRepository struct {
 
+	event_log store.Log
 	aggregates map[vm.Identifier]aggregate.Aggregate
 	aggregate_instances map[*vm.AggregateIdentifier]aggregate.Aggregate
 }
@@ -37,12 +39,15 @@ func (self *MemoryRepository) Save(aggregate aggregate.Aggregate) error {
 
 	self.aggregate_instances[aggregate.Id()] = aggregate
 
+	self.event_log.Append(aggregate.Events())
+
 	return nil
 }
 
-func CreateMemoryRepository() *MemoryRepository {
+func CreateMemoryRepository(event_log store.Log) *MemoryRepository {
 
 	return &MemoryRepository {
+		event_log: event_log,
 		aggregates: map[vm.Identifier]aggregate.Aggregate{},
 		aggregate_instances: map[*vm.AggregateIdentifier]aggregate.Aggregate{},
 	}
