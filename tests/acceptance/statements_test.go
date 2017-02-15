@@ -7,6 +7,7 @@ import (
 	controllers "github.com/domain-query-language/dql-server/examples/dql/application/http"
 	"bytes"
 	"encoding/json"
+	"github.com/davecgh/go-spew/spew"
 )
 
 const (
@@ -20,15 +21,15 @@ func TestListDatabases(t *testing.T) {
 
 	input := bytes.NewBuffer([]byte(LIST_DATABASE))
 
-	req, err := http.NewRequest("POST", "/schema", input)
+	request, err := http.NewRequest("POST", "", input)
 
 	if err != nil {
 		t.Fatal(err)
 	}
+	
+	controllers.Schema(responseRecorder, request)
 
-	handler := http.HandlerFunc(controllers.Schema)
-
-	handler.ServeHTTP(responseRecorder, req)
+	panic(spew.Sdump(responseRecorder))
 
 	status := responseRecorder.Code
 	response := responseRecorder.Body.String()
