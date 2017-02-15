@@ -9,7 +9,6 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
-	"github.com/satori/go.uuid"
 	"strings"
 )
 
@@ -40,17 +39,22 @@ func (e *UnexpectedIdentifierError) Error() string {
 type parser struct {
 
 	t tokenizer.Tokenizer
+	idGen UuidGenerator
 	error error
 
 	curToken  *token.Token
 	peekToken *token.Token
 }
 
-func New(statements string) adapter.Adapter {
+type UuidGenerator interface {
+	Generate() vm.Identifier
+}
+
+func New(idGenerator UuidGenerator, statements string) adapter.Adapter {
 
 	t := tokenizer.NewTokenizer(statements);
 
-	a:= &parser{t, nil, nil, nil}
+	a:= &parser{t, idGenerator, nil, nil, nil}
 
 	a.nextToken()
 	a.nextToken()
@@ -236,7 +240,7 @@ func (a *parser) parseCreateCommand() vm.Command {
 		return nil;
 	}
 
-	id, _ := uuid.FromString("2bdecde9-a3a2-43cd-a1b6-234855e5399a")
+	id := a.idGen.Generate()
 
 	aggId := vm.NewAggregateIdentifier(id, database.Identifier)
 

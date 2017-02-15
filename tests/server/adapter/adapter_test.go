@@ -29,7 +29,7 @@ func TestStatementToListQuery(t *testing.T){
 
 	for _, testCase := range listStatements {
 
-		adptr := parser.New(testCase.statement);
+		adptr := parser.New(idGenerator, testCase.statement);
 
 		actual, err := adptr.Next();
 
@@ -51,7 +51,7 @@ func TestStatementToListQuery(t *testing.T){
 	}
 }
 
-var id, _ = uuid.FromString("2bdecde9-a3a2-43cd-a1b6-234855e5399a")
+var aggregateId, _ = uuid.FromString("3bdecde9-a3a2-43cd-a1b6-234855e5399a")
 
 var createStatements = []struct{
 	statement string
@@ -61,7 +61,7 @@ var createStatements = []struct{
 		"CREATE DATABASE 'db';",
 		adapter.NewCommand(
 			vm.NewCommand(
-				vm.NewAggregateIdentifier(id, database.Identifier),
+				vm.NewAggregateIdentifier(aggregateId, database.Identifier),
 				command.Create {"db"},
 			),
 
@@ -76,7 +76,9 @@ func TestCreateStatements(t *testing.T){
 
 	for _, testCase := range createStatements {
 
-		adptr := parser.New(testCase.statement);
+		idGenerator.SetNext(aggregateId)
+
+		adptr := parser.New(idGenerator, testCase.statement);
 
 		actual, err := adptr.Next();
 
@@ -147,7 +149,7 @@ func TestInvalidStatement(t *testing.T) {
 
 	for _, testCase := range invalidStatements {
 
-		adptr := parser.New(testCase.statement);
+		adptr := parser.New(nil, testCase.statement);
 
 		actual, err := adptr.Next();
 
@@ -164,4 +166,21 @@ func TestInvalidStatement(t *testing.T) {
 		}
 	}
 }
+
+type IdGenerator struct {
+	next vm.Identifier
+}
+
+func (i *IdGenerator) SetNext(next vm.Identifier) {
+
+	i.next = next
+}
+
+
+func (i *IdGenerator) Generate() vm.Identifier {
+
+	return i.next
+}
+
+var idGenerator = &IdGenerator{}
 
