@@ -401,13 +401,11 @@ var statements = testCases {
 				nil,
 			},
 		}),
-	},/*
+	},
 	{
 		`if (a) {
 			b;
-		} else {
-			c;
-		}`,
+		} `,
 		blkStmt([]ast.Node{
 			&ast.IfStatement{
 				"if",
@@ -429,7 +427,7 @@ var statements = testCases {
 				}),
 			},
 		}),
-	},*/
+	},
 }
 
 func TestStatements(t *testing.T) {
