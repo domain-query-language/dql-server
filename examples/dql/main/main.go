@@ -9,8 +9,9 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"github.com/satori/go.uuid"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +81,7 @@ func main() {
 
 	infrastructure.Boot()
 
-	spew.Dump(infrastructure.CommandHandler.Handle(
+	infrastructure.CommandHandler.Handle(
 		vm.NewCommand(
 			vm.NewAggregateIdentifier(
 				uuid.NewV4(),
@@ -90,7 +91,16 @@ func main() {
 				Name: "dql",
 			},
 		),
-	))
+	)
+
+	result, _ := infrastructure.QueryHandler.Handle(
+		vm.NewQuery(
+			list_databases.Identifier,
+			list_databases.Query{},
+		),
+	)
+
+	spew.Dump(result)
 
 	/*
 	http.HandleFunc("/schema", schema)

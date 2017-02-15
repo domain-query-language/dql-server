@@ -17,6 +17,8 @@ type Aggregate interface {
 
 	Id() *vm.AggregateIdentifier
 
+	ContextId() vm.Identifier
+
 	Reset()
 
 	Apply(event vm.Event) error
@@ -45,7 +47,7 @@ type Aggregate interface {
 type Aggregate_ struct {
 
 	id *vm.AggregateIdentifier
-	type_id vm.Identifier
+	context_id vm.Identifier
 
 	handlers *map[vm.Identifier]AggregateHandler
 
@@ -57,6 +59,10 @@ type Aggregate_ struct {
 
 func (self *Aggregate_) Id() *vm.AggregateIdentifier {
 	return self.id
+}
+
+func (self *Aggregate_) ContextId() vm.Identifier {
+	return self.context_id
 }
 
 func (self *Aggregate_) Reset() {
@@ -136,13 +142,14 @@ func (self *Aggregate_) Copy(id vm.Identifier) Aggregate {
 	return &aggregate
 }
 
-func NewAggregate(id vm.Identifier, projector projection.Projector, handlers *map[vm.Identifier]AggregateHandler) *Aggregate_ {
+func NewAggregate(id vm.Identifier, context_id vm.Identifier, projector projection.Projector, handlers *map[vm.Identifier]AggregateHandler) *Aggregate_ {
 
 	return &Aggregate_ {
 		id: vm.NewAggregateIdentifier(
 			nil,
 			id,
 		),
+		context_id: context_id,
 		projector: projector,
 		handlers: handlers,
 	}

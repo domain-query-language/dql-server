@@ -4,7 +4,6 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/aggregate"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/player"
-	"github.com/davecgh/go-spew/spew"
 )
 
 type Handler interface {
@@ -36,18 +35,11 @@ func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 
 	self.repository_aggregates.Save(agg)
 
-	spew.Dump(self.repository_players)
+	players, _ := self.repository_players.Get(agg.ContextId())
 
-	/*
-	players_index := self.context_map[command.AggregateTypeId()]
-
-	for player_id := range players_index {
-		player, _ := self.repository_players.Get(player_id)
-
+	for _, player := range players {
 		player.Play(1000)
 	}
-
-	*/
 
 	return events, nil
 }
