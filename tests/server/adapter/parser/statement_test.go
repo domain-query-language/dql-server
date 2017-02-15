@@ -430,6 +430,46 @@ var statements = testCases {
 			},
 		}),
 	},
+	{
+		`if a {
+			b;
+		} else {
+			if (c) {
+				d;
+			}
+		}`,
+		blkStmt([]ast.Node{
+			&ast.IfStatement{
+				"if",
+				&ast.Identifier{
+					"identifier",
+					"a",
+				},
+				blkStmt([]ast.Node{
+					expStmt(&ast.Identifier{
+						"identifier",
+						"b",
+					}),
+				}),
+				blkStmt([]ast.Node{
+					&ast.IfStatement{
+						"if",
+						&ast.Identifier{
+							"identifier",
+							"c",
+						},
+						blkStmt([]ast.Node{
+							expStmt(&ast.Identifier{
+								"identifier",
+								"d",
+							}),
+						}),
+						nil,
+					},
+				}),
+			},
+		}),
+	},
 }
 
 func TestStatements(t *testing.T) {
