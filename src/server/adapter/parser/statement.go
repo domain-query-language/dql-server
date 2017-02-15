@@ -244,18 +244,41 @@ func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
 		return nil
 	}
 
+	p.nextToken()
+
 	stmt.Collection = p.parseExpression(LOWEST)
 
-	panic (p.curToken.String())
+	p.nextToken()
 
+	if !p.curTokenIs(token.AS) {
+		return nil
+	}
 
-	/*
-	stmt.Expression = p.parseExpression(LOWEST)
+	p.nextToken()
 
-	if p.peekTokenIs(token.SEMICOLON) {
+	if (p.peekTokenIs(token.STRONGARROW)){
+		stmt.Key = p.parseIdentifier().(*ast.Identifier)
+
 		p.nextToken()
 	}
-	*/
+
+	stmt.Value =  p.parseIdentifier().(*ast.Identifier)
+
+	p.nextToken()
+
+	if !p.curTokenIs(token.RPAREN) {
+		return nil
+	}
+
+	p.nextToken()
+
+	if !p.curTokenIs(token.LBRACE) {
+		return nil
+	}
+
+	body, _ := p.ParseBlockStatement()
+
+	stmt.Body = body
 
 	return stmt
 }
