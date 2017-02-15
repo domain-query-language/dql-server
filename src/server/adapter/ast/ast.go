@@ -36,10 +36,10 @@ func (bs *BlockStatement) String() string {
 
 	var out bytes.Buffer
 
-	//out.WriteString("["+bs.Type+"]: ")
-
 	for _, s := range bs.Statements {
-		out.WriteString(s.String())
+		if (s != nil) {
+			out.WriteString(s.String())
+		}
 	}
 
 	return out.String()
