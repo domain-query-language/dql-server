@@ -29,7 +29,9 @@ func Schema(w http.ResponseWriter, r *http.Request) {
 	handleable, err := adptr.Next()
 
 	if (err != nil) {
-		panic(err.Error())
+
+		respondWithError(w, err.Error())
+		return
 	}
 
 	if(handleable.Typ == "query") {
@@ -68,5 +70,4 @@ func Schema(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
 }

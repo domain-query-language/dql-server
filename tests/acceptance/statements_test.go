@@ -32,6 +32,31 @@ func when(statement string) (string, error) {
 	return processStatement(statement)
 }
 
+func whenError(statement string, errorCode int) (string, error) {
+
+	infrastructure.Boot()
+
+	request, err := makeRequest(statement)
+
+	if err != nil {
+		return "", errors.New(err.Error())
+	}
+
+	response, status := handleRequest(request)
+
+	if status != errorCode {
+		msg := fmt.Sprintf("handler returned wrong status code: got %v want %v", status, errorCode)
+		return "", errors.New(msg)
+	}
+
+	if (!isJSON(response)) {
+		msg := "Response is not JSON"
+		return response, errors.New(msg)
+	}
+
+	return response, nil
+}
+
 func processStatement(statement string) (string, error) {
 
 	infrastructure.Boot()
@@ -126,6 +151,21 @@ func TestAddingDatabase(t *testing.T) {
 
 	if (!strings.Contains(response, expected)) {
 		t.Error("Does not contain expected value '"+expected+"'")
+		t.Error(response)
+	}
+}
+
+func TestInvalidStatement(t *testing.T) {
+
+	response, err := whenError("CREATE DATABASE '[[[--%%%';", http.StatusBadRequest)
+
+	if (err != nil) {
+		t.Error(err)
+		return
+	}
+
+	if (!strings.Contains(response, "error")) {
+		t.Error("Body does not contain error")
 		t.Error(response)
 	}
 }

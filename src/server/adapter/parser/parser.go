@@ -10,6 +10,7 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"strings"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/valueobjects"
 )
 
 type UnexpectedTokenError struct {
@@ -234,7 +235,12 @@ func (a *parser) parseCreateCommand() vm.Command {
 		return nil;
 	}
 
-	name := a.curToken.Val
+	name, err := valueobjects.NewName(a.curToken.Val)
+
+	if (err != nil) {
+		a.error = err
+		return nil
+	}
 
 	if (!a.expectPeek(token.SEMICOLON)) {
 		return nil;
