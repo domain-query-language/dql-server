@@ -39,6 +39,7 @@ func Schema(w http.ResponseWriter, r *http.Request) {
 		)
 
 		if err != nil {
+
 			w.Header().Add("error", err.Error())
 			w.WriteHeader(http.StatusBadRequest)
 
@@ -67,4 +68,5 @@ func Schema(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
 }
