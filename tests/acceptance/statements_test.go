@@ -7,10 +7,82 @@ import (
 	controllers "github.com/domain-query-language/dql-server/examples/dql/application/http"
 	"bytes"
 	"encoding/json"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
 	"strings"
+	"errors"
+	"fmt"
 )
+
+func given(statements ...string) error {
+
+	for _, statement := range statements {
+
+		_, err := processStatement(statement)
+
+		if (err != nil) {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func when(statement string) (string, error) {
+
+	return processStatement(statement)
+}
+
+func processStatement(statement string) (string, error) {
+
+	infrastructure.Boot()
+
+	request, err := makeRequest(statement)
+
+	if err != nil {
+		return "", errors.New(err.Error())
+	}
+
+	response, status := handleRequest(request)
+
+	if status != http.StatusOK {
+		msg := fmt.Sprintf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
+		return "", errors.New(msg)
+	}
+
+	if (!isJSON(response)) {
+		msg := "Response is not JSON"
+		return response, errors.New(msg)
+	}
+
+	return response, nil
+}
+
+func handleRequest(request *http.Request) (response string, code int) {
+
+	responseRecorder := httptest.NewRecorder()
+
+	server := controllers.SetupServer()
+
+	server.ServeHTTP(responseRecorder, request)
+
+	response = responseRecorder.Body.String()
+	code = responseRecorder.Code
+
+	return
+}
+
+func makeRequest(statement string) (*http.Request, error) {
+
+	input := bytes.NewBuffer([]byte(statement))
+
+	return http.NewRequest("POST", "/schema", input)
+}
+
+func isJSON(s string) bool {
+
+	var js map[string]interface{}
+	return json.Unmarshal([]byte(s), &js) == nil
+}
 
 const (
 	LIST_DATABASE string = "LIST DATABASES;"
@@ -19,9 +91,12 @@ const (
 
 func TestListDatabases(t *testing.T) {
 
-	infrastructure.Boot()
+	response, err := when(LIST_DATABASE)
 
-	response := makeRequest(LIST_DATABASE, t)
+	if (err != nil) {
+		t.Error(err)
+		return
+	}
 
 	expected := "data"
 
@@ -31,51 +106,21 @@ func TestListDatabases(t *testing.T) {
 	}
 }
 
-func makeRequest(statement string, t *testing.T) string {
-
-	responseRecorder := httptest.NewRecorder()
-
-	input := bytes.NewBuffer([]byte(statement))
-
-	request, err := http.NewRequest("POST", "/", input)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	controllers.Schema(responseRecorder, request)
-
-	status := responseRecorder.Code
-	response := responseRecorder.Body.String()
-
-	if status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
-
-		t.Error(spew.Sdump(responseRecorder))
-	}
-
-	if (!isJSON(response)) {
-		t.Error("Response is not JSON")
-		t.Error(response)
-	}
-
-	return response
-}
-
-func isJSON(s string) bool {
-
-	var js map[string]interface{}
-	return json.Unmarshal([]byte(s), &js) == nil
-}
-
 func TestAddingDatabase(t *testing.T) {
 
-	infrastructure.Boot()
+	err := given(CREATE_DATABASE)
 
-	makeRequest(CREATE_DATABASE, t)
+	if (err != nil) {
+		t.Error(err)
+		return
+	}
 
-	response := makeRequest(LIST_DATABASE, t)
+	response, err := when(LIST_DATABASE)
+
+	if (err != nil) {
+		t.Error(err)
+		return
+	}
 
 	expected := "db1"
 
