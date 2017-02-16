@@ -13,18 +13,18 @@ var Identifier = uuid.FromStringOrNil("655bdd1e-8deb-4e08-9bbf-14496e148e2e")
 
 var Handlers = 	&map[vm.Identifier]aggregate.AggregateHandler {
 
-	command.TypeCreate: func(aggregate aggregate.Aggregate, cmd vm.Command) error  {
+	command.TypeCreate: func(agg aggregate.Aggregate, c vm.Command) error  {
 
-		payload := cmd.Payload().(command.Create)
+		create := c.Payload().(command.Create)
 
-		// Assert Invariant 'Created'
+		//agg.Check().That(invariant.Created).Not().Asserts()
 
-		aggregate.Apply(
+		agg.Apply(
 			vm.NewEvent(
-				cmd.AggregateId(),
-				cmd.Id(),
+				*c.AggregateId(),
+				c.Id(),
 				event.Created {
-					payload.Name,
+					create.Name,
 				},
 			),
 		)
@@ -32,18 +32,18 @@ var Handlers = 	&map[vm.Identifier]aggregate.AggregateHandler {
 		return nil
 	},
 
-	command.TypeRename: func(aggregate aggregate.Aggregate, cmd vm.Command) error  {
+	command.TypeRename: func(agg aggregate.Aggregate, c vm.Command) error  {
 
-		payload := cmd.Payload().(command.Rename)
+		rename := c.Payload().(command.Rename)
 
 		// Assert Invariant 'Created'
 
-		aggregate.Apply(
+		agg.Apply(
 			vm.NewEvent(
-				cmd.AggregateId(),
-				cmd.Id(),
+				*c.AggregateId(),
+				c.Id(),
 				event.Renamed {
-					payload.Name,
+					rename.Name,
 				},
 			),
 		)
@@ -51,14 +51,14 @@ var Handlers = 	&map[vm.Identifier]aggregate.AggregateHandler {
 		return nil
 	},
 
-	command.TypeDelete: func(aggregate aggregate.Aggregate, cmd vm.Command) error  {
+	command.TypeDelete: func(agg aggregate.Aggregate, c vm.Command) error  {
 
 		// Assert Invariant 'Created'
 
-		aggregate.Apply(
+		agg.Apply(
 			vm.NewEvent(
-				cmd.AggregateId(),
-				cmd.Id(),
+				*c.AggregateId(),
+				c.Id(),
 				event.Deleted {},
 			),
 		)

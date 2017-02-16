@@ -15,3 +15,16 @@ type Stream interface {
 	Value() vm.Event
 
 }
+
+type AggregateStream interface {
+
+	Reset()
+
+	Version() int
+
+	Seek(version int)
+
+	Next() bool
+
+	Value() vm.Event
+}

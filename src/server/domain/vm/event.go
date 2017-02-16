@@ -3,9 +3,11 @@ package vm
 import (
 	"time"
 	"github.com/satori/go.uuid"
+	"github.com/pquerna/ffjson/ffjson"
 )
 
 type Payload interface {
+
 	TypeId() Identifier
 }
 
@@ -16,7 +18,7 @@ type Event interface {
 
 	CommandId() Identifier
 
-	AggregateId() *AggregateIdentifier
+	AggregateId() AggregateIdentifier
 
 	OccurredAt() time.Time
 
@@ -25,16 +27,16 @@ type Event interface {
 
 type Event_  struct {
 
-	id Identifier
-	type_id Identifier
+	id Identifier `json:"id"`
+	typeId Identifier `json:"type_id"`
 
-	command_id Identifier
+	commandId Identifier `json:"command_id"`
 
-	aggregate_id *AggregateIdentifier
+	aggregateId AggregateIdentifier `json:"aggregate"`
 
-	occurred_at time.Time
+	occurredAt time.Time `json:"occurred_at"`
 
-	payload Payload
+	payload Payload `json:"payload"`
 }
 
 func (self *Event_) Id() Identifier {
@@ -42,34 +44,60 @@ func (self *Event_) Id() Identifier {
 }
 
 func (self *Event_) TypeId() Identifier {
-	return self.type_id
+	return self.typeId
 }
 
 func (self *Event_) CommandId() Identifier {
-	return self.command_id
+	return self.commandId
 }
 
-func (self *Event_) AggregateId() *AggregateIdentifier {
-	return self.aggregate_id
+func (self *Event_) AggregateId() AggregateIdentifier {
+	return self.aggregateId
 }
 
 func (self *Event_) OccurredAt() time.Time {
-	return self.occurred_at
+	return self.occurredAt
 }
 
 func (self *Event_) Payload() Payload {
 	return self.payload
 }
 
-func NewEvent(aggregate_id *AggregateIdentifier, command_id Identifier, payload Payload) *Event_ {
+func (self *Event_) MarshalJSON() ([]byte, error) {
+
+	return ffjson.Marshal(
+			struct {
+				Id Identifier `json:"id"`
+				TypeId Identifier `json:"type_id"`
+
+				CommandId Identifier `json:"command_id"`
+
+				AggregateId AggregateIdentifier `json:"aggregate"`
+
+				OccurredAt time.Time `json:"occurred_at"`
+
+				Payload Payload `json:"payload"`
+			}{
+				self.id,
+				self.typeId,
+				self.commandId,
+				self.aggregateId,
+				self.occurredAt,
+				self.payload,
+			},
+	)
+}
+
+func NewEvent(aggregateId AggregateIdentifier, commandId Identifier, payload Payload) *Event_ {
 
 	return &Event_ {
 		id: uuid.NewV4(),
-		command_id: command_id,
-		type_id: payload.TypeId(),
-		aggregate_id: aggregate_id,
-		occurred_at: time.Now(),
+		typeId: payload.TypeId(),
+
+		commandId: commandId,
+
+		aggregateId: aggregateId,
+		occurredAt: time.Now(),
 		payload: payload,
 	}
 }
-

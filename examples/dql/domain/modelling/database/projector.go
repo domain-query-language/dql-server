@@ -10,7 +10,7 @@ var ProjectorHandlers = &map[vm.Identifier]projection.ProjectorHandler {
 
 	event.TypeCreated: func(p projection.Projection, e vm.Event) {
 
-		projection := p.(Projection)
+		projection := p.(*Projection)
 
 		projection.Create()
 	},
@@ -21,7 +21,7 @@ var ProjectorHandlers = &map[vm.Identifier]projection.ProjectorHandler {
 
 	event.TypeDeleted: func(p projection.Projection, e vm.Event) {
 
-		projection := p.(Projection)
+		projection := p.(*Projection)
 
 		projection.Delete()
 	},

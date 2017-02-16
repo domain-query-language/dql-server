@@ -23,10 +23,8 @@ type Handler_ struct {
 
 func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 
-	// Get Aggregate from Repository
 	agg, _ := self.repository_aggregates.Get(command.AggregateId())
 
-	// Handle Command
 	events, handling_error := agg.Handle(command)
 
 	if handling_error != nil {

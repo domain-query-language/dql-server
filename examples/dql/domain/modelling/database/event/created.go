@@ -9,7 +9,7 @@ var TypeCreated = uuid.FromStringOrNil("b7dbb816-1141-4357-abbf-250e0cb7ec1f")
 
 type Created struct {
 
-	Name string
+	Name string `json:"name"`
 }
 
 func (self Created) TypeId() vm.Identifier {

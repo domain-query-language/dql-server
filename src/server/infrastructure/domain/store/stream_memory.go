@@ -69,3 +69,54 @@ func NewMemoryStream(log *MemoryLog) *MemoryStream {
 
 	return stream
 }
+
+type MemoryAggregateStream struct {
+
+	id vm.AggregateIdentifier
+	log *MemoryLog
+
+	current_event vm.Event
+	current int
+}
+
+func (self *MemoryAggregateStream) Reset() {
+
+	self.current_event = nil
+	self.current = -1
+}
+
+func (self *MemoryAggregateStream) Version() int {
+	return self.current + 1
+}
+
+func (self *MemoryAggregateStream) Seek(version int) {
+
+}
+
+func (self *MemoryAggregateStream) Next() bool {
+
+	if(self.current >= (len(self.log.aggregates[self.id]) - 1)) {
+		return false
+	}
+
+	self.current++
+	self.current_event = self.log.aggregates[self.id][self.current]
+
+	return true
+}
+
+func (self *MemoryAggregateStream) Value() vm.Event {
+	return self.current_event
+}
+
+func NewMemoryAggregateStream(id *vm.AggregateIdentifier, log *MemoryLog) *MemoryAggregateStream {
+
+	stream := &MemoryAggregateStream {
+		id: (*id),
+		log: log,
+	}
+
+	stream.Reset()
+
+	return stream
+}

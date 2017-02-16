@@ -35,6 +35,8 @@ type Aggregate interface {
 
 	Handle(command vm.Command) ([]vm.Event, error)
 
+	//Check() Check
+
 	Copy(id vm.Identifier) Aggregate
 }
 
@@ -136,11 +138,21 @@ func (self *Aggregate_) Handle(command vm.Command) ([]vm.Event, error) {
 func (self *Aggregate_) Copy(id vm.Identifier) Aggregate {
 
 	aggregate := *self
-	aggregate.id.Id = id
+
+	aggregate_id := *aggregate.id
+	aggregate_id.Id = id
+	aggregate.id = &aggregate_id
+
 	aggregate.projector = aggregate.projector.Copy()
 
 	return &aggregate
 }
+
+/*
+func (self *Aggregate_) Check() Check {
+
+}
+*/
 
 func NewAggregate(id vm.Identifier, context_id vm.Identifier, projector projection.Projector, handlers *map[vm.Identifier]AggregateHandler) *Aggregate_ {
 

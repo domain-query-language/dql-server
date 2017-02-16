@@ -12,11 +12,11 @@ type Projection struct {
 	IsDeleted bool
 }
 
-func (self Projection) Id() vm.Identifier {
+func (self *Projection) Id() vm.Identifier {
 	return self.Identifier
 }
 
-func (self Projection) Reset() {
+func (self *Projection) Reset() {
 	self.IsCreated = false
 }
 
@@ -28,7 +28,7 @@ func (self *Projection) Delete() {
 	self.IsDeleted = true
 }
 
-var State = Projection {
+var State = &Projection {
 	Identifier: Identifier,
 	IsCreated: false,
 	IsDeleted: false,

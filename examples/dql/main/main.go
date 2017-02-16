@@ -5,13 +5,8 @@ import (
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/adapter"
 	"strings"
 	"encoding/json"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
-	"github.com/domain-query-language/dql-server/src/server/domain/vm"
-	"github.com/satori/go.uuid"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
-	"github.com/davecgh/go-spew/spew"
-	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
+	"log"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -81,56 +76,6 @@ func main() {
 
 	infrastructure.Boot()
 
-	aggregate_id := uuid.NewV4()
-
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				aggregate_id,
-				database.Identifier,
-			),
-			command.Create {
-				Name: "dql",
-			},
-		),
-	)
-
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				aggregate_id,
-				database.Identifier,
-			),
-			command.Rename {
-				Name: "dql-lol",
-			},
-		),
-	)
-
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				aggregate_id,
-				database.Identifier,
-			),
-			command.Rename {
-				Name: "dql-rofl",
-			},
-		),
-	)
-
-	result, _ := infrastructure.QueryHandler.Handle(
-		vm.NewQuery(
-			list_databases.Identifier,
-			list_databases.Query {
-
-			},
-		),
-	)
-
-	spew.Dump(result)
-
-	/*
 	http.HandleFunc("/schema", schema)
 
 	err := http.ListenAndServe(":4242", nil)
@@ -138,5 +83,4 @@ func main() {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-	*/
 }

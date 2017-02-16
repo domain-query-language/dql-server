@@ -2,8 +2,8 @@ package vm
 
 type AggregateIdentifier struct {
 
-	Id Identifier
-	TypeId Identifier
+	Id Identifier `json:"id"`
+	TypeId Identifier `json:"type_id"`
 
 }
 

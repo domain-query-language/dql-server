@@ -7,7 +7,7 @@ import (
 
 type Snapshot struct {
 
-	Id vm.Identifier
+	Id *vm.AggregateIdentifier
 
 	OccurredAt time.Time
 

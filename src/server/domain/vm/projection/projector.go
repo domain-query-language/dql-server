@@ -70,6 +70,9 @@ func (self *Projector_) Copy() Projector {
 
 	projector := *self
 
+	//projection := *projector.projection
+	//projector.projection = &projection
+
 	return &projector
 }
 

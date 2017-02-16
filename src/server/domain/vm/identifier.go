@@ -3,6 +3,8 @@ package vm
 type Identifier interface {
 
 	Bytes() []byte
+
+	MarshalText() (text []byte, err error)
 }
 
 type IdentifierGenerator interface {
