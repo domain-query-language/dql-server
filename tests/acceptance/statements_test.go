@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/davecgh/go-spew/spew"
+	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
 )
 
 const (
@@ -17,19 +18,19 @@ const (
 
 func TestListDatabases(t *testing.T) {
 
+	infrastructure.Boot()
+
 	responseRecorder := httptest.NewRecorder()
 
 	input := bytes.NewBuffer([]byte(LIST_DATABASE))
 
-	request, err := http.NewRequest("POST", "", input)
+	request, err := http.NewRequest("POST", "/", input)
 
 	if err != nil {
 		t.Fatal(err)
 	}
-	
-	controllers.Schema(responseRecorder, request)
 
-	panic(spew.Sdump(responseRecorder))
+	controllers.Schema(responseRecorder, request)
 
 	status := responseRecorder.Code
 	response := responseRecorder.Body.String()
@@ -37,8 +38,9 @@ func TestListDatabases(t *testing.T) {
 	if status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusOK)
-	}
 
+		t.Error(spew.Sdump(responseRecorder))
+	}
 
 	if (!isJSON(response)) {
 		t.Error("Response is not JSON")
