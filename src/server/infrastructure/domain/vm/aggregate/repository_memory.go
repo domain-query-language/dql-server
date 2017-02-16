@@ -22,6 +22,7 @@ func (self *MemoryRepository) Get(id *vm.AggregateIdentifier) (aggregate.Aggrega
 
 	aggregate, ok := self.aggregate_instances[id]
 
+
 	if !ok {
 		aggregate, aggregate_found := self.aggregates[id.TypeId]
 
@@ -40,6 +41,8 @@ func (self *MemoryRepository) Save(aggregate aggregate.Aggregate) error {
 	self.aggregate_instances[aggregate.Id()] = aggregate
 
 	self.event_log.Append(aggregate.Events())
+
+	aggregate.Reset()
 
 	return nil
 }

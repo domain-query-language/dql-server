@@ -41,12 +41,12 @@ func (self *Event_) Id() Identifier {
 	return self.id
 }
 
-func (self *Event_) CommandId() Identifier {
-	return self.command_id
-}
-
 func (self *Event_) TypeId() Identifier {
 	return self.type_id
+}
+
+func (self *Event_) CommandId() Identifier {
+	return self.command_id
 }
 
 func (self *Event_) AggregateId() *AggregateIdentifier {
