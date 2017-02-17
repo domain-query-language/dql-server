@@ -92,4 +92,16 @@ func Seed() {
 			},
 		),
 	)
+
+	players, _ := PlayersRepository.Get(modelling.Identifier)
+
+	for _, player := range players {
+		player.Play(1000)
+	}
+
+	players, _ = PlayersRepository.Get(application.Identifier)
+
+	for _, player := range players {
+		player.Play(1000)
+	}
 }

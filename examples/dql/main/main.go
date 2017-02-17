@@ -5,15 +5,10 @@ import (
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/adapter"
 	"strings"
 	"encoding/json"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database"
-	"github.com/domain-query-language/dql-server/src/server/domain/vm"
-	"github.com/satori/go.uuid"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database/command"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
+	"log"
 	"github.com/davecgh/go-spew/spew"
-	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 	"github.com/domain-query-language/dql-server/examples/dql/application"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/value"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +34,9 @@ func schema(w http.ResponseWriter, r *http.Request) {
 		result, handle_err := infrastructure.QueryHandler.Handle(
 			handleable.Query,
 		)
+
+		spew.Dump(infrastructure.ProjectionsRepository)
+		spew.Dump(infrastructure.EventLog)
 
 		if handle_err != nil {
 			w.Header().Add("error", handle_err.Error())
@@ -75,6 +73,12 @@ func schema(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(json_events)
 
+		players, _ := infrastructure.PlayersRepository.Get(application.Identifier)
+
+		for _, player := range players {
+			player.Play(1000)
+		}
+
 		return
 	}
 }
@@ -84,87 +88,6 @@ func main() {
 	infrastructure.Boot()
 	infrastructure.Seed()
 
-	aggregate_id := uuid.NewV4()
-
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				aggregate_id,
-				database.Identifier,
-			),
-			command.Create {
-				Name: value.Name("dql"),
-			},
-		),
-	)
-
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				aggregate_id,
-				database.Identifier,
-			),
-			command.Rename {
-				Name: value.Name("dql-lol"),
-			},
-		),
-	)
-
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				aggregate_id,
-				database.Identifier,
-			),
-			command.Rename {
-				Name: value.Name("dql-rofl"),
-			},
-		),
-	)
-
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				uuid.NewV4(),
-				database.Identifier,
-			),
-			command.Create {
-				Name: value.Name("dql-2"),
-			},
-		),
-	)
-
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				uuid.NewV4(),
-				database.Identifier,
-			),
-			command.Create {
-				Name: value.Name("dql-3"),
-			},
-		),
-	)
-
-	players, _ := infrastructure.PlayersRepository.Get(application.Identifier)
-
-	for _, player := range players {
-		player.Play(1000)
-	}
-
-	result, _ := infrastructure.QueryHandler.Handle(
-		vm.NewQuery(
-			list_databases.Identifier,
-			list_databases.Query {
-
-			},
-		),
-	)
-
-	spew.Dump(infrastructure.PlayersRepository)
-	spew.Dump(result)
-
-	/*
 	http.HandleFunc("/schema", schema)
 
 	err := http.ListenAndServe(":4242", nil)
@@ -172,5 +95,4 @@ func main() {
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
-	*/
 }
