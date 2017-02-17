@@ -383,7 +383,7 @@ var statements = testCases {
 			},
 		}),
 	},
-	/*{
+	{
 		`if (a) { b; }`,
 		blkStmt([]ast.Node{
 			&ast.IfStatement{
@@ -409,7 +409,7 @@ var statements = testCases {
 			c;
 		}`,
 		blkStmt([]ast.Node{
-			&ast.If{
+			&ast.IfStatement{
 				"if",
 				&ast.Identifier{
 					"identifier",
@@ -430,7 +430,95 @@ var statements = testCases {
 			},
 		}),
 	},
-	*/
+	{
+		`if a {
+			b;
+		} else {
+			if (c) {
+				d;
+			}
+		}`,
+		blkStmt([]ast.Node{
+			&ast.IfStatement{
+				"if",
+				&ast.Identifier{
+					"identifier",
+					"a",
+				},
+				blkStmt([]ast.Node{
+					expStmt(&ast.Identifier{
+						"identifier",
+						"b",
+					}),
+				}),
+				blkStmt([]ast.Node{
+					&ast.IfStatement{
+						"if",
+						&ast.Identifier{
+							"identifier",
+							"c",
+						},
+						blkStmt([]ast.Node{
+							expStmt(&ast.Identifier{
+								"identifier",
+								"d",
+							}),
+						}),
+						nil,
+					},
+				}),
+			},
+		}),
+	},
+	{
+		`foreach (things as thing) { a; }`,
+		blkStmt([]ast.Node{
+			&ast.ForeachStatement{
+				"foreach",
+				&ast.Identifier{
+					"identifier",
+					"things",
+				},
+				nil,
+				&ast.Identifier{
+					"identifier",
+					"thing",
+				},
+				blkStmt([]ast.Node{
+					expStmt(&ast.Identifier{
+						"identifier",
+						"a",
+					}),
+				}),
+			},
+		}),
+	},
+	{
+		`foreach (things as key=>thing) { a; }`,
+		blkStmt([]ast.Node{
+			&ast.ForeachStatement{
+				"foreach",
+				&ast.Identifier{
+					"identifier",
+					"things",
+				},
+				&ast.Identifier{
+					"identifier",
+					"key",
+				},
+				&ast.Identifier{
+					"identifier",
+					"thing",
+				},
+				blkStmt([]ast.Node{
+					expStmt(&ast.Identifier{
+						"identifier",
+						"a",
+					}),
+				}),
+			},
+		}),
+	},
 }
 
 func TestStatements(t *testing.T) {

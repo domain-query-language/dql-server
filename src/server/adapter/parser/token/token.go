@@ -39,11 +39,6 @@ const (
 	EOF TokenType	= "eof"
 	ERROR 		= "error"
 
-	USINGDATABASE 	= "usingDatabase"
-	FORDOMAIN 	= "forDomain"
-	INCONTEXT 	= "inContext"
-	WITHINAGGREGATE = "withinAggregate"
-
 	CLASSOPEN 	= "<|"
 	CLASSCLOSE 	= "|>"
 	OBJECTNAME 	= "objectName"
@@ -51,33 +46,25 @@ const (
 	//DQL Keywords - Objects
 	CREATE 	   = "create"
 	LIST	   = "list"
-	DATABASE   = "database"
-	DATABASES   = "databases"
-	DOMAIN     = "domain"
-	CONTEXT    = "context"
-	AGGREGATE  = "aggregate"
-	VALUE      = "value"
-	EVENT      = "event"
-	ENTITY     = "entity"
-	COMMAND    = "command"
-	PROJECTION = "projection"
-	INVARIANT  = "invariant"
-	QUERY      = "query"
 	AS 	   = "as"
 	ON 	   = "on"
+	USING	   = "using"
+	FOR   	   = "for"
+	IN	   = "in"
+	WITHIN	   = "with"
 
 	// Class components
 	PROPERTIES = "properties"
 	CHECK      = "check"
-	HANDLER    = "command"
+	HANDLER    = "handler"
 	FUNCTION   = "function"
-	WHENEVENT  = "when event"
+	WHEN  = "when"
 
 	// Command Handler statements
-	ASSERTINVARIANT = "assert invariant"
-	NOT 		= "not"
-	RUNQUERY 	= "run query"
-	APPLYEVENT 	= "apply event"
+	ASSERT  = "assert"
+	NOT 	= "not"
+	RUN 	= "run"
+	APPLY 	= "apply"
 
 	// Operators
 	ASSIGN    = "="

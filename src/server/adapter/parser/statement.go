@@ -135,6 +135,19 @@ func (p *statementParser) expectPeek(t token.TokenType) bool {
 	}
 }
 
+func (p *statementParser) expectCurrent(t token.TokenType) bool {
+
+	if p.curTokenIs(t) {
+
+		p.nextToken()
+		return true
+	} else {
+
+		p.peekError(t)
+		return false
+	}
+}
+
 func (p *statementParser) peekError(t token.TokenType) {
 
 	if (p.peekToken == nil) {
@@ -150,6 +163,8 @@ func (p *statementParser) peekError(t token.TokenType) {
 func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
 	if (!p.curTokenIs(token.LBRACE) ) {
+		msg := fmt.Sprintf("Expected next token to be '%s', got '%s' instead", token.LBRACE, p.curToken.Val)
+		p.error = errors.New(msg);
 		return nil, p.error
 	}
 
@@ -158,14 +173,10 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 	block := &ast.BlockStatement{Type:"blockstatement"}
 	block.Statements = []ast.Node{}
 
-	for !p.curTokenIs(token.RBRACE)  {
+	for !p.curTokenIs(token.RBRACE) && p.error == nil  {
 		stmt := p.parseStatement()
 		if stmt != nil {
 			block.Statements = append(block.Statements, stmt)
-			/*switch stmt.(type) {
-			case ast.IfStatement:
-				panic(stmt.String());
-			}*/
 		}
 		p.nextToken()
 	}
@@ -182,6 +193,9 @@ func (p *statementParser) parseStatement() ast.Node {
 
 		case token.IF:
 			return p.parseIfStatement()
+
+		case token.FOREACH:
+			return p.parseForeachStatement()
 
 		default:
 			return p.parseExpressionStatement()
@@ -220,6 +234,56 @@ func (p *statementParser) parseReturnStatement() *ast.Return {
 	return stmt
 }
 
+func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
+
+	stmt := &ast.ForeachStatement{Type:"foreach"}
+
+	p.nextToken()
+
+	if !p.curTokenIs(token.LPAREN) {
+		return nil
+	}
+
+	p.nextToken()
+
+	stmt.Collection = p.parseExpression(LOWEST)
+
+	p.nextToken()
+
+	if !p.curTokenIs(token.AS) {
+		return nil
+	}
+
+	p.nextToken()
+
+	if (p.peekTokenIs(token.STRONGARROW)){
+		stmt.Key = p.parseIdentifier().(*ast.Identifier)
+
+		p.nextToken()
+		p.nextToken()
+	}
+
+	stmt.Value =  p.parseIdentifier().(*ast.Identifier)
+
+	p.nextToken()
+
+	if !p.curTokenIs(token.RPAREN) {
+		return nil
+	}
+
+	p.nextToken()
+
+	if !p.curTokenIs(token.LBRACE) {
+		return nil
+	}
+
+	body, _ := p.ParseBlockStatement()
+
+	stmt.Body = body
+
+	return stmt
+}
+
 func (p *statementParser) parseIfStatement() ast.Statement {
 
 	stmt := &ast.IfStatement{Type:"if"}
@@ -228,16 +292,19 @@ func (p *statementParser) parseIfStatement() ast.Statement {
 
 	stmt.Test = p.parseExpression(LOWEST)
 
-	if !p.expectPeek(token.LBRACE) {
+	p.nextToken()
+
+	if !p.curTokenIs(token.LBRACE) {
 		return nil
 	}
 
-	p.nextToken()
+	consequent, _ := p.ParseBlockStatement()
 
-	stmt.Consequent, _ = p.ParseBlockStatement()
+	stmt.Consequent = consequent
 
 	if p.peekTokenIs(token.ELSE) {
 
+		p.nextToken()
 		p.nextToken()
 
 		stmt.Alternate, _ = p.ParseBlockStatement()

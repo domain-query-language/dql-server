@@ -1,16 +1,40 @@
 package parser
 
 import (
-	"errors"
 	"fmt"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
-	"github.com/domain-query-language/dql-server/src/server/query/schema"
-	"github.com/domain-query-language/dql-server/src/server/vm/handler"
+	query "github.com/domain-query-language/dql-server/src/server/query/schema"
+	command "github.com/domain-query-language/dql-server/src/server/command/schema"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
+	"strings"
 )
 
-/** Implementation of the adapter, written using the tokenizer, parser pattern */
+type UnexpectedTokenError struct {
+	Expected string
+	Actual *token.Token
+}
+
+func (e *UnexpectedTokenError) Error() string {
+
+	return fmt.Sprintf("Error at char %d, expected [%s], got [%s] instead", e.Actual.Pos, e.Expected, e.Actual.Type)
+}
+
+
+type UnexpectedIdentifierError struct {
+	Expected string
+	Actual *token.Token
+}
+
+func (e *UnexpectedIdentifierError) Error() string {
+
+	return fmt.Sprintf("Error at char %d, expected '%s', got '%s' instead", e.Actual.Pos, e.Expected, e.Actual.Val)
+}
+
+/**
+ * Implementation of the adapter, written using the tokenizer, parser pattern
+ */
 type parser struct {
 
 	t tokenizer.Tokenizer
@@ -65,15 +89,41 @@ func (a *parser) expectPeek(t token.TokenType) bool {
 	}
 }
 
+func (a *parser) expectPeekIdentifier(value string) bool {
+
+	if (!a.expectPeek(token.IDENT)) {
+		return false
+	}
+
+	if (strings.ToLower(a.curToken.Val) != value) {
+		a.currValueError(value)
+		return false
+	}
+
+	return true
+}
+
 func (a *parser) peekError(t token.TokenType) {
 
+	actual := a.peekToken
 	if (a.peekToken == nil) {
-		msg := fmt.Sprintf("Expected next token to be '%s', got EOF instead", t)
-		a.error = errors.New(msg);
-		return;
+		actual = &token.Token{token.EOF, "eof", a.curToken.Pos + len(a.curToken.Val)}
 	}
-	msg := fmt.Sprintf("Expected next token to be '%s', got '%s' instead", t, a.peekToken.Val)
-	a.error = errors.New(msg);
+
+	a.error = &UnexpectedTokenError{string(t), actual}
+}
+
+func (a *parser) currValueError(value string) {
+
+	a.error = &UnexpectedIdentifierError{value, a.curToken}
+}
+
+var queryStartTokens = []token.TokenType {
+	token.LIST,
+}
+
+var commandStartTokens = []token.TokenType {
+	token.CREATE,
 }
 
 // Return the next handlable object
@@ -84,33 +134,72 @@ func (a *parser) Next() (*adapter.Handleable, error) {
 		return nil, nil;
 	}
 
-	qry := a.parseQuery();
+	if (a.isQuery()) {
 
-	if (qry == nil) {
-
-		return nil, a.error
+		qry := a.parseQuery();
+		if (qry == nil) {
+			return nil, a.error
+		}
+		return adapter.NewQuery(qry), nil;
 	}
 
-	return adapter.NewQuery(qry), nil;
-}
+	if (a.isCommand()) {
 
-func (a *parser) parseQuery() handler.Query {
+		cmd := a.parseCommand();
 
-	// This is where the type of object to be parsed is figured out
-	if (a.curTokenIs(token.LIST)) {
+		if (cmd == nil) {
+			return nil, a.error
+		}
 
-		return a.parseListQuery();
+		return adapter.NewCommand(cmd), nil;
 	}
 
-	a.error = errors.New("Unexpected token '"+a.curToken.Val+"'")
-	return nil;
+	return nil, a.cantFindMatchingStartTokenError()
 }
 
-func (a *parser) parseListQuery() handler.Query {
+func (a *parser) isQuery() bool {
 
-	qry := &schema.ListDatabases{};
+	for _, tok := range queryStartTokens {
+		if a.curTokenIs(tok) {
+			return true
+		}
+	}
+	return false
+}
 
-	if (!a.expectPeek(token.DATABASES)) {
+func (a *parser) isCommand() bool {
+
+	for _, tok := range commandStartTokens {
+		if a.curTokenIs(tok) {
+			return true
+		}
+	}
+	return false
+}
+
+func (a *parser) cantFindMatchingStartTokenError() *UnexpectedTokenError {
+
+	startTokens := append(commandStartTokens, queryStartTokens...);
+
+	startTokenStrs := make([]string, len(startTokens))
+
+	for i, typ := range startTokens {
+		startTokenStrs[i] = string(typ)
+	}
+
+	return &UnexpectedTokenError{strings.Join(startTokenStrs, "/"), a.curToken}
+}
+
+func (a *parser) parseQuery() vm.Query {
+
+	return a.parseListQuery();
+}
+
+func (a *parser) parseListQuery() vm.Query {
+
+	qry := &query.ListDatabases{};
+
+	if (!a.expectPeekIdentifier("databases")) {
 
 		return nil;
 	}
@@ -121,4 +210,33 @@ func (a *parser) parseListQuery() handler.Query {
 	}
 
 	return qry;
+}
+
+func (a *parser) parseCommand() vm.Command {
+
+	return a.parseCreateCommand()
+}
+
+func (a *parser) parseCreateCommand() vm.Command {
+
+	cmd := &command.CreateDatabase{};
+
+	if (!a.expectPeekIdentifier("database")) {
+
+		return nil;
+	}
+
+	if (!a.expectPeek(token.OBJECTNAME)) {
+
+		return nil;
+	}
+
+	cmd.Name = a.curToken.Val
+
+	if (!a.expectPeek(token.SEMICOLON)) {
+
+		return nil;
+	}
+
+	return cmd;
 }
