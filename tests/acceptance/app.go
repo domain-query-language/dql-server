@@ -13,9 +13,7 @@ import (
 )
 
 type app struct {
-
 	server http.Handler
-
 }
 
 func NewApp() *app {
