@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
 	"log"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/domain-query-language/dql-server/examples/dql/application"
 )
 
@@ -34,9 +33,6 @@ func schema(w http.ResponseWriter, r *http.Request) {
 		result, handle_err := infrastructure.QueryHandler.Handle(
 			handleable.Query,
 		)
-
-		spew.Dump(infrastructure.ProjectionsRepository)
-		spew.Dump(infrastructure.EventLog)
 
 		if handle_err != nil {
 			w.Header().Add("error", handle_err.Error())
