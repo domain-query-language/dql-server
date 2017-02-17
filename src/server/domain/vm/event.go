@@ -18,7 +18,7 @@ type Event interface {
 
 	CommandId() Identifier
 
-	AggregateId() AggregateIdentifier
+	AggregateId() *AggregateIdentifier
 
 	OccurredAt() time.Time
 
@@ -32,7 +32,7 @@ type Event_  struct {
 
 	commandId Identifier `json:"command_id"`
 
-	aggregateId AggregateIdentifier `json:"aggregate"`
+	aggregateId *AggregateIdentifier `json:"aggregate"`
 
 	occurredAt time.Time `json:"occurred_at"`
 
@@ -51,7 +51,7 @@ func (self *Event_) CommandId() Identifier {
 	return self.commandId
 }
 
-func (self *Event_) AggregateId() AggregateIdentifier {
+func (self *Event_) AggregateId() *AggregateIdentifier {
 	return self.aggregateId
 }
 
@@ -72,7 +72,7 @@ func (self *Event_) MarshalJSON() ([]byte, error) {
 
 				CommandId Identifier `json:"command_id"`
 
-				AggregateId AggregateIdentifier `json:"aggregate"`
+				AggregateId *AggregateIdentifier `json:"aggregate"`
 
 				OccurredAt time.Time `json:"occurred_at"`
 
@@ -88,7 +88,7 @@ func (self *Event_) MarshalJSON() ([]byte, error) {
 	)
 }
 
-func NewEvent(aggregateId AggregateIdentifier, commandId Identifier, payload Payload) *Event_ {
+func NewEvent(aggregateId *AggregateIdentifier, commandId Identifier, payload Payload) *Event_ {
 
 	return &Event_ {
 		id: uuid.NewV4(),

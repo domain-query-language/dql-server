@@ -5,6 +5,7 @@ import (
 	"sort"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 	"github.com/satori/go.uuid"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm/projection"
 )
 
 type ListDatabases struct {
@@ -19,6 +20,13 @@ func (self *ListDatabases) Id() vm.Identifier {
 
 func (self *ListDatabases) Reset() {
 	self.Databases = map[vm.Identifier]string{}
+}
+
+func (self *ListDatabases) Copy() projection.Projection {
+
+	projection := *self
+
+	return &projection
 }
 
 func (self *ListDatabases) Add(id vm.Identifier, name string) {

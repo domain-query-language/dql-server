@@ -25,7 +25,7 @@ func (self *MemoryLog) Append(events []vm.Event) {
 
 	for _, event := range events {
 
-		aggregate_id := event.AggregateId()
+		aggregate_id := *event.AggregateId()
 
 		self.events = append(self.events, event)
 		self.events_index[event.Id()] = len(self.events) - 1

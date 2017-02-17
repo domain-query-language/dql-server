@@ -8,6 +8,8 @@ type Projection interface {
 
 	Reset()
 
+	Copy() Projection
+
 	/*
 	GobEncode() []byte
 

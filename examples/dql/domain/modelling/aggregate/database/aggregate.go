@@ -4,8 +4,8 @@ import (
 	"github.com/satori/go.uuid"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/aggregate"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/event"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database/command"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database/event"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling"
 )
 
@@ -21,7 +21,7 @@ var Handlers = 	&map[vm.Identifier]aggregate.AggregateHandler {
 
 		agg.Apply(
 			vm.NewEvent(
-				*c.AggregateId(),
+				c.AggregateId(),
 				c.Id(),
 				event.Created {
 					create.Name,
@@ -40,7 +40,7 @@ var Handlers = 	&map[vm.Identifier]aggregate.AggregateHandler {
 
 		agg.Apply(
 			vm.NewEvent(
-				*c.AggregateId(),
+				c.AggregateId(),
 				c.Id(),
 				event.Renamed {
 					rename.Name,
@@ -57,7 +57,7 @@ var Handlers = 	&map[vm.Identifier]aggregate.AggregateHandler {
 
 		agg.Apply(
 			vm.NewEvent(
-				*c.AggregateId(),
+				c.AggregateId(),
 				c.Id(),
 				event.Deleted {},
 			),

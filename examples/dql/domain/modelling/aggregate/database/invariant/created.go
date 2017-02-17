@@ -1,7 +1,7 @@
 package invariant
 
 import (
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database"
 	"github.com/satori/go.uuid"
 )
 

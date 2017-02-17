@@ -6,10 +6,10 @@ import (
 	"errors"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"regexp"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database/command"
 	"github.com/satori/go.uuid"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database"
 )
 
 var CREATE_DATABASE_REGEX = regexp.MustCompile("^create database \\'([a-zA-Z0-9-]{1,256})\\'$")

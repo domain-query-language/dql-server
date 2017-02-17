@@ -69,9 +69,7 @@ func (self *Projector_) Version() int {
 func (self *Projector_) Copy() Projector {
 
 	projector := *self
-
-	//projection := *projector.projection
-	//projector.projection = &projection
+	projector.projection = projector.projection.Copy()
 
 	return &projector
 }

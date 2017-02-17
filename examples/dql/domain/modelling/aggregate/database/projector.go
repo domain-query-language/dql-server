@@ -3,7 +3,7 @@ package database
 import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/projection"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
-	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/event"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database/event"
 )
 
 var ProjectorHandlers = &map[vm.Identifier]projection.ProjectorHandler {
