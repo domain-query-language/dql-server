@@ -15,7 +15,7 @@ func TestListDatabases(t *testing.T) {
 
 	app := NewApp()
 
-	response, err := app.when(LIST_DATABASE)
+	response, err := app.process(LIST_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
@@ -41,7 +41,7 @@ func TestAddingDatabase(t *testing.T) {
 		return
 	}
 
-	response, err := app.when(LIST_DATABASE)
+	response, err := app.process(LIST_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
@@ -67,7 +67,7 @@ func TestCannotAddDatabaseThatAlreadyExists(t *testing.T) {
 		return
 	}
 
-	_, err = app.whenError(CREATE_DATABASE)
+	_, err = app.processAndFail(CREATE_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
@@ -79,7 +79,7 @@ func TestInvalidStatement(t *testing.T) {
 
 	app := NewApp()
 
-	_, err := app.whenError("CREATE DATABASE '[[[--%%%';")
+	_, err := app.processAndFail("CREATE DATABASE '[[[--%%%';")
 
 	if (err != nil) {
 		t.Error(err)

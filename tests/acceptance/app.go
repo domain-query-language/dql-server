@@ -30,7 +30,7 @@ func (a *app) given(statements ...string) error {
 
 	for _, statement := range statements {
 
-		_, err := a.when(statement)
+		_, err := a.process(statement)
 
 		if (err != nil) {
 			return err
@@ -40,7 +40,7 @@ func (a *app) given(statements ...string) error {
 	return nil
 }
 
-func (a *app) when(statement string) (string, error) {
+func (a *app) process(statement string) (string, error) {
 
 	response, err := a.makeHttpRequest(statement, http.StatusOK)
 
@@ -57,7 +57,7 @@ func (a *app) when(statement string) (string, error) {
 }
 
 
-func (a *app) whenError(statement string) (string, error) {
+func (a *app) processAndFail(statement string) (string, error) {
 
 	response, err := a.makeHttpRequest(statement, http.StatusBadRequest)
 
