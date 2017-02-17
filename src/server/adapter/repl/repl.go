@@ -29,7 +29,7 @@ func Start(in io.Reader, out io.Writer) {
 			break;
 		}
 
-		p := parser.New(line)
+		p := parser.New(nil, line)
 
 		handleable, err := p.Next()
 

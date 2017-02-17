@@ -404,12 +404,6 @@ func (l *lexer) lexQuotedStringAsToken(tokenType tok.TokenType) stateFn {
 		return nil
 	}
 
-	/*if (found == "") {
-		l.err("value name", "empty name")
-		return nil
-	}
-	*/
-
 	l.emit(tokenType)
 	l.skip()
 	return lexToken;
