@@ -8,6 +8,8 @@ type Log interface {
 
 	Append(events []vm.Event)
 
+	AppendCommands(commands []vm.Command)
+
 	Stream() Stream
 
 	AggregateStream(id *vm.AggregateIdentifier) AggregateStream

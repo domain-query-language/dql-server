@@ -52,6 +52,7 @@ func (self *MemoryRepository) Get(id *vm.AggregateIdentifier) (aggregate.Aggrega
 func (self *MemoryRepository) Save(aggregate aggregate.Aggregate) error {
 
 	self.event_log.Append(aggregate.Events())
+	self.event_log.AppendCommands(aggregate.Commands())
 
 	aggregate.Flush()
 
