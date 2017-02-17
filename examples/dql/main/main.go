@@ -13,6 +13,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 	"github.com/domain-query-language/dql-server/examples/dql/application"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/value"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -81,6 +82,7 @@ func schema(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	infrastructure.Boot()
+	infrastructure.Seed()
 
 	aggregate_id := uuid.NewV4()
 
@@ -91,7 +93,7 @@ func main() {
 				database.Identifier,
 			),
 			command.Create {
-				Name: "dql",
+				Name: value.Name("dql"),
 			},
 		),
 	)
@@ -103,7 +105,7 @@ func main() {
 				database.Identifier,
 			),
 			command.Rename {
-				Name: "dql-lol",
+				Name: value.Name("dql-lol"),
 			},
 		),
 	)
@@ -115,7 +117,7 @@ func main() {
 				database.Identifier,
 			),
 			command.Rename {
-				Name: "dql-rofl",
+				Name: value.Name("dql-rofl"),
 			},
 		),
 	)
@@ -127,7 +129,19 @@ func main() {
 				database.Identifier,
 			),
 			command.Create {
-				Name: "dql-2",
+				Name: value.Name("dql-2"),
+			},
+		),
+	)
+
+	infrastructure.CommandHandler.Handle(
+		vm.NewCommand(
+			vm.NewAggregateIdentifier(
+				uuid.NewV4(),
+				database.Identifier,
+			),
+			command.Create {
+				Name: value.Name("dql-3"),
 			},
 		),
 	)

@@ -7,6 +7,10 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/player"
 	"github.com/domain-query-language/dql-server/examples/dql/application"
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure/domain/projection/database-name-unique"
+	"github.com/satori/go.uuid"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database/command"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/value"
 )
 
 func Boot() {
@@ -36,5 +40,56 @@ func Boot() {
 	QueryHandler.Add(
 		list_databases.Identifier,
 		list_databases.QueryHandler,
+	)
+}
+
+func Seed() {
+
+	CommandHandler.Handle(
+		vm.NewCommand(
+			vm.NewAggregateIdentifier(
+				uuid.NewV4(),
+				database.Identifier,
+			),
+			command.Create {
+				Name: value.Name("schema"),
+			},
+		),
+	)
+
+	CommandHandler.Handle(
+		vm.NewCommand(
+			vm.NewAggregateIdentifier(
+				uuid.NewV4(),
+				database.Identifier,
+			),
+			command.Create {
+				Name: value.Name("master-0.0.1"),
+			},
+		),
+	)
+
+	CommandHandler.Handle(
+		vm.NewCommand(
+			vm.NewAggregateIdentifier(
+				uuid.NewV4(),
+				database.Identifier,
+			),
+			command.Create {
+				Name: value.Name("master-0.0.2"),
+			},
+		),
+	)
+
+	CommandHandler.Handle(
+		vm.NewCommand(
+			vm.NewAggregateIdentifier(
+				uuid.NewV4(),
+				database.Identifier,
+			),
+			command.Create {
+				Name: value.Name("master-0.0.3"),
+			},
+		),
 	)
 }

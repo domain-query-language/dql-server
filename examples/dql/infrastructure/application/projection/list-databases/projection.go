@@ -4,7 +4,6 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"sort"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
-	"github.com/satori/go.uuid"
 	"github.com/domain-query-language/dql-server/src/server/domain/vm/projection"
 )
 
@@ -56,10 +55,5 @@ func (self *ListDatabases) List() []string {
 
 var Projection = &ListDatabases {
 	Pid: list_databases.Identifier,
-	Databases: map[vm.Identifier]string {
-		uuid.NewV4(): "master-0.0.1",
-		uuid.NewV4(): "master-0.0.3",
-		uuid.NewV4(): "master-0.0.2",
-		uuid.NewV4(): "schema",
-	},
+	Databases: map[vm.Identifier]string {},
 }

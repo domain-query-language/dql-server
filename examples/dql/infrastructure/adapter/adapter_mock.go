@@ -10,6 +10,7 @@ import (
 	"github.com/satori/go.uuid"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/aggregate/database"
+	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/value"
 )
 
 var CREATE_DATABASE_REGEX = regexp.MustCompile("^create database \\'([a-zA-Z0-9-]{1,256})\\'$")
@@ -47,6 +48,14 @@ func (self *MockAdapter) Next() (*adapter.Handleable, error) {
 
 		self.index++
 
+		name, name_err := value.NewName(
+			CREATE_DATABASE_REGEX.FindStringSubmatch(statement)[1],
+		)
+
+		if name_err != nil {
+			return nil, name_err
+		}
+
 		return adapter.NewCommand(
 			vm.NewCommand(
 				vm.NewAggregateIdentifier(
@@ -54,7 +63,7 @@ func (self *MockAdapter) Next() (*adapter.Handleable, error) {
 					database.Identifier,
 				),
 				command.Create {
-					Name: CREATE_DATABASE_REGEX.FindStringSubmatch(statement)[1],
+					Name: name,
 				},
 			),
 		), nil
