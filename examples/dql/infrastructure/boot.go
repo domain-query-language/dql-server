@@ -9,6 +9,8 @@ import (
 
 func Boot() {
 
+	list_databases.Projection.Reset()
+
 	AggregatesRepository.Add(database.Aggregate)
 
 	ProjectionsRepository.Add(list_databases.Projection)

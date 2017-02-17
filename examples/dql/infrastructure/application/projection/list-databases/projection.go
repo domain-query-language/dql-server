@@ -46,6 +46,19 @@ func (self *ListDatabases) List() []string {
 	return names
 }
 
+func (self *ListDatabases) HasName(name string) bool {
+
+	for _, v := range self.Databases {
+		if (v == name) {
+			return true
+		}
+	}
+
+	return false
+}
+
+
+
 var Projection = &ListDatabases{
 	Pid: list_databases.Identifier,
 	Databases: map[vm.Identifier]string {

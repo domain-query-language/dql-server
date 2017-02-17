@@ -3,6 +3,7 @@ package parser
 import (
 	"fmt"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
+	listDBInfra "github.com/domain-query-language/dql-server/examples/dql/infrastructure/application/projection/list-databases"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/database/command"
 	"github.com/domain-query-language/dql-server/src/server/adapter"
@@ -11,6 +12,7 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"strings"
 	"github.com/domain-query-language/dql-server/examples/dql/domain/modelling/valueobjects"
+	"errors"
 )
 
 type UnexpectedTokenError struct {
@@ -239,6 +241,11 @@ func (a *parser) parseCreateCommand() vm.Command {
 
 	if (err != nil) {
 		a.error = err
+		return nil
+	}
+
+	if (listDBInfra.Projection.HasName(a.curToken.Val)) {
+		a.error = errors.New("Cannot create Database '"+a.curToken.Val+"', name is already in use")
 		return nil
 	}
 

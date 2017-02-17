@@ -34,8 +34,6 @@ func when(statement string) (string, error) {
 
 func whenError(statement string, errorCode int) (string, error) {
 
-	infrastructure.Boot()
-
 	request, err := makeRequest(statement)
 
 	if err != nil {
@@ -54,12 +52,15 @@ func whenError(statement string, errorCode int) (string, error) {
 		return response, errors.New(msg)
 	}
 
+	if (!strings.Contains(response, "error")) {
+		msg := "Body does not contain error"
+		return response, errors.New(msg)
+	}
+
 	return response, nil
 }
 
 func processStatement(statement string) (string, error) {
-
-	infrastructure.Boot()
 
 	request, err := makeRequest(statement)
 
@@ -116,6 +117,8 @@ const (
 
 func TestListDatabases(t *testing.T) {
 
+	infrastructure.Boot()
+
 	response, err := when(LIST_DATABASE)
 
 	if (err != nil) {
@@ -132,6 +135,8 @@ func TestListDatabases(t *testing.T) {
 }
 
 func TestAddingDatabase(t *testing.T) {
+
+	infrastructure.Boot()
 
 	err := given(CREATE_DATABASE)
 
@@ -155,17 +160,31 @@ func TestAddingDatabase(t *testing.T) {
 	}
 }
 
-func TestInvalidStatement(t *testing.T) {
+func TestCannotAddDatabaseThatAlreadyExists(t *testing.T) {
 
-	response, err := whenError("CREATE DATABASE '[[[--%%%';", http.StatusBadRequest)
+	infrastructure.Boot()
+
+	err := given(CREATE_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
 		return
 	}
 
-	if (!strings.Contains(response, "error")) {
-		t.Error("Body does not contain error")
-		t.Error(response)
+	_, err = whenError(CREATE_DATABASE, http.StatusBadRequest)
+
+	if (err != nil) {
+		t.Error(err)
+		return
+	}
+}
+
+func TestInvalidStatement(t *testing.T) {
+
+	_, err := whenError("CREATE DATABASE '[[[--%%%';", http.StatusBadRequest)
+
+	if (err != nil) {
+		t.Error(err)
+		return
 	}
 }
