@@ -2,113 +2,9 @@ package acceptance
 
 import (
 	"testing"
-	"net/http/httptest"
-	"net/http"
-	controllers "github.com/domain-query-language/dql-server/examples/dql/application/http"
-	"bytes"
-	"encoding/json"
-	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
 	"strings"
-	"errors"
-	"fmt"
 )
 
-func given(statements ...string) error {
-
-	for _, statement := range statements {
-
-		_, err := processStatement(statement)
-
-		if (err != nil) {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func when(statement string) (string, error) {
-
-	return processStatement(statement)
-}
-
-func whenError(statement string, errorCode int) (string, error) {
-
-	request, err := makeRequest(statement)
-
-	if err != nil {
-		return "", errors.New(err.Error())
-	}
-
-	response, status := handleRequest(request)
-
-	if status != errorCode {
-		msg := fmt.Sprintf("handler returned wrong status code: got %v want %v", status, errorCode)
-		return "", errors.New(msg)
-	}
-
-	if (!isJSON(response)) {
-		msg := "Response is not JSON"
-		return response, errors.New(msg)
-	}
-
-	if (!strings.Contains(response, "error")) {
-		msg := "Body does not contain error"
-		return response, errors.New(msg)
-	}
-
-	return response, nil
-}
-
-func processStatement(statement string) (string, error) {
-
-	request, err := makeRequest(statement)
-
-	if err != nil {
-		return "", errors.New(err.Error())
-	}
-
-	response, status := handleRequest(request)
-
-	if status != http.StatusOK {
-		msg := fmt.Sprintf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
-		return "", errors.New(msg)
-	}
-
-	if (!isJSON(response)) {
-		msg := "Response is not JSON"
-		return response, errors.New(msg)
-	}
-
-	return response, nil
-}
-
-func handleRequest(request *http.Request) (response string, code int) {
-
-	responseRecorder := httptest.NewRecorder()
-
-	server := controllers.SetupServer()
-
-	server.ServeHTTP(responseRecorder, request)
-
-	response = responseRecorder.Body.String()
-	code = responseRecorder.Code
-
-	return
-}
-
-func makeRequest(statement string) (*http.Request, error) {
-
-	input := bytes.NewBuffer([]byte(statement))
-
-	return http.NewRequest("POST", "/schema", input)
-}
-
-func isJSON(s string) bool {
-
-	var js map[string]interface{}
-	return json.Unmarshal([]byte(s), &js) == nil
-}
 
 const (
 	LIST_DATABASE string = "LIST DATABASES;"
@@ -117,9 +13,9 @@ const (
 
 func TestListDatabases(t *testing.T) {
 
-	infrastructure.Boot()
+	app := NewApp()
 
-	response, err := when(LIST_DATABASE)
+	response, err := app.when(LIST_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
@@ -136,16 +32,16 @@ func TestListDatabases(t *testing.T) {
 
 func TestAddingDatabase(t *testing.T) {
 
-	infrastructure.Boot()
+	app := NewApp()
 
-	err := given(CREATE_DATABASE)
+	err := app.given(CREATE_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
 		return
 	}
 
-	response, err := when(LIST_DATABASE)
+	response, err := app.when(LIST_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
@@ -162,16 +58,16 @@ func TestAddingDatabase(t *testing.T) {
 
 func TestCannotAddDatabaseThatAlreadyExists(t *testing.T) {
 
-	infrastructure.Boot()
+	app := NewApp()
 
-	err := given(CREATE_DATABASE)
+	err := app.given(CREATE_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
 		return
 	}
 
-	_, err = whenError(CREATE_DATABASE, http.StatusBadRequest)
+	_, err = app.whenError(CREATE_DATABASE)
 
 	if (err != nil) {
 		t.Error(err)
@@ -181,7 +77,9 @@ func TestCannotAddDatabaseThatAlreadyExists(t *testing.T) {
 
 func TestInvalidStatement(t *testing.T) {
 
-	_, err := whenError("CREATE DATABASE '[[[--%%%';", http.StatusBadRequest)
+	app := NewApp()
+
+	_, err := app.whenError("CREATE DATABASE '[[[--%%%';")
 
 	if (err != nil) {
 		t.Error(err)
