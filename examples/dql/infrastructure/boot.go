@@ -9,8 +9,6 @@ import (
 
 func Boot() {
 
-	list_databases.Projection.Reset()
-
 	AggregatesRepository.Add(database.Aggregate)
 
 	ProjectionsRepository.Add(list_databases.Projection)
@@ -28,4 +26,9 @@ func Boot() {
 		list_databases.Identifier,
 		list_databases.QueryHandler,
 	)
+}
+
+func Reset() {
+
+	list_databases.Projection.Reset()
 }

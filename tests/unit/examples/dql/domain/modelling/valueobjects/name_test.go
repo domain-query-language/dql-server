@@ -38,6 +38,7 @@ var invalid = []string {
 	"[db",
 	"db]",
 	"db@1",
+	"areallylongnamethatisatleast120characterinlengthwowisntthatbigareallylongnamethatisatleast120characterinlengthwowisntthatbig",
 }
 
 func TestInvalidValidNames(t *testing.T) {

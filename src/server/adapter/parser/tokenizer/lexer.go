@@ -398,16 +398,17 @@ func (l *lexer) lexQuotedStringAsToken(tokenType tok.TokenType) stateFn {
 	}
 	l.ignore();
 
-	found, isEOF := l.scanQuotedName()
+	_, isEOF := l.scanQuotedName()
 	if (isEOF) {
 		l.err("'", "EOF")
 		return nil
 	}
 
-	if (found == "") {
+	/*if (found == "") {
 		l.err("value name", "empty name")
 		return nil
 	}
+	*/
 
 	l.emit(tokenType)
 	l.skip()

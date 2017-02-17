@@ -19,6 +19,8 @@ type app struct {
 func NewApp() *app {
 
 	infrastructure.Boot()
+	infrastructure.Reset()
+
 	handler := controllers.SetupServer()
 	return &app{handler}
 }
