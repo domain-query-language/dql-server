@@ -54,7 +54,7 @@ func (self *ListDatabases) List() []string {
 	return names
 }
 
-var Projection = &ListDatabases{
+var Projection = &ListDatabases {
 	Pid: list_databases.Identifier,
 	Databases: map[vm.Identifier]string {
 		uuid.NewV4(): "master-0.0.1",

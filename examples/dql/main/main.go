@@ -12,6 +12,7 @@ import (
 	"github.com/domain-query-language/dql-server/examples/dql/infrastructure"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/domain-query-language/dql-server/examples/dql/application/projection/list-databases"
+	"github.com/domain-query-language/dql-server/examples/dql/application"
 )
 
 func schema(w http.ResponseWriter, r *http.Request) {
@@ -131,15 +132,11 @@ func main() {
 		),
 	)
 
-	infrastructure.CommandHandler.Handle(
-		vm.NewCommand(
-			vm.NewAggregateIdentifier(
-				aggregate_id,
-				database.Identifier,
-			),
-			command.Delete {},
-		),
-	)
+	players, _ := infrastructure.PlayersRepository.Get(application.Identifier)
+
+	for _, player := range players {
+		player.Play(1000)
+	}
 
 	result, _ := infrastructure.QueryHandler.Handle(
 		vm.NewQuery(
@@ -150,7 +147,7 @@ func main() {
 		),
 	)
 
-	//spew.Dump(infrastructure.AggregatesRepository)
+	spew.Dump(infrastructure.PlayersRepository)
 	spew.Dump(result)
 
 	/*
