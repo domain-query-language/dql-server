@@ -6,9 +6,7 @@ type Log interface {
 
 	Reset()
 
-	Append(events []vm.Event)
-
-	AppendCommands(commands []vm.Command)
+	Append(loggable vm.Loggable)
 
 	Stream() Stream
 

@@ -12,7 +12,7 @@ type Stream interface {
 
 	Next() bool
 
-	Value() vm.Event
+	Value() vm.Loggable
 
 }
 
@@ -26,5 +26,5 @@ type AggregateStream interface {
 
 	Next() bool
 
-	Value() vm.Event
+	Value() vm.Loggable
 }

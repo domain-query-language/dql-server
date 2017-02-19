@@ -13,12 +13,11 @@ type Payload interface {
 
 type Event interface {
 
-	Id() Identifier
+	Loggable
+
 	TypeId() Identifier
 
 	CommandId() Identifier
-
-	AggregateId() *AggregateIdentifier
 
 	OccurredAt() time.Time
 

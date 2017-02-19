@@ -9,7 +9,7 @@ type MemoryStream struct {
 
 	log *MemoryLog
 
-	current_event vm.Event
+	current_event vm.Loggable
 	current int
 }
 
@@ -55,7 +55,7 @@ func (self *MemoryStream) Next() bool {
 	return true
 }
 
-func (self *MemoryStream) Value() vm.Event {
+func (self *MemoryStream) Value() vm.Loggable {
 	return self.current_event
 }
 
@@ -75,7 +75,7 @@ type MemoryAggregateStream struct {
 	id vm.AggregateIdentifier
 	log *MemoryLog
 
-	current_event vm.Event
+	current_event vm.Loggable
 	current int
 }
 
@@ -105,7 +105,7 @@ func (self *MemoryAggregateStream) Next() bool {
 	return true
 }
 
-func (self *MemoryAggregateStream) Value() vm.Event {
+func (self *MemoryAggregateStream) Value() vm.Loggable {
 	return self.current_event
 }
 

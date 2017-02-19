@@ -7,11 +7,9 @@ import (
 
 type Command interface {
 
-	Id() Identifier
+	Loggable
 
 	TypeId() Identifier
-
-	AggregateId() *AggregateIdentifier
 
 	Payload() Payload
 }

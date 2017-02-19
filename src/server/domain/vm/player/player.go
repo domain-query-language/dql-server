@@ -45,7 +45,7 @@ func (self *Player) Play(limit int) error {
 
 	for self.stream.Next() {
 
-		event := self.stream.Value()
+		event := self.stream.Value().(vm.Event)
 
 		proj_err := self.projector.Apply(
 			event,

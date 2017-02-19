@@ -10,6 +10,7 @@ import (
 type MemoryRepository struct {
 
 	event_log store.Log
+	command_log store.Log
 
 	aggregates_archetypes map[vm.Identifier]aggregate.Aggregate
 	aggregate_instances map[vm.AggregateIdentifier]aggregate.Aggregate
@@ -41,7 +42,7 @@ func (self *MemoryRepository) Get(id *vm.AggregateIdentifier) (aggregate.Aggrega
 	stream := self.event_log.AggregateStream(id)
 
 	for stream.Next() {
-		aggregate.Apply(stream.Value())
+		aggregate.Apply(stream.Value().(vm.Event))
 	}
 
 	aggregate.Flush()
@@ -51,8 +52,13 @@ func (self *MemoryRepository) Get(id *vm.AggregateIdentifier) (aggregate.Aggrega
 
 func (self *MemoryRepository) Save(aggregate aggregate.Aggregate) error {
 
-	self.event_log.Append(aggregate.Events())
-	self.event_log.AppendCommands(aggregate.Commands())
+	for _, event := range aggregate.Events() {
+		self.event_log.Append(event)
+	}
+
+	for _, command := range aggregate.Commands() {
+		self.command_log.Append(command)
+	}
 
 	aggregate.Flush()
 
@@ -61,10 +67,11 @@ func (self *MemoryRepository) Save(aggregate aggregate.Aggregate) error {
 	return nil
 }
 
-func CreateMemoryRepository(event_log store.Log) *MemoryRepository {
+func CreateMemoryRepository(event_log store.Log, command_log store.Log) *MemoryRepository {
 
 	return &MemoryRepository {
 		event_log: event_log,
+		command_log: command_log,
 		aggregates_archetypes: map[vm.Identifier]aggregate.Aggregate{},
 		aggregate_instances: map[vm.AggregateIdentifier]aggregate.Aggregate{},
 	}

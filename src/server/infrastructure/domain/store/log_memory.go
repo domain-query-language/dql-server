@@ -7,44 +7,27 @@ import (
 
 type MemoryLog struct {
 
-	aggregates map[vm.AggregateIdentifier][]vm.Event
+	aggregates map[vm.AggregateIdentifier][]vm.Loggable
 
 	events_index map[vm.Identifier]int
-	events []vm.Event
-
-	commands_index map[vm.Identifier]int
-	commands []vm.Command
+	events []vm.Loggable
 }
 
 func (self *MemoryLog) Reset() {
 
-	self.aggregates = map[vm.AggregateIdentifier][]vm.Event{}
+	self.aggregates = map[vm.AggregateIdentifier][]vm.Loggable{}
 
 	self.events_index = map[vm.Identifier]int{}
-	self.events = []vm.Event{}
-
-	self.commands_index = map[vm.Identifier]int{}
-	self.commands = []vm.Command{}
+	self.events = []vm.Loggable{}
 }
 
-func (self *MemoryLog) Append(events []vm.Event) {
+func (self *MemoryLog) Append(loggable vm.Loggable) {
 
-	for _, event := range events {
+	aggregate_id := *loggable.AggregateId()
 
-		aggregate_id := *event.AggregateId()
-
-		self.events = append(self.events, event)
-		self.events_index[event.Id()] = len(self.events) - 1
-		self.aggregates[aggregate_id] = append(self.aggregates[aggregate_id], event)
-	}
-}
-
-func (self *MemoryLog) AppendCommands(commands []vm.Command) {
-
-	for _, command := range commands {
-		self.commands = append(self.commands, command)
-		self.commands_index[command.Id()] = len(self.commands) - 1
-	}
+	self.events = append(self.events, loggable)
+	self.events_index[loggable.Id()] = len(self.events) - 1
+	self.aggregates[aggregate_id] = append(self.aggregates[aggregate_id], loggable)
 }
 
 func (self *MemoryLog) Stream() store.Stream {
@@ -58,10 +41,8 @@ func (self *MemoryLog) AggregateStream(id *vm.AggregateIdentifier) store.Aggrega
 func NewMemoryLog() *MemoryLog {
 
 	return &MemoryLog {
-		aggregates: map[vm.AggregateIdentifier][]vm.Event{},
+		aggregates: map[vm.AggregateIdentifier][]vm.Loggable{},
 		events_index: map[vm.Identifier]int{},
-		events: []vm.Event{},
-		commands_index: map[vm.Identifier]int{},
-		commands: []vm.Command{},
+		events: []vm.Loggable{},
 	}
 }
