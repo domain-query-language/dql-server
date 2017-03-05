@@ -8,6 +8,13 @@ import (
 
 var ProjectionsRepository = projection.CreateMemoryRepository()
 
-var PlayersRepository = player.CreateMemoryRepository()
+var PlayersRepository = player.CreateBoltRespositoryCached(
+	"/tmp/bolt-players.db",
+	EventLog,
+)
 
-var AggregatesRepository = aggregate.CreateMemoryRepository(EventLog, CommandLog)
+
+var AggregatesRepository = aggregate.CreateMemoryRepository(
+	EventLog,
+	CommandLog,
+)

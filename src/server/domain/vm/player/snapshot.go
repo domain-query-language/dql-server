@@ -3,11 +3,14 @@ package player
 import (
 	"github.com/domain-query-language/dql-server/src/server/domain/vm"
 	"time"
+	"github.com/satori/go.uuid"
 )
 
 type Snapshot struct {
 
 	Id vm.Identifier
+
+	ContextId vm.Identifier
 
 	LastId vm.Identifier
 
@@ -16,10 +19,13 @@ type Snapshot struct {
 	Version int
 }
 
-func (self *Snapshot) Encode() []byte {
-	return []byte{}
-}
+func NewSnapshot(identifier vm.Identifier, contextId vm.Identifier) *Snapshot {
 
-func (self *Snapshot) Decode([]byte) {
-
+	return &Snapshot {
+		Id: identifier,
+		ContextId: contextId,
+		LastId: uuid.Nil,
+		OccurredAt: time.Now(),
+		Version: 0,
+	}
 }

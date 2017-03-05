@@ -19,7 +19,21 @@ func Boot() {
 
 	ProjectionsRepository.Add(list_databases.Projection)
 
+	PlayersRepository.Open()
+
 	PlayersRepository.Add(
+		database_name_unique.Identifier,
+		database_name_unique.Projector,
+	)
+
+	PlayersRepository.Add(
+		list_databases.Identifier,
+		list_databases.Projector,
+	)
+
+	PlayersRepository.Reset()
+
+	PlayersRepository.Save(
 		player.NewPlayer(
 			database_name_unique.Identifier,
 			modelling.Identifier,
@@ -28,7 +42,7 @@ func Boot() {
 		),
 	)
 
-	PlayersRepository.Add(
+	PlayersRepository.Save(
 		player.NewPlayer(
 			list_databases.Identifier,
 			application.Identifier,
@@ -93,15 +107,12 @@ func Seed() {
 		),
 	)
 
-	players, _ := PlayersRepository.Get(modelling.Identifier)
+	players, _ := PlayersRepository.GetByContext(application.Identifier)
 
 	for _, player := range players {
-		player.Play(1000)
-	}
 
-	players, _ = PlayersRepository.Get(application.Identifier)
-
-	for _, player := range players {
 		player.Play(1000)
+
+		PlayersRepository.Save(player)
 	}
 }

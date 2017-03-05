@@ -1,13 +1,13 @@
 package store
-
+/*
 import (
-	//"encoding/binary"
-	//"github.com/boltdb/bolt"
-	//"log"
-	//"github.com/domain-query-language/dql-server/src/server/domain/store"
+	"github.com/boltdb/bolt"
+	"encoding/binary"
+	"log"
+	"github.com/domain-query-language/dql-server/src/server/domain/vm"
+	"github.com/domain-query-language/dql-server/src/server/domain/store"
 )
 
-/*
 type BoltLog_ struct {
 
 	db *bolt.DB
@@ -30,7 +30,7 @@ func (self *BoltLog_) Reset() {
 	})
 }
 
-func (self *BoltLog_) Append(events []store.Event) {
+func (self *BoltLog_) Append(events []vm.Loggable) {
 
 	self.db.Update(func(tx *bolt.Tx) error {
 
@@ -66,7 +66,7 @@ func (self *BoltLog_) Append(events []store.Event) {
 			//	Associate with Aggregate
 			//
 
-			aggregate_id = append(event.AggregateTypeId().Bytes(), event.AggregateId().Bytes()...)
+			aggregate_id = append(event.AggregateId().Bytes(), event.AggregateId().Bytes()...)
 
 			// Create a new Aggregate bucket.
 			aggregate_bucket, _ := aggregates_bucket.CreateBucketIfNotExists(
@@ -86,6 +86,14 @@ func (self *BoltLog_) Append(events []store.Event) {
 
 		return nil
 	})
+}
+
+func (self *BoltLog_) Stream() store.Stream {
+
+}
+
+func (self *BoltLog_) AggregateStream(id *vm.AggregateIdentifier) store.AggregateStream {
+
 }
 
 func (self *BoltLog_) Close() {

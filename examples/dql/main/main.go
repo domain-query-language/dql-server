@@ -69,7 +69,7 @@ func schema(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write(json_events)
 
-		players, _ := infrastructure.PlayersRepository.Get(application.Identifier)
+		players, _ := infrastructure.PlayersRepository.GetByContext(application.Identifier)
 
 		for _, player := range players {
 			player.Play(1000)

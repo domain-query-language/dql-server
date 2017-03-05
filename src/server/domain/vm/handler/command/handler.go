@@ -33,10 +33,13 @@ func (self *Handler_) Handle(command vm.Command) ([]vm.Event, error) {
 
 	self.repository_aggregates.Save(agg)
 
-	players, _ := self.repository_players.Get(agg.ContextId())
+	players, _ := self.repository_players.GetByContext(agg.ContextId())
 
 	for _, player := range players {
+
 		player.Play(1000)
+
+		self.repository_players.Save(player)
 	}
 
 	return events, nil

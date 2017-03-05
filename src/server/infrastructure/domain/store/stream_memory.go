@@ -30,6 +30,13 @@ func (self *MemoryStream) LastId() vm.Identifier {
 
 func (self *MemoryStream) Seek(identifier vm.Identifier) {
 
+	if identifier == uuid.Nil {
+
+		self.Reset()
+
+		return
+	}
+
 	index, exists := self.log.events_index[identifier]
 
 	if exists {
