@@ -19,7 +19,7 @@ func compareBlockStatements(a *ast.BlockStatement, b *ast.BlockStatement) bool {
 func blkStmt(nodes []ast.Node) *ast.BlockStatement {
 
 	return &ast.BlockStatement{
-		Type: "blockstatement",
+		Type: ast.BLOCK_STATEMENT,
 		Statements: nodes,
 	}
 }
@@ -27,7 +27,7 @@ func blkStmt(nodes []ast.Node) *ast.BlockStatement {
 func expStmt(exp ast.Expression) ast.Statement {
 
 	return &ast.ExpressionStatement{
-		Type: "expressionstatement",
+		Type: ast.EXPRESSION_STATEMENT,
 		Expression: exp,
 	}
 }
@@ -35,30 +35,30 @@ func expStmt(exp ast.Expression) ast.Statement {
 func infixInt(a int64, op string, b int64) ast.Node {
 
 	return expStmt(&ast.Infix{
-		"infix",
-		&ast.IntegerLiteral{"integer",a},
+		ast.INFIX,
+		&ast.Integer{ast.INTEGER,a},
 		op,
-		&ast.IntegerLiteral{"integer",b},
+		&ast.Integer{ast.INTEGER,b},
 	});
 }
 
 func infixIdent(a string, op string, b string) ast.Node {
 
 	return expStmt(&ast.Infix{
-		"infix",
-		&ast.Identifier{"identifier",a},
+		ast.INFIX,
+		&ast.Identifier{ast.IDENTIFIER,a},
 		op,
-		&ast.Identifier{"identifier",b},
+		&ast.Identifier{ast.IDENTIFIER,b},
 	});
 }
 
 func infixBool(a bool, op string, b bool) ast.Node {
 
 	return expStmt(&ast.Infix{
-		"infix",
-		&ast.Boolean{"boolean",a},
+		ast.INFIX,
+		&ast.Boolean{ast.BOOLEAN,a},
 		op,
-		&ast.Boolean{"boolean",b},
+		&ast.Boolean{ast.BOOLEAN,b},
 	});
 }
 
@@ -111,40 +111,40 @@ var prefixExpressions = testCases{
 	{
 		"--a;",
 		expStmt(&ast.Prefix{
-			"prefix",
+			ast.PREFIX,
 			"--",
 			&ast.Identifier{
-				"identifier",
+				ast.IDENTIFIER,
 				"a",
 			},
 		}),
 	}, {
 		"++a;",
 		expStmt(&ast.Prefix{
-			"prefix",
+			ast.PREFIX,
 			"++",
 			&ast.Identifier{
-				"identifier",
+				ast.IDENTIFIER,
 				"a",
 			},
 		}),
 	}, {
 		"!true;",
 		expStmt(&ast.Prefix{
-			"prefix",
+			ast.PREFIX,
 			"!",
 			&ast.Identifier{
-				"boolean",
+				ast.BOOLEAN,
 				"true",
 			},
 		}),
 	}, {
 		"-15;",
 		expStmt(&ast.Prefix{
-			"prefix",
+			ast.PREFIX,
 			"-",
 			&ast.Identifier{
-				"integer",
+				ast.INTEGER,
 				"15",
 			},
 		}),
@@ -328,15 +328,15 @@ func TestPredence(t *testing.T) {
 var basicTypes = testCases{
 	{
 		"15.1;",
-		expStmt(&ast.FloatLiteral{
-			"float",
+		expStmt(&ast.Float{
+			ast.FLOAT,
 			15.1,
 		}),
 	},
 	{
 		"\"I am a string, ohh yes I am!\";",
 		expStmt(&ast.String{
-			"string",
+			ast.STRING,
 			"I am a string, ohh yes I am!",
 		}),
 	},
@@ -355,11 +355,11 @@ var statementBlock = testCase{
 	`,
 	blkStmt([]ast.Node{
 		expStmt(&ast.Identifier{
-			"identifier",
+			ast.IDENTIFIER,
 			"a",
 		}),
 		expStmt(&ast.Identifier{
-			"identifier",
+			ast.IDENTIFIER,
 			"b",
 		}),
 	}),
@@ -375,9 +375,9 @@ var statements = testCases {
 		"return a;",
 		blkStmt([]ast.Node{
 			&ast.Return{
-				"return",
+				ast.RETURN_STATEMENT,
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"a",
 				},
 			},
@@ -387,14 +387,14 @@ var statements = testCases {
 		`if (a) { b; }`,
 		blkStmt([]ast.Node{
 			&ast.IfStatement{
-				"if",
+				ast.IF_STATEMENT,
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"a",
 				},
 				blkStmt([]ast.Node{
 					expStmt(&ast.Identifier{
-						"identifier",
+						ast.IDENTIFIER,
 						"b",
 					}),
 				}),
@@ -410,20 +410,20 @@ var statements = testCases {
 		}`,
 		blkStmt([]ast.Node{
 			&ast.IfStatement{
-				"if",
+				ast.IF_STATEMENT,
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"a",
 				},
 				blkStmt([]ast.Node{
 					expStmt(&ast.Identifier{
-						"identifier",
+						ast.IDENTIFIER,
 						"b",
 					}),
 				}),
 				blkStmt([]ast.Node{
 					expStmt(&ast.Identifier{
-						"identifier",
+						ast.IDENTIFIER,
 						"c",
 					}),
 				}),
@@ -440,14 +440,14 @@ var statements = testCases {
 		}`,
 		blkStmt([]ast.Node{
 			&ast.IfStatement{
-				"if",
+				ast.IF_STATEMENT,
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"a",
 				},
 				blkStmt([]ast.Node{
 					expStmt(&ast.Identifier{
-						"identifier",
+						ast.IDENTIFIER,
 						"b",
 					}),
 				}),
@@ -455,12 +455,12 @@ var statements = testCases {
 					&ast.IfStatement{
 						"if",
 						&ast.Identifier{
-							"identifier",
+							ast.IDENTIFIER,
 							"c",
 						},
 						blkStmt([]ast.Node{
 							expStmt(&ast.Identifier{
-								"identifier",
+								ast.IDENTIFIER,
 								"d",
 							}),
 						}),
@@ -474,19 +474,19 @@ var statements = testCases {
 		`foreach (things as thing) { a; }`,
 		blkStmt([]ast.Node{
 			&ast.ForeachStatement{
-				"foreach",
+				ast.FOREACH_STATEMENT,
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"things",
 				},
 				nil,
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"thing",
 				},
 				blkStmt([]ast.Node{
 					expStmt(&ast.Identifier{
-						"identifier",
+						ast.IDENTIFIER,
 						"a",
 					}),
 				}),
@@ -497,22 +497,22 @@ var statements = testCases {
 		`foreach (things as key=>thing) { a; }`,
 		blkStmt([]ast.Node{
 			&ast.ForeachStatement{
-				"foreach",
+				ast.FOREACH_STATEMENT,
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"things",
 				},
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"key",
 				},
 				&ast.Identifier{
-					"identifier",
+					ast.IDENTIFIER,
 					"thing",
 				},
 				blkStmt([]ast.Node{
 					expStmt(&ast.Identifier{
-						"identifier",
+						ast.IDENTIFIER,
 						"a",
 					}),
 				}),

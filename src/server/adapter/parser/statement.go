@@ -170,7 +170,7 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
 	p.nextToken()
 
-	block := &ast.BlockStatement{Type:"blockstatement"}
+	block := &ast.BlockStatement{Type:ast.BLOCK_STATEMENT}
 	block.Statements = []ast.Node{}
 
 	for !p.curTokenIs(token.RBRACE) && p.error == nil  {
@@ -204,7 +204,7 @@ func (p *statementParser) parseStatement() ast.Node {
 
 func (p *statementParser) parseExpressionStatement() ast.Node {
 
-	stmt := &ast.ExpressionStatement{Type:"expressionstatement"}
+	stmt := &ast.ExpressionStatement{Type:ast.EXPRESSION_STATEMENT}
 
 	stmt.Expression = p.parseExpression(LOWEST)
 
@@ -221,7 +221,7 @@ func (p *statementParser) parseExpressionStatement() ast.Node {
 
 func (p *statementParser) parseReturnStatement() *ast.Return {
 
-	stmt := &ast.Return{Type:"return"}
+	stmt := &ast.Return{Type:ast.RETURN_STATEMENT}
 
 	p.nextToken()
 
@@ -236,7 +236,7 @@ func (p *statementParser) parseReturnStatement() *ast.Return {
 
 func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
 
-	stmt := &ast.ForeachStatement{Type:"foreach"}
+	stmt := &ast.ForeachStatement{Type:ast.FOREACH_STATEMENT}
 
 	p.nextToken()
 
@@ -286,7 +286,7 @@ func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
 
 func (p *statementParser) parseIfStatement() ast.Statement {
 
-	stmt := &ast.IfStatement{Type:"if"}
+	stmt := &ast.IfStatement{Type:ast.IF_STATEMENT}
 
 	p.nextToken()
 
@@ -373,7 +373,7 @@ func (p *statementParser) parsePrefixExpression() ast.Expression {
 	}
 
 	expression := &ast.Prefix{
-		Type: "prefix",
+		Type: ast.PREFIX,
 		Operator: operator,
 	}
 
@@ -392,7 +392,7 @@ func (p *statementParser) isIncrementOrDecrement() bool {
 func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expression {
 
 	expression := &ast.Infix{
-		Type: "infix",
+		Type: ast.INFIX,
 		Operator: p.curToken.Val,
 		Left:     left,
 	}
@@ -412,12 +412,12 @@ func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expressi
 
 func (p *statementParser) parseIdentifier() ast.Expression {
 
-	return &ast.Identifier{Type:"identifier", Value: p.curToken.Val}
+	return &ast.Identifier{Type:ast.IDENTIFIER, Value: p.curToken.Val}
 }
 
 func (p *statementParser) parseIntegerLiteral() ast.Expression {
 
-	lit := &ast.IntegerLiteral{Type:"integer"}
+	lit := &ast.Integer{Type:ast.INTEGER}
 
 	value, err := strconv.ParseInt(p.curToken.Val, 0, 64)
 	if err != nil {
@@ -433,7 +433,7 @@ func (p *statementParser) parseIntegerLiteral() ast.Expression {
 
 func (p *statementParser) parseBoolean() ast.Expression {
 
-	return &ast.Boolean{Type:"boolean", Value: p.curToken.Val == "true"}
+	return &ast.Boolean{Type:ast.BOOLEAN, Value: p.curToken.Val == "true"}
 }
 
 func (p *statementParser) parseGroupedExpression() ast.Expression {
@@ -451,7 +451,7 @@ func (p *statementParser) parseGroupedExpression() ast.Expression {
 
 func (p *statementParser) parseFloatLiteral() ast.Expression {
 
-	lit := &ast.FloatLiteral{Type:"float"}
+	lit := &ast.Float{Type:ast.FLOAT}
 
 	value, err := strconv.ParseFloat(p.curToken.Val, 64)
 	if err != nil {
@@ -467,5 +467,5 @@ func (p *statementParser) parseFloatLiteral() ast.Expression {
 
 func (p *statementParser) parseString() ast.Expression {
 
-	return &ast.String{Type:"string", Value:p.curToken.Val}
+	return &ast.String{Type:ast.STRING, Value:p.curToken.Val}
 }

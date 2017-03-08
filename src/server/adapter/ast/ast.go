@@ -5,6 +5,22 @@ import (
 	"strconv"
 )
 
+const (
+	BLOCK_STATEMENT string = "blockstatement"
+	EXPRESSION_STATEMENT = "expressionstatement"
+	RETURN_STATEMENT = "returnstatement"
+	FOREACH_STATEMENT = "foreachstatement"
+	IF_STATEMENT = "ifstatement"
+
+	PREFIX = "prefix"
+	INFIX = "infix"
+	IDENTIFIER = "identifier"
+	INTEGER = "integer"
+	BOOLEAN = "boolean"
+	FLOAT = "float"
+	STRING = "string"
+)
+
 // The base Node interface
 type Node interface {
 	String() string
@@ -189,28 +205,28 @@ func (b *Boolean) String() string {
 }
 
 
-type IntegerLiteral struct {
+type Integer struct {
 	Type string
 	Value int64
 }
 
-func (il *IntegerLiteral) expressionNode() {}
+func (il *Integer) expressionNode() {}
 
-func (il *IntegerLiteral) String() string {
+func (il *Integer) String() string {
 
 	//return "["+il.Type+"]: "+strconv.FormatInt(il.Value, 10);
 	return strconv.FormatInt(il.Value, 10);
 }
 
 
-type FloatLiteral struct {
+type Float struct {
 	Type string
 	Value float64
 }
 
-func (f *FloatLiteral) expressionNode() {}
+func (f *Float) expressionNode() {}
 
-func (f *FloatLiteral) String() string {
+func (f *Float) String() string {
 
 	return strconv.FormatFloat(f.Value, 'E', -1, 64)
 }
