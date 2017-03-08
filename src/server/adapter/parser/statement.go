@@ -173,6 +173,7 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 	p.nextToken()
 
 	block := &ast.BlockStatement{Type:ast.BLOCK_STATEMENT}
+
 	block.Statements = []ast.Node{}
 
 	for !p.curTokenIs(token.RBRACE) && p.error == nil  {
@@ -181,6 +182,11 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 			block.Statements = append(block.Statements, stmt)
 		}
 		p.nextToken()
+
+		if p.curToken == nil {
+			p.logError("Unexpected EOF")
+			break;
+		}
 	}
 
 	return block, p.error
@@ -239,9 +245,7 @@ func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
 
 	stmt := &ast.ForeachStatement{Type:ast.FOREACH_STATEMENT}
 
-	p.nextToken()
-
-	if !p.curTokenIs(token.LPAREN) {
+	if (!p.expectPeek(token.LPAREN)) {
 		return nil
 	}
 
@@ -249,9 +253,7 @@ func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
 
 	stmt.Collection = p.parseExpression(LOWEST)
 
-	p.nextToken()
-
-	if !p.curTokenIs(token.AS) {
+	if (!p.expectPeek(token.AS)) {
 		return nil
 	}
 
@@ -266,15 +268,11 @@ func (p *statementParser) parseForeachStatement() *ast.ForeachStatement {
 
 	stmt.Value =  p.parseIdentifier().(*ast.Identifier)
 
-	p.nextToken()
-
-	if !p.curTokenIs(token.RPAREN) {
+	if (!p.expectPeek(token.RPAREN)) {
 		return nil
 	}
 
-	p.nextToken()
-
-	if !p.curTokenIs(token.LBRACE) {
+	if (!p.expectPeek(token.LBRACE)) {
 		return nil
 	}
 
@@ -293,9 +291,7 @@ func (p *statementParser) parseIfStatement() ast.Statement {
 
 	stmt.Test = p.parseExpression(LOWEST)
 
-	p.nextToken()
-
-	if !p.curTokenIs(token.LBRACE) {
+	if (!p.expectPeek(token.LBRACE)) {
 		return nil
 	}
 
@@ -349,6 +345,7 @@ func (p *statementParser) peekPrecedence() int {
 	if (p.peekToken == nil) {
 		return LOWEST
 	}
+
 	if p, ok := precedences[p.peekToken.Type]; ok {
 		return p
 	}
@@ -368,6 +365,7 @@ func (p *statementParser) curPrecedence() int {
 func (p *statementParser) parsePrefixExpression() ast.Expression {
 
 	operator := p.curToken.Val
+
 	if (p.isIncrementOrDecrement()) {
 		p.nextToken()
 		operator += p.curToken.Val
@@ -399,7 +397,9 @@ func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expressi
 	}
 
 	precedence := p.curPrecedence()
+
 	p.nextToken()
+
 	expression.Right = p.parseExpression(precedence)
 
 	if (expression.Right == nil) {
@@ -420,6 +420,7 @@ func (p *statementParser) parseIntegerLiteral() ast.Expression {
 	lit := &ast.Integer{Type:ast.INTEGER}
 
 	value, err := strconv.ParseInt(p.curToken.Val, 0, 64)
+
 	if err != nil {
 		p.logError("could not parse %q as integer", p.curToken.Val)
 		return nil
