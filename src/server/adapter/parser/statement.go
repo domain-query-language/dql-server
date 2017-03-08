@@ -151,20 +151,22 @@ func (p *statementParser) expectCurrent(t token.TokenType) bool {
 func (p *statementParser) peekError(t token.TokenType) {
 
 	if (p.peekToken == nil) {
-		msg := fmt.Sprintf("Expected next token to be '%s', got EOF instead", t)
-		p.error = errors.New(msg);
+		p.logError("Expected next token to be '%s', got EOF instead", t)
 		return;
 	}
-	msg := fmt.Sprintf("Expected next token to be '%s', got '%s' instead", t, p.peekToken.Val)
-	p.error = errors.New(msg);
+	p.logError("Expected next token to be '%s', got '%s' instead", t, p.peekToken.Val)
+}
+
+func (p *statementParser) logError(format string, a...interface{}) {
+	msg := fmt.Sprintf(format, a...)
+	p.error = errors.New(msg)
 }
 
 
 func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
 	if (!p.curTokenIs(token.LBRACE) ) {
-		msg := fmt.Sprintf("Expected next token to be '%s', got '%s' instead", token.LBRACE, p.curToken.Val)
-		p.error = errors.New(msg);
+		p.logError("Expected next token to be '%s', got '%s' instead", token.LBRACE, p.curToken.Val)
 		return nil, p.error
 	}
 
@@ -211,8 +213,7 @@ func (p *statementParser) parseExpressionStatement() ast.Node {
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	} else {
-		msg := fmt.Sprintf("Expected %v, got %v", token.SEMICOLON, p.peekToken);
-		p.error = errors.New(msg);
+		p.logError("Expected %v, got %v", token.SEMICOLON, p.peekToken);
 	}
 
 	return stmt
@@ -402,8 +403,7 @@ func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expressi
 	expression.Right = p.parseExpression(precedence)
 
 	if (expression.Right == nil) {
-
-		p.error = errors.New("Expected expression, got nothing")
+		p.logError("Expected expression, got nothing")
 		return nil
 	}
 
@@ -421,8 +421,7 @@ func (p *statementParser) parseIntegerLiteral() ast.Expression {
 
 	value, err := strconv.ParseInt(p.curToken.Val, 0, 64)
 	if err != nil {
-		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Val)
-		p.error = errors.New(msg)
+		p.logError("could not parse %q as integer", p.curToken.Val)
 		return nil
 	}
 
@@ -455,8 +454,7 @@ func (p *statementParser) parseFloatLiteral() ast.Expression {
 
 	value, err := strconv.ParseFloat(p.curToken.Val, 64)
 	if err != nil {
-		msg := fmt.Sprintf("could not parse %q as float", p.curToken.Val)
-		p.error = errors.New(msg)
+		p.logError("could not parse %q as float", p.curToken.Val);
 		return nil
 	}
 
