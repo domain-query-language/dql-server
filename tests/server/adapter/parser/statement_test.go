@@ -361,6 +361,43 @@ func TestBasicTypes(t *testing.T) {
 	basicTypes.test(t);
 }
 
+var methodCalls = testCases{
+	{
+		"a->b();",
+		expStmt(&ast.MethodCall{
+			ast.METHOD_CALL,
+			&ast.Infix{
+				ast.INFIX,
+				&ast.Identifier{ast.IDENTIFIER, "a"},
+				"->",
+				&ast.Identifier{ast.IDENTIFIER, "b"},
+			},
+			[]ast.Expression{},
+		}),
+	},
+	{
+		"a->b(c, d);",
+		expStmt(&ast.MethodCall{
+			ast.METHOD_CALL,
+			&ast.Infix{
+				ast.INFIX,
+				&ast.Identifier{ast.IDENTIFIER, "a"},
+				"->",
+				&ast.Identifier{ast.IDENTIFIER, "b"},
+			},
+			[]ast.Expression{
+				&ast.Identifier{ast.IDENTIFIER, "c"},
+				&ast.Identifier{ast.IDENTIFIER, "d"},
+			},
+		}),
+	},
+}
+
+func TestMethodClass(t *testing.T) {
+
+	methodCalls.test(t);
+}
+
 var statementBlock = testCase{
 	`
 	a;

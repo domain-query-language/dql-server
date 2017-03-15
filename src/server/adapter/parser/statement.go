@@ -473,7 +473,7 @@ func (p *statementParser) parseString() ast.Expression {
 
 func (p *statementParser) parseMethodCallExpression(method ast.Expression) ast.Expression {
 
-	exp := &ast.MethodCall{Method: method}
+	exp := &ast.MethodCall{Type: ast.METHOD_CALL, Method: method}
 	exp.Arguments = p.parseExpressionList(token.RPAREN)
 	return exp
 }

@@ -20,6 +20,7 @@ const (
 	BOOLEAN = "boolean"
 	FLOAT = "float"
 	STRING = "string"
+	METHOD_CALL = "methodcall"
 )
 
 // The base Node interface
@@ -246,6 +247,7 @@ func (s *String) String() string {
 }
 
 type MethodCall struct {
+	Type string
 	Method  Expression
 	Arguments []Expression
 }
