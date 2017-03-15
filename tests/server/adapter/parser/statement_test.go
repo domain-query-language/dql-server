@@ -186,30 +186,6 @@ func TestInfixExpressions(t *testing.T) {
 	infixExpressions.test(t)
 }
 
-var invalidStatements = []struct{
-	statement string
-}{
-	{"a a a"},
-	{`foreach (things key=>thing) { a; }`},
-	{`foreach (`},
-	{`if a == b`},
-	{`if (a) { b;`},
-}
-
-func TestInvalidStatements(t *testing.T) {
-
-	for _, testCase := range invalidStatements {
-
-		p := parser.NewStatement("{"+testCase.statement+"}");
-
-		node, err := p.ParseBlockStatement()
-
-		if (err == nil) {
-			t.Error("Expected error for '"+testCase.statement+"', got "+node.String())
-		}
-	}
-}
-
 var precedenceTests = []struct {
 	statement string
 	expected  string
@@ -574,6 +550,32 @@ var statements = testCases {
 func TestStatements(t *testing.T) {
 
 	statements.test(t);
+}
+
+var invalidStatements = []struct{
+	statement string
+}{
+	{"a a a"},
+	{`foreach (things key=>thing) { a; }`},
+	{`foreach (`},
+	{`if a == b`},
+	{`if (a) { b;`},
+	{`a->b->c(d,`},
+	{`a->b->c(d, e`},
+}
+
+func TestInvalidStatements(t *testing.T) {
+
+	for _, testCase := range invalidStatements {
+
+		p := parser.NewStatement("{"+testCase.statement+"}");
+
+		node, err := p.ParseBlockStatement()
+
+		if (err == nil) {
+			t.Error("Expected error for '"+testCase.statement+"', got "+node.String())
+		}
+	}
 }
 
 
