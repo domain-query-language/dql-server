@@ -88,6 +88,8 @@ func NewStatement(statements string) *statementParser {
 	p.registerInfix(token.ARROW, p.parseInfixExpression)
 	p.registerInfix(token.ASSIGN, p.parseInfixExpression)
 
+	p.registerInfix(token.LPAREN, p.parseMethodCallExpression)
+
 	p.nextToken()
 	p.nextToken()
 
@@ -467,4 +469,35 @@ func (p *statementParser) parseFloatLiteral() ast.Expression {
 func (p *statementParser) parseString() ast.Expression {
 
 	return &ast.String{Type:ast.STRING, Value:p.curToken.Val}
+}
+
+func (p *statementParser) parseMethodCallExpression(method ast.Expression) ast.Expression {
+
+	exp := &ast.MethodCall{Method: method}
+	exp.Arguments = p.parseExpressionList(token.RPAREN)
+	return exp
+}
+
+func (p *statementParser) parseExpressionList(end token.TokenType) []ast.Expression {
+	list := []ast.Expression{}
+
+	if p.peekTokenIs(end) {
+		p.nextToken()
+		return list
+	}
+
+	p.nextToken()
+	list = append(list, p.parseExpression(LOWEST))
+
+	for p.peekTokenIs(token.COMMA) {
+		p.nextToken()
+		p.nextToken()
+		list = append(list, p.parseExpression(LOWEST))
+	}
+
+	if !p.expectPeek(end) {
+		return nil
+	}
+
+	return list
 }

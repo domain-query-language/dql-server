@@ -3,6 +3,7 @@ package ast
 import (
 	"bytes"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -242,4 +243,21 @@ func (s *String) expressionNode() {}
 func (s *String) String() string {
 
 	return s.Value
+}
+
+type MethodCall struct {
+	Method  Expression
+	Arguments []Expression
+}
+
+func (m *MethodCall) expressionNode() {}
+
+func (m *MethodCall) String() string {
+
+	args := make([]string, len(m.Arguments))
+	for i, arg := range m.Arguments {
+		args[i] = arg.String()
+	}
+
+	return m.Method.String() + "("+strings.Join(args, ", ")+")";
 }

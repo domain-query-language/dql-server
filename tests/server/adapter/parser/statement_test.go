@@ -302,6 +302,18 @@ var precedenceTests = []struct {
 		"a->b->c = 34 - 1;",
 		"(((a -> b) -> c) = (34 - 1));",
 	},
+	{
+		"a->b->c();",
+		"((a -> b) -> c)();",
+	},
+	{
+		"a->b(1, c + d);",
+		"(a -> b)(1, (c + d));",
+	},
+	{
+		"a->b()->c->d();",
+		"(((a -> b)() -> c) -> d)();",
+	},
 }
 
 func TestPredence(t *testing.T) {
@@ -348,7 +360,6 @@ func TestBasicTypes(t *testing.T) {
 
 	basicTypes.test(t);
 }
-
 
 var statementBlock = testCase{
 	`
