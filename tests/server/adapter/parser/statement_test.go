@@ -600,6 +600,9 @@ var invalidStatements = []struct{
 	{`if (a) { b;`},
 	{`a->b->c(d,`},
 	{`a->b->c(d, e`},
+	{`a[`},
+	{`a[b`},
+	{`a[b,c`},
 }
 
 func TestInvalidStatements(t *testing.T) {
