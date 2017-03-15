@@ -274,6 +274,34 @@ func TestArrayAccess(t *testing.T) {
 	arrayAccess.test(t);
 }
 
+var arrayCreation = testCases{
+	{
+		"[a];",
+		expStmt(&ast.Array{
+			ast.ARRAY,
+			[]ast.Expression{
+				&ast.Identifier{ast.IDENTIFIER, "a"},
+			},
+		}),
+	},
+	{
+		"[a, b, 1];",
+		expStmt(&ast.Array{
+			ast.ARRAY,
+			[]ast.Expression{
+				&ast.Identifier{ast.IDENTIFIER, "a"},
+				&ast.Identifier{ast.IDENTIFIER, "b"},
+				&ast.Integer{ast.INTEGER, 1},
+			},
+		}),
+	},
+}
+
+func TestArrayCreation(t *testing.T) {
+
+	arrayCreation.test(t);
+}
+
 var statementBlock = testCase{
 	`
 	a;

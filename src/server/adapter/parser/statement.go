@@ -75,6 +75,7 @@ func NewStatement(statements string) *statementParser {
 	p.registerPrefix(token.MINUS, p.parsePrefixExpression)
 	p.registerPrefix(token.BOOLEAN, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
+	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -88,7 +89,7 @@ func NewStatement(statements string) *statementParser {
 	p.registerInfix(token.ARROW, p.parseInfixExpression)
 	p.registerInfix(token.ASSIGN, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseMethodCallExpression)
-	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
+	p.registerInfix(token.LBRACKET, p.parseArrayAccess)
 
 	p.nextToken()
 	p.nextToken()
@@ -502,7 +503,16 @@ func (p *statementParser) parseExpressionList(end token.TokenType) []ast.Express
 	return list
 }
 
-func (p *statementParser) parseIndexExpression(left ast.Expression) ast.Expression {
+
+func (p *statementParser) parseArrayLiteral() ast.Expression {
+	array := &ast.Array{Type: ast.ARRAY}
+
+	array.Elements = p.parseExpressionList(token.RBRACKET)
+
+	return array
+}
+
+func (p *statementParser) parseArrayAccess(left ast.Expression) ast.Expression {
 	exp := &ast.ArrayAccess{Type: ast.ARRAY_ACCESS, Left: left}
 
 	p.nextToken()

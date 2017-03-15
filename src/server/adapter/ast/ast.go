@@ -21,6 +21,7 @@ const (
 	FLOAT = "float"
 	STRING = "string"
 	METHOD_CALL = "methodcall"
+	ARRAY = "array"
 	ARRAY_ACCESS = "arrayaccess"
 )
 
@@ -264,6 +265,23 @@ func (m *MethodCall) String() string {
 	}
 
 	return m.Method.String() + "("+strings.Join(args, ", ")+")";
+}
+
+type Array struct {
+	Type string
+	Elements []Expression
+}
+
+func (a *Array) expressionNode() {}
+
+func (a *Array) String() string {
+
+	elms := make([]string, len(a.Elements))
+	for i, elm := range a.Elements {
+		elms[i] = elm.String()
+	}
+
+	return "["+strings.Join(elms, ", ")+"]";
 }
 
 type ArrayAccess struct {
