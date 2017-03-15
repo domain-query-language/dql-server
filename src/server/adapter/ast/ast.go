@@ -21,6 +21,7 @@ const (
 	FLOAT = "float"
 	STRING = "string"
 	METHOD_CALL = "methodcall"
+	ARRAY_ACCESS = "arrayaccess"
 )
 
 // The base Node interface
@@ -246,6 +247,7 @@ func (s *String) String() string {
 	return s.Value
 }
 
+
 type MethodCall struct {
 	Type string
 	Method  Expression
@@ -262,4 +264,25 @@ func (m *MethodCall) String() string {
 	}
 
 	return m.Method.String() + "("+strings.Join(args, ", ")+")";
+}
+
+type ArrayAccess struct {
+	Type string
+	Left  Expression
+	Offset Expression
+}
+
+func (m *ArrayAccess) expressionNode() {}
+
+func (a *ArrayAccess) String() string {
+
+	var out bytes.Buffer
+
+	out.WriteString("(")
+	out.WriteString(a.Left.String())
+	out.WriteString("[")
+	out.WriteString(a.Offset.String())
+	out.WriteString("])")
+
+	return out.String()
 }

@@ -186,135 +186,6 @@ func TestInfixExpressions(t *testing.T) {
 	infixExpressions.test(t)
 }
 
-var precedenceTests = []struct {
-	statement string
-	expected  string
-}{
-	{
-		"-a * b;",
-		"((-a) * b);",
-	},
-	{
-		"(a);",
-		"a;",
-	},
-	{
-		"!-a;",
-		"(!(-a));",
-	},
-	{
-		"a + b + c;",
-		"((a + b) + c);",
-	},
-	{
-		"a + b - c;",
-		"((a + b) - c);",
-	},
-	{
-		"a * b * c;",
-		"((a * b) * c);",
-	},
-	{
-		"a * b / c;",
-		"((a * b) / c);",
-	},
-	{
-		"a + b / c;",
-		"(a + (b / c));",
-	},
-	{
-		"a + b * c + d / e - f;",
-		"(((a + (b * c)) + (d / e)) - f);",
-	},
-	{
-		"3 + 4 - -5 * 5;",
-		"((3 + 4) - ((-5) * 5));",
-	},
-	{
-		"5 > 4 == 3 < 4;",
-		"((5 > 4) == (3 < 4));",
-	},
-	{
-		"5 < 4 != 3 > 4;",
-		"((5 < 4) != (3 > 4));",
-	},
-	{
-		"3 + 4 * 5 == 3 * 1 + 4 * 5;",
-		"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)));",
-	},
-	{
-		"3 > 5 == false;",
-		"((3 > 5) == false);",
-	},
-	{
-		"1 + (2 + 3) + 4;",
-		"((1 + (2 + 3)) + 4);",
-	},
-	{
-		"(5 + 5) * 2;",
-		"((5 + 5) * 2);",
-	},
-	{
-		"2 / (5 + 5);",
-		"(2 / (5 + 5));",
-	},
-	{
-		"(5 + 5) * 2 * (5 + 5);",
-		"(((5 + 5) * 2) * (5 + 5));",
-	},
-	{
-		"-(5 + 5);",
-		"(-(5 + 5));",
-	},
-	{
-		"!(true == true);",
-		"(!(true == true));",
-	},
-	{
-		"a->b->c->d;",
-		"(((a -> b) -> c) -> d);",
-	},
-	{
-		"a->b->c = 34 - 1;",
-		"(((a -> b) -> c) = (34 - 1));",
-	},
-	{
-		"a->b->c();",
-		"((a -> b) -> c)();",
-	},
-	{
-		"a->b(1, c + d);",
-		"(a -> b)(1, (c + d));",
-	},
-	{
-		"a->b()->c->d();",
-		"(((a -> b)() -> c) -> d)();",
-	},
-}
-
-func TestPredence(t *testing.T) {
-
-	for _, testCase := range precedenceTests {
-
-		statementBlockStr := "{ "+testCase.statement+" }";
-
-		p := parser.NewStatement(statementBlockStr);
-
-		node, err := p.ParseBlockStatement()
-
-		if (err != nil) {
-			t.Error("Got error on '"+testCase.statement+"'");
-			t.Error(err.Error());
-		}
-
-		if (node.String() != testCase.expected) {
-			t.Error("Error in precedence")
-			t.Error("Expected: "+testCase.expected)
-			t.Error("Got: "+node.String())
-		}
-	}
-}
-
 var basicTypes = testCases{
 	{
 		"15.1;",
@@ -372,6 +243,35 @@ var methodCalls = testCases{
 func TestMethodClass(t *testing.T) {
 
 	methodCalls.test(t);
+}
+
+var arrayAccess = testCases{
+	{
+		"a[1];",
+		expStmt(&ast.ArrayAccess{
+			ast.ARRAY_ACCESS,
+			&ast.Identifier{ast.IDENTIFIER, "a"},
+			&ast.Integer{ast.INTEGER, 1},
+		}),
+	},
+	{
+		"a[b+c];",
+		expStmt(&ast.ArrayAccess{
+			ast.ARRAY_ACCESS,
+			&ast.Identifier{ast.IDENTIFIER, "a"},
+			&ast.Infix{
+				ast.INFIX,
+				&ast.Identifier{ast.IDENTIFIER, "b"},
+				"+",
+				&ast.Identifier{ast.IDENTIFIER,"c"},
+			},
+		}),
+	},
+}
+
+func TestArrayAccess(t *testing.T) {
+
+	arrayAccess.test(t);
 }
 
 var statementBlock = testCase{
@@ -550,6 +450,144 @@ var statements = testCases {
 func TestStatements(t *testing.T) {
 
 	statements.test(t);
+}
+
+
+var precedenceTests = []struct {
+	statement string
+	expected  string
+}{
+	{
+		"-a * b;",
+		"((-a) * b);",
+	},
+	{
+		"(a);",
+		"a;",
+	},
+	{
+		"!-a;",
+		"(!(-a));",
+	},
+	{
+		"a + b + c;",
+		"((a + b) + c);",
+	},
+	{
+		"a + b - c;",
+		"((a + b) - c);",
+	},
+	{
+		"a * b * c;",
+		"((a * b) * c);",
+	},
+	{
+		"a * b / c;",
+		"((a * b) / c);",
+	},
+	{
+		"a + b / c;",
+		"(a + (b / c));",
+	},
+	{
+		"a + b * c + d / e - f;",
+		"(((a + (b * c)) + (d / e)) - f);",
+	},
+	{
+		"3 + 4 - -5 * 5;",
+		"((3 + 4) - ((-5) * 5));",
+	},
+	{
+		"5 > 4 == 3 < 4;",
+		"((5 > 4) == (3 < 4));",
+	},
+	{
+		"5 < 4 != 3 > 4;",
+		"((5 < 4) != (3 > 4));",
+	},
+	{
+		"3 + 4 * 5 == 3 * 1 + 4 * 5;",
+		"((3 + (4 * 5)) == ((3 * 1) + (4 * 5)));",
+	},
+	{
+		"3 > 5 == false;",
+		"((3 > 5) == false);",
+	},
+	{
+		"1 + (2 + 3) + 4;",
+		"((1 + (2 + 3)) + 4);",
+	},
+	{
+		"(5 + 5) * 2;",
+		"((5 + 5) * 2);",
+	},
+	{
+		"2 / (5 + 5);",
+		"(2 / (5 + 5));",
+	},
+	{
+		"(5 + 5) * 2 * (5 + 5);",
+		"(((5 + 5) * 2) * (5 + 5));",
+	},
+	{
+		"-(5 + 5);",
+		"(-(5 + 5));",
+	},
+	{
+		"!(true == true);",
+		"(!(true == true));",
+	},
+	{
+		"a->b->c->d;",
+		"(((a -> b) -> c) -> d);",
+	},
+	{
+		"a->b->c = 34 - 1;",
+		"(((a -> b) -> c) = (34 - 1));",
+	},
+	{
+		"a->b->c();",
+		"((a -> b) -> c)();",
+	},
+	{
+		"a->b(1, c + d);",
+		"(a -> b)(1, (c + d));",
+	},
+	{
+		"a->b()->c->d();",
+		"(((a -> b)() -> c) -> d)();",
+	},
+	{
+		"a->b[1];",
+		"((a -> b)[1]);",
+	},
+	{
+		"a->b[1][2];",
+		"(((a -> b)[1])[2]);",
+	},
+}
+
+func TestPredence(t *testing.T) {
+
+	for _, testCase := range precedenceTests {
+
+		statementBlockStr := "{ "+testCase.statement+" }";
+
+		p := parser.NewStatement(statementBlockStr);
+
+		node, err := p.ParseBlockStatement()
+
+		if (err != nil) {
+			t.Error("Got error on '"+testCase.statement+"'");
+			t.Error(err.Error());
+		}
+
+		if (node.String() != testCase.expected) {
+			t.Error("Error in precedence")
+			t.Error("Expected: "+testCase.expected)
+			t.Error("Got: "+node.String())
+		}
+	}
 }
 
 var invalidStatements = []struct{

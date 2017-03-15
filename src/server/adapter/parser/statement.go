@@ -19,8 +19,8 @@ const (
 	PRODUCT     // *
 	PREFIX      // -X or !X
 	CALL        // myFunction(X)
-	OBJECT	    // object->key
 	INDEX       // array[index]
+	OBJECT	    // object->key
 
 )
 
@@ -87,8 +87,8 @@ func NewStatement(statements string) *statementParser {
 	p.registerInfix(token.GT, p.parseInfixExpression)
 	p.registerInfix(token.ARROW, p.parseInfixExpression)
 	p.registerInfix(token.ASSIGN, p.parseInfixExpression)
-
 	p.registerInfix(token.LPAREN, p.parseMethodCallExpression)
+	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
 
 	p.nextToken()
 	p.nextToken()
@@ -500,4 +500,17 @@ func (p *statementParser) parseExpressionList(end token.TokenType) []ast.Express
 	}
 
 	return list
+}
+
+func (p *statementParser) parseIndexExpression(left ast.Expression) ast.Expression {
+	exp := &ast.ArrayAccess{Type: ast.ARRAY_ACCESS, Left: left}
+
+	p.nextToken()
+	exp.Offset = p.parseExpression(LOWEST)
+
+	if !p.expectPeek(token.RBRACKET) {
+		return nil
+	}
+
+	return exp
 }
