@@ -23,6 +23,7 @@ const (
 	METHOD_CALL = "methodcall"
 	ARRAY = "array"
 	ARRAY_ACCESS = "arrayaccess"
+	OBJECT_CREATION = "objectcreation"
 )
 
 // The base Node interface
@@ -303,4 +304,22 @@ func (a *ArrayAccess) String() string {
 	out.WriteString("])")
 
 	return out.String()
+}
+
+type ObjectCreation struct {
+	Type string
+	Name  string
+	Arguments []Expression
+}
+
+func (o *ObjectCreation) expressionNode() {}
+
+func (o *ObjectCreation) String() string {
+
+	args := make([]string, len(o.Arguments))
+	for i, arg := range o.Arguments {
+		args[i] = arg.String()
+	}
+
+	return "'"+o.Name + "'("+strings.Join(args, ", ")+")";
 }

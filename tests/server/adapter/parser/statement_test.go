@@ -480,6 +480,32 @@ func TestStatements(t *testing.T) {
 	statements.test(t);
 }
 
+var createObject = testCases {
+	{
+		`vo = 'value-object'(a, b);`,
+		blkStmt([]ast.Node{
+			expStmt(&ast.Infix{
+				ast.INFIX,
+				&ast.Identifier{ast.IDENTIFIER, "vo"},
+				"=",
+				&ast.ObjectCreation{
+					ast.OBJECT_CREATION,
+					"value-object",
+					[]ast.Expression{
+						&ast.Identifier{ast.IDENTIFIER, "a"},
+						&ast.Identifier{ast.IDENTIFIER, "b"},
+					},
+				},
+			}),
+		}),
+	},
+}
+
+func TestCreateObject(t *testing.T) {
+
+	createObject.test(t);
+}
+
 
 var precedenceTests = []struct {
 	statement string

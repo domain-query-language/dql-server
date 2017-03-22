@@ -76,6 +76,7 @@ func NewStatement(statements string) *statementParser {
 	p.registerPrefix(token.BOOLEAN, p.parseBoolean)
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
+	p.registerPrefix(token.OBJECTNAME, p.parseObjectCreation)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -480,6 +481,7 @@ func (p *statementParser) parseMethodCallExpression(method ast.Expression) ast.E
 }
 
 func (p *statementParser) parseExpressionList(end token.TokenType) []ast.Expression {
+
 	list := []ast.Expression{}
 
 	if p.peekTokenIs(end) {
@@ -505,7 +507,10 @@ func (p *statementParser) parseExpressionList(end token.TokenType) []ast.Express
 
 
 func (p *statementParser) parseArrayLiteral() ast.Expression {
+
 	array := &ast.Array{Type: ast.ARRAY}
+
+	//panic(p.curToken)
 
 	array.Elements = p.parseExpressionList(token.RBRACKET)
 
@@ -513,6 +518,7 @@ func (p *statementParser) parseArrayLiteral() ast.Expression {
 }
 
 func (p *statementParser) parseArrayAccess(left ast.Expression) ast.Expression {
+
 	exp := &ast.ArrayAccess{Type: ast.ARRAY_ACCESS, Left: left}
 
 	p.nextToken()
@@ -523,4 +529,19 @@ func (p *statementParser) parseArrayAccess(left ast.Expression) ast.Expression {
 	}
 
 	return exp
+}
+
+func (p *statementParser) parseObjectCreation() ast.Expression {
+
+	oc := &ast.ObjectCreation{Type: ast.OBJECT_CREATION};
+
+	oc.Name = p.curToken.Val
+
+	if (!p.expectPeek(token.LPAREN)) {
+		return nil
+	}
+
+	oc.Arguments = p.parseExpressionList(token.RPAREN)
+
+	return oc
 }

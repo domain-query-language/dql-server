@@ -224,8 +224,8 @@ var classComponents = testStatements{
 		`
 		properties
 		{
-			value\service_charge service_charge = 'value\service_charge'(1);
-			value\category category = [];
+			value\service_charge service_charge;
+			value\category category;
 		}`,
 		[]tok.Token{
 			tk(tok.PROPERTIES, "properties"),
@@ -324,7 +324,7 @@ var classComponents = testStatements{
 		`
 		handler
 		{
-			assert  invariant not 'is-started';
+			assert invariant not 'is-started';
 			revision = run query 'next-revision-number' (agency_id, quote_number);
 			apply event 'started' (agency_id, brand_id, quote_number, revision);
 		}`,
