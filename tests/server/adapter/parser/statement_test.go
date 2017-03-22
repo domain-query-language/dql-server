@@ -499,11 +499,106 @@ var createObject = testCases {
 			}),
 		}),
 	},
+	{
+		`vo = 'vo-with-no-args';`,
+		blkStmt([]ast.Node{
+			expStmt(&ast.Infix{
+				ast.INFIX,
+				&ast.Identifier{ast.IDENTIFIER, "vo"},
+				"=",
+				&ast.ObjectCreation{
+					ast.OBJECT_CREATION,
+					"vo-with-no-args",
+					[]ast.Expression{},
+				},
+			}),
+		}),
+	},
+	{
+		`'vo-with-no-args';`,
+		blkStmt([]ast.Node{
+			expStmt(&ast.ObjectCreation{
+				ast.OBJECT_CREATION,
+				"vo-with-no-args",
+				[]ast.Expression{},
+			}),
+		}),
+	},
 }
 
 func TestCreateObject(t *testing.T) {
 
 	createObject.test(t);
+}
+
+var handlerSpecificStatementsAndExpressions = testCases {
+	{
+		`assert invariant 'is-started';`,
+		blkStmt([]ast.Node{
+			&ast.AssertStatement{
+				ast.ASSERT_STATEMENT,
+				"",
+				&ast.ObjectCreation{
+					ast.OBJECT_CREATION,
+					"is-started",
+					[]ast.Expression{},
+				},
+			},
+		}),
+	},
+	{
+		`assert invariant not 'is-started';`,
+		blkStmt([]ast.Node{
+			&ast.AssertStatement{
+				ast.ASSERT_STATEMENT,
+				"not",
+				&ast.ObjectCreation{
+					ast.OBJECT_CREATION,
+					"is-started",
+					[]ast.Expression{},
+				},
+			},
+		}),
+	},
+	{
+		`revision = run query 'next-revision-number' (agency_id, quote_number);`,
+		blkStmt([]ast.Node{
+			expStmt(&ast.Infix{
+				ast.INFIX,
+				&ast.Identifier{ast.IDENTIFIER, "revision"},
+				"=",
+				&ast.RunQuery{
+					ast.RUN_QUERY,
+					&ast.ObjectCreation{
+						ast.OBJECT_CREATION,
+						"next-revision-number",
+						[]ast.Expression{
+							&ast.Identifier{ast.IDENTIFIER, "agency_id"},
+							&ast.Identifier{ast.IDENTIFIER, "quote_number"},
+						},
+					},
+				},
+			}),
+		}),
+	},
+	{
+		`apply event 'started';`,
+		blkStmt([]ast.Node{
+			&ast.ApplyStatement{
+				ast.APPLY_STATEMENT,
+				&ast.ObjectCreation{
+					ast.OBJECT_CREATION,
+					"started",
+					[]ast.Expression{},
+				},
+			},
+		}),
+	},
+}
+
+func TestHandlerSpecificStatementsAndExpressions(t *testing.T) {
+
+	handlerSpecificStatementsAndExpressions.test(t);
 }
 
 

@@ -12,6 +12,8 @@ const (
 	RETURN_STATEMENT = "returnstatement"
 	FOREACH_STATEMENT = "foreachstatement"
 	IF_STATEMENT = "ifstatement"
+	ASSERT_STATEMENT = "assertstatement"
+	APPLY_STATEMENT = "applystatement"
 
 	PREFIX = "prefix"
 	INFIX = "infix"
@@ -24,6 +26,7 @@ const (
 	ARRAY = "array"
 	ARRAY_ACCESS = "arrayaccess"
 	OBJECT_CREATION = "objectcreation"
+	RUN_QUERY = "runquery"
 )
 
 // The base Node interface
@@ -133,6 +136,44 @@ func (f *ForeachStatement) String() string {
 
 	return str;
 }
+
+
+/** Handler statements **/
+
+type AssertStatement struct {
+	Type string
+	Operator string
+	Event Expression
+}
+
+func (a *AssertStatement) statementNode() {}
+
+func (a *AssertStatement) String() string {
+
+	str := "assert invariant "
+
+	if (a.Operator == "") {
+		str += a.Operator+""
+	}
+
+	return str + a.Event.String()
+}
+
+
+type ApplyStatement struct {
+	Type string
+	Event Expression
+}
+
+func (a *ApplyStatement) statementNode() {}
+
+func (a *ApplyStatement) String() string {
+
+	str := "apply event "
+
+	return str + a.Event.String()
+}
+
 
 /** Expressions **/
 
@@ -322,4 +363,16 @@ func (o *ObjectCreation) String() string {
 	}
 
 	return "'"+o.Name + "'("+strings.Join(args, ", ")+")";
+}
+
+type RunQuery struct {
+	Type string
+	Query Expression
+}
+
+func (r *RunQuery) expressionNode() {}
+
+func (r *RunQuery) String() string {
+
+	return "run query "+r.Query.String()
 }

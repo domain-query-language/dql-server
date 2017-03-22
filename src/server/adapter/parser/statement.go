@@ -77,6 +77,7 @@ func NewStatement(statements string) *statementParser {
 	p.registerPrefix(token.LPAREN, p.parseGroupedExpression)
 	p.registerPrefix(token.LBRACKET, p.parseArrayLiteral)
 	p.registerPrefix(token.OBJECTNAME, p.parseObjectCreation)
+	p.registerPrefix(token.RUN, p.parseRunQuery)
 
 	p.infixParseFns = make(map[token.TokenType]infixParseFn)
 	p.registerInfix(token.PLUS, p.parseInfixExpression)
@@ -209,10 +210,17 @@ func (p *statementParser) parseStatement() ast.Node {
 		case token.FOREACH:
 			return p.parseForeachStatement()
 
+		case token.ASSERT:
+			return p.parseAssertStatement()
+
+		case token.APPLY:
+			return p.parseApplyStatement()
+
 		default:
 			return p.parseExpressionStatement()
 	}
 }
+
 
 func (p *statementParser) parseExpressionStatement() ast.Node {
 
@@ -313,6 +321,60 @@ func (p *statementParser) parseIfStatement() ast.Statement {
 
 	return stmt
 }
+
+func (p *statementParser) parseAssertStatement() ast.Statement {
+
+	a := &ast.AssertStatement{ast.ASSERT_STATEMENT, "", nil};
+
+	if (!p.expectPeek(token.IDENT)) {
+		return nil
+	}
+
+	if (p.curToken.Val != "invariant") {
+		p.logError("Expected next identifier to be 'invariant', got '%s' instead", p.curToken.Val)
+		return nil
+	}
+
+	if (p.peekTokenIs(token.NOT)) {
+		a.Operator = "not"
+		p.nextToken()
+	}
+
+	p.nextToken()
+
+	a.Event = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return a
+}
+
+func (p *statementParser) parseApplyStatement() ast.Statement {
+
+	a := &ast.ApplyStatement{ast.APPLY_STATEMENT, nil};
+
+	if (!p.expectPeek(token.IDENT)) {
+		return nil
+	}
+
+	if (p.curToken.Val != "event") {
+		p.logError("Expected next identifier to be 'event', got '%s' instead", p.curToken.Val)
+		return nil
+	}
+
+	p.nextToken()
+
+	a.Event = p.parseExpression(LOWEST)
+
+	if p.peekTokenIs(token.SEMICOLON) {
+		p.nextToken()
+	}
+
+	return a
+}
+
 
 func (p *statementParser) parseExpression(precedence int) ast.Expression {
 
@@ -510,8 +572,6 @@ func (p *statementParser) parseArrayLiteral() ast.Expression {
 
 	array := &ast.Array{Type: ast.ARRAY}
 
-	//panic(p.curToken)
-
 	array.Elements = p.parseExpressionList(token.RBRACKET)
 
 	return array
@@ -533,15 +593,32 @@ func (p *statementParser) parseArrayAccess(left ast.Expression) ast.Expression {
 
 func (p *statementParser) parseObjectCreation() ast.Expression {
 
-	oc := &ast.ObjectCreation{Type: ast.OBJECT_CREATION};
+	oc := &ast.ObjectCreation{ast.OBJECT_CREATION, p.curToken.Val, []ast.Expression{}};
 
-	oc.Name = p.curToken.Val
+	if (p.peekTokenIs(token.LPAREN)) {
+		p.nextToken()
+		oc.Arguments = p.parseExpressionList(token.RPAREN)
+	}
 
-	if (!p.expectPeek(token.LPAREN)) {
+	return oc
+}
+
+func (p* statementParser) parseRunQuery() ast.Expression {
+
+	r := &ast.RunQuery{ast.RUN_QUERY, nil}
+
+	if (!p.expectPeek(token.IDENT)) {
 		return nil
 	}
 
-	oc.Arguments = p.parseExpressionList(token.RPAREN)
+	if (p.curToken.Val != "query") {
+		p.logError("Expected next identifier to be 'query', got '%s' instead", p.curToken.Val)
+		return nil
+	}
 
-	return oc
+	p.nextToken()
+
+	r.Query = p.parseExpression(LOWEST)
+
+	return r
 }
