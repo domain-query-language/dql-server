@@ -111,10 +111,7 @@ func (p *functionParser) ParseFunction() (*ast.Function, error) {
 
 	function.Parameters = p.parseParameters(token.RPAREN)
 
-	function.Body = &ast.BlockStatement{
-		ast.BLOCK_STATEMENT,
-		[]ast.Node{},
-	}
+	function.Body = p.parseBlockStatement()
 
 	return function, p.error
 }
@@ -140,6 +137,8 @@ func (p *functionParser) parseParameters(end token.TokenType) []*ast.Parameter {
 		return nil
 	}
 
+	p.nextToken()
+
 	return list
 }
 
@@ -158,6 +157,18 @@ func (p *functionParser) parseParameter() *ast.Parameter{
 	param.Name = p.curToken.Val
 
 	return param
+}
 
+func (p *functionParser) parseBlockStatement() *ast.BlockStatement {
 
+	statementParser := NewStatementFromTokenizer(p.t, p.curToken, p.peekToken)
+
+	blkStmnt, err := statementParser.ParseBlockStatement()
+
+	if (err != nil) {
+		p.error = err
+		return nil
+	}
+
+	return blkStmnt
 }

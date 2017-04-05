@@ -401,7 +401,7 @@ func (f *Function) String() string {
 		params[i] = param.String()
 	}
 
-	return "function "+f.Name+"("+strings.Join(params, ", ")+")"+f.Body.String()
+	return "function "+f.Name+"("+strings.Join(params, ", ")+"){"+f.Body.String()+"}"
 }
 
 type Parameter struct {

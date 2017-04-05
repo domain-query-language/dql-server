@@ -65,6 +65,30 @@ func NewStatement(statements string) *statementParser {
 		t: t,
 	};
 
+	p.bootstrapRules()
+
+	p.nextToken()
+	p.nextToken()
+
+	return p;
+}
+
+func NewStatementFromTokenizer(t tokenizer.Tokenizer, curToken *token.Token, peekToken *token.Token) *statementParser {
+
+	p := &statementParser{
+		t: t,
+	};
+
+	p.bootstrapRules()
+
+	p.curToken = curToken
+	p.peekToken = peekToken
+
+	return p;
+}
+
+func (p *statementParser) bootstrapRules(){
+
 	p.prefixParseFns = make(map[token.TokenType]prefixParseFn)
 	p.registerPrefix(token.IDENT, p.parseIdentifier)
 	p.registerPrefix(token.INTEGER, p.parseIntegerLiteral)
@@ -92,11 +116,6 @@ func NewStatement(statements string) *statementParser {
 	p.registerInfix(token.ASSIGN, p.parseInfixExpression)
 	p.registerInfix(token.LPAREN, p.parseMethodCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseArrayAccess)
-
-	p.nextToken()
-	p.nextToken()
-
-	return p;
 }
 
 func (p *statementParser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {

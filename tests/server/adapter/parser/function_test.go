@@ -25,12 +25,12 @@ var functions = []struct{
 		},
 	},
 	{
-		`function doThing(value\name n, value\age a) {
+		`function doThing2(value\name n, value\age a) {
 
 		}`,
 		&ast.Function{
 			ast.FUNCTION,
-			"doThing",
+			"doThing2",
 			[]*ast.Parameter{
 				{`value\name`, "n"},
 				{`value\age`, "a"},
@@ -41,13 +41,28 @@ var functions = []struct{
 			},
 		},
 	},
-	/*{
-		`function doThing() {
-			return a;
+	{
+		`function doThing3() {
+			a;
 		}`,
+		&ast.Function{
+			ast.FUNCTION,
+			"doThing3",
+			[]*ast.Parameter{},
+			&ast.BlockStatement{
+				ast.BLOCK_STATEMENT,
+				[]ast.Node{
+					&ast.ExpressionStatement{
+						ast.EXPRESSION_STATEMENT,
+						&ast.Identifier{
+							ast.IDENTIFIER,
+							"a",
+						},
+					},
+				},
+			},
+		},
 	},
-
-	*/
 }
 
 func TestFunctionParsing(t *testing.T) {
