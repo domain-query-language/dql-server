@@ -51,7 +51,7 @@ type Expression interface {
 // All expression nodes implement this
 type ObjectComponent interface {
 	Node
-	objectComponentnNode()
+	objectComponentNode()
 }
 
 
@@ -68,9 +68,12 @@ func (bs *BlockStatement) String() string {
 
 	var out bytes.Buffer
 
-	for _, s := range bs.Statements {
+	for i, s := range bs.Statements {
 		if (s != nil) {
 			out.WriteString(s.String())
+		}
+		if (i+1!= len(bs.Statements)) {
+			out.WriteString("\n")
 		}
 	}
 
@@ -99,7 +102,7 @@ func (r *Return) statementNode() {}
 
 func (r *Return) String() string {
 
-	return "return "+r.Expression.String()
+	return "return "+r.Expression.String()+";"
 }
 
 
@@ -392,7 +395,7 @@ type Function struct {
 	Body Statement
 }
 
-func (f *Function) objectComponentnNode() {}
+func (f *Function) objectComponentNode() {}
 
 func (f *Function) String() string {
 
@@ -401,7 +404,11 @@ func (f *Function) String() string {
 		params[i] = param.String()
 	}
 
-	return "function "+f.Name+"("+strings.Join(params, ", ")+"){"+f.Body.String()+"}"
+	body := f.Body.String()
+
+	body = "\t"+strings.Replace(body, "\n", "\n\t", -1)
+
+	return "function "+f.Name+"("+strings.Join(params, ", ")+") {\n"+body+"\n}"
 }
 
 type Parameter struct {

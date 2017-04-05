@@ -170,5 +170,9 @@ func (p *functionParser) parseBlockStatement() *ast.BlockStatement {
 		return nil
 	}
 
+	//TODO: Cleanup
+	p.peekToken = statementParser.peekToken
+	p.nextToken()
+
 	return blkStmnt
 }
