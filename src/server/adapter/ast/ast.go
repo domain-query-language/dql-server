@@ -27,6 +27,8 @@ const (
 	ARRAY_ACCESS = "arrayaccess"
 	OBJECT_CREATION = "objectcreation"
 	RUN_QUERY = "runquery"
+
+	FUNCTION = "function"
 )
 
 // The base Node interface
@@ -44,6 +46,12 @@ type Statement interface {
 type Expression interface {
 	Node
 	expressionNode()
+}
+
+// All expression nodes implement this
+type ObjectComponent interface {
+	Node
+	objectComponentnNode()
 }
 
 
@@ -375,4 +383,32 @@ func (r *RunQuery) expressionNode() {}
 func (r *RunQuery) String() string {
 
 	return "run query "+r.Query.String()
+}
+
+type Function struct {
+	Type string
+	Name string
+	Parameters []Parameter
+	Body Statement
+}
+
+func (f *Function) objectComponentnNode() {}
+
+func (f *Function) String() string {
+
+	params := make([]string, len(f.Parameters))
+	for i, param := range f.Parameters {
+		params[i] = param.String()
+	}
+
+	return "function "+f.Name+"("+strings.Join(params, ", ")+")"+f.Body.String()
+}
+
+type Parameter struct {
+	Type string
+	Name string
+}
+
+func (p Parameter) String() string {
+	return p.Type+" "+p.Name
 }
