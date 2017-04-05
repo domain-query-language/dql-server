@@ -388,7 +388,7 @@ func (r *RunQuery) String() string {
 type Function struct {
 	Type string
 	Name string
-	Parameters []Parameter
+	Parameters []*Parameter
 	Body Statement
 }
 

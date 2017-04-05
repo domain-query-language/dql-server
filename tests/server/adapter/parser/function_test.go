@@ -17,10 +17,27 @@ var functions = []struct{
 		&ast.Function{
 			ast.FUNCTION,
 			"doThing",
-			[]ast.Parameter{},
-			ast.BlockStatement{
+			[]*ast.Parameter{},
+			&ast.BlockStatement{
 				ast.BLOCK_STATEMENT,
-				[]ast.Node,
+				[]ast.Node{},
+			},
+		},
+	},
+	{
+		`function doThing(value\name n, value\age a) {
+
+		}`,
+		&ast.Function{
+			ast.FUNCTION,
+			"doThing",
+			[]*ast.Parameter{
+				{`value\name`, "n"},
+				{`value\age`, "a"},
+			},
+			&ast.BlockStatement{
+				ast.BLOCK_STATEMENT,
+				[]ast.Node{},
 			},
 		},
 	},
@@ -29,11 +46,7 @@ var functions = []struct{
 			return a;
 		}`,
 	},
-	{
-		`function doThing(value\name n, value\age a) {
-			return a;
-		}`,
-	},
+
 	*/
 }
 
@@ -41,16 +54,16 @@ func TestFunctionParsing(t *testing.T) {
 
 	for _, testCase := range functions {
 
-		p := parser.NewFunction(testCase);
+		p := parser.NewFunction(testCase.function);
 
 		parsed, err := p.ParseFunction();
 
 		if (err != nil) {
 			t.Error("Unexpected error while parsing: "+testCase.function)
-			t.Error("Err: "+err)
+			t.Error("Err: "+err.Error())
 		}
 
-		if (!parsed.String != testCase.node.String()) {
+		if (parsed.String() != testCase.node.String()) {
 			t.Error("Function parsed incorrectly: "+testCase.function)
 			t.Error("Expected: "+testCase.node.String())
 			t.Error("Actual: "+parsed.String())
@@ -60,9 +73,13 @@ func TestFunctionParsing(t *testing.T) {
 
 /*
 Todo
-1. check
-2. when
-3. properties
-4. handler
+- parsing two functions in sequence
+- function with params
+- function with body
+- printing a function
+- check
+- when
+- properties
+- handler
  */
 
