@@ -97,7 +97,23 @@ func (p *functionParser) logError(format string, a...interface{}) {
 	p.error = errors.New(msg)
 }
 
-func (p *functionParser) ParseFunction() (*ast.Function, error) {
+func (p *functionParser) ParseObjectComponent() (*ast.Function, error) {
+
+	switch p.curToken.Type {
+
+	case token.FUNCTION:
+		return p.parseFunction()
+
+	case token.CHECK:
+		return p.parseCheck()
+
+	default:
+		p.logError("Unexpected token '%s'", p.curToken.Type);
+		return nil, p.error
+	}
+}
+
+func (p *functionParser) parseFunction() (*ast.Function, error) {
 
 	function := &ast.Function{Type: ast.FUNCTION}
 
@@ -111,9 +127,24 @@ func (p *functionParser) ParseFunction() (*ast.Function, error) {
 
 	function.Parameters = p.parseParameters(token.RPAREN)
 
-	function.Body = p.parseBlockStatement()
+	function.Body = p.parseBlockStatement(token.LBRACE, token.RBRACE)
 
 	return function, p.error
+}
+
+func (p *functionParser) parseCheck() (*ast.Function, error) {
+
+	check := &ast.Function{Type: ast.FUNCTION}
+	
+	check.Name = p.curToken.Val
+
+	p.expectPeek(token.LPAREN)
+
+	check.Parameters = []*ast.Parameter{}
+
+	check.Body = p.parseBlockStatement(token.LPAREN, token.RPAREN)
+
+	return check, p.error
 }
 
 func (p *functionParser) parseParameters(end token.TokenType) []*ast.Parameter {
@@ -159,11 +190,11 @@ func (p *functionParser) parseParameter() *ast.Parameter{
 	return param
 }
 
-func (p *functionParser) parseBlockStatement() *ast.BlockStatement {
+func (p *functionParser) parseBlockStatement(open token.TokenType, close token.TokenType) *ast.BlockStatement {
 
 	statementParser := NewStatementFromTokenizer(p.t, p.curToken, p.peekToken)
 
-	blkStmnt, err := statementParser.ParseBlockStatement()
+	blkStmnt, err := statementParser.ParseBlockStatementSurroundedBy(open, close)
 
 	if (err != nil) {
 		p.error = err

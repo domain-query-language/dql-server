@@ -187,10 +187,10 @@ func (p *statementParser) logError(format string, a...interface{}) {
 }
 
 
-func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
+func (p *statementParser) ParseBlockStatementSurroundedBy(open token.TokenType, close token.TokenType) (*ast.BlockStatement, error) {
 
-	if (!p.curTokenIs(token.LBRACE) ) {
-		p.logError("Expected next token to be '%s', got '%s' instead", token.LBRACE, p.curToken.Val)
+	if (!p.curTokenIs(open)) {
+		p.logError("Expected next token to be '%s', got '%s' instead", open, p.curToken.Val)
 		return nil, p.error
 	}
 
@@ -200,7 +200,7 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 
 	block.Statements = []ast.Node{}
 
-	for !p.curTokenIs(token.RBRACE) && p.error == nil  {
+	for !p.curTokenIs(close) && p.error == nil  {
 		stmt := p.parseStatement()
 		if stmt != nil {
 			block.Statements = append(block.Statements, stmt)
@@ -214,6 +214,11 @@ func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
 	}
 
 	return block, p.error
+}
+
+func (p *statementParser) ParseBlockStatement() (*ast.BlockStatement, error) {
+
+	return p.ParseBlockStatementSurroundedBy(token.LBRACE, token.RBRACE)
 }
 
 func (p *statementParser) parseStatement() ast.Node {

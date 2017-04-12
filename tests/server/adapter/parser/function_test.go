@@ -6,10 +6,30 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
 )
 
-var functions = []struct{
+type funcTestCase struct {
 	function string
 	node ast.Node
-}{
+}
+
+func testParsingFunction(testCase funcTestCase, t *testing.T) {
+
+	p := parser.NewFunction(testCase.function);
+
+	parsed, err := p.ParseObjectComponent();
+
+	if (err != nil) {
+		t.Error("Unexpected error while parsing: "+testCase.function)
+		t.Error("Err: "+err.Error())
+	}
+
+	if (parsed.String() != testCase.node.String()) {
+		t.Error("Function parsed incorrectly: "+testCase.function)
+		t.Error("Expected: "+testCase.node.String())
+		t.Error("Actual: "+parsed.String())
+	}
+}
+
+var functions = []funcTestCase {
 	{
 		`function doThing() {
 
@@ -55,20 +75,7 @@ func TestFunctionParsing(t *testing.T) {
 
 	for _, testCase := range functions {
 
-		p := parser.NewFunction(testCase.function);
-
-		parsed, err := p.ParseFunction();
-
-		if (err != nil) {
-			t.Error("Unexpected error while parsing: "+testCase.function)
-			t.Error("Err: "+err.Error())
-		}
-
-		if (parsed.String() != testCase.node.String()) {
-			t.Error("Function parsed incorrectly: "+testCase.function)
-			t.Error("Expected: "+testCase.node.String())
-			t.Error("Actual: "+parsed.String())
-		}
+		testParsingFunction(testCase, t)
 	}
 }
 
@@ -85,7 +92,7 @@ func TestParsingMultipleFunctionsInOneString(t *testing.T) {
 
 	for _, testCase := range functions {
 
-		parsed, err := p.ParseFunction();
+		parsed, err := p.ParseObjectComponent();
 
 		if (err != nil) {
 			t.Error("Unexpected error while parsing: "+testCase.function)
@@ -111,7 +118,7 @@ func TestPrintingFunction(t *testing.T) {
 
 	p := parser.NewFunction(input);
 
-	parsed, err := p.ParseFunction();
+	parsed, err := p.ParseObjectComponent();
 
 	if (err != nil) {
 		t.Error("Unexpected error while parsing: "+input)
@@ -126,6 +133,40 @@ func TestPrintingFunction(t *testing.T) {
 
 }
 
+var checkStatements = []funcTestCase{
+	{
+		`check (
+			return a;
+		)`,
+		&ast.Function{
+			ast.FUNCTION,
+			"check",
+			[]*ast.Parameter{},
+			&ast.BlockStatement{
+				ast.BLOCK_STATEMENT,
+				[]ast.Node{
+					&ast.Return{
+						ast.RETURN_STATEMENT,
+						&ast.Identifier{
+							ast.IDENTIFIER,
+							"a",
+						},
+					},
+				},
+			},
+		},
+	},
+}
+
+func TestCheckStatement(t *testing.T) {
+
+	for _, testCase := range checkStatements {
+
+		testParsingFunction(testCase, t)
+	}
+}
+
+
 /*
 Done
 - parsing two functions in sequence
@@ -133,8 +174,10 @@ Done
 - function with body
 - printing a function
 
-Todo
+Inprogress
 - check
+
+Todo
 - when
 - properties
 - handler
