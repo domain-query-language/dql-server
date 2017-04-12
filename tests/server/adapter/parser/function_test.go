@@ -166,6 +166,71 @@ func TestCheckStatement(t *testing.T) {
 	}
 }
 
+var handlerStatements = []funcTestCase{
+	{
+		`handler {
+			return a;
+		}`,
+		&ast.Function{
+			ast.FUNCTION,
+			"handler",
+			[]*ast.Parameter{},
+			&ast.BlockStatement{
+				ast.BLOCK_STATEMENT,
+				[]ast.Node{
+					&ast.Return{
+						ast.RETURN_STATEMENT,
+						&ast.Identifier{
+							ast.IDENTIFIER,
+							"a",
+						},
+					},
+				},
+			},
+		},
+	},
+}
+
+func TestHandlerStatement(t *testing.T) {
+
+	for _, testCase := range handlerStatements {
+
+		testParsingFunction(testCase, t)
+	}
+}
+
+var whenStatements = []funcTestCase{
+	{
+		`WHEN event 'started' {
+			return a;
+		}`,
+		&ast.When{
+			ast.WHEN,
+			"started",
+			&ast.BlockStatement{
+				ast.BLOCK_STATEMENT,
+				[]ast.Node{
+					&ast.Return{
+						ast.RETURN_STATEMENT,
+						&ast.Identifier{
+							ast.IDENTIFIER,
+							"a",
+						},
+					},
+				},
+			},
+		},
+	},
+}
+
+func TestWhenStatement(t *testing.T) {
+
+	for _, testCase := range whenStatements {
+
+		testParsingFunction(testCase, t)
+	}
+}
+
 
 /*
 Done
@@ -173,14 +238,14 @@ Done
 - function with params
 - function with body
 - printing a function
+- check
+- handler
+- when
 
 Inprogress
-- check
+- properties
 
 Todo
-- when
-- properties
-- handler
 - Clean up handing over of state back to function parser
  */
 

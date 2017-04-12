@@ -29,6 +29,7 @@ const (
 	RUN_QUERY = "runquery"
 
 	FUNCTION = "function"
+	WHEN = "when"
 )
 
 // The base Node interface
@@ -418,4 +419,21 @@ type Parameter struct {
 
 func (p Parameter) String() string {
 	return p.Type+" "+p.Name
+}
+
+type When struct {
+	Type string
+	Event string
+	Body Statement
+}
+
+func (f *When) objectComponentNode() {}
+
+func (f *When) String() string {
+
+	body := f.Body.String()
+
+	body = "\t"+strings.Replace(body, "\n", "\n\t", -1)
+
+	return "when event  "+f.Event+ "{\n"+body+"\n}"
 }

@@ -97,7 +97,7 @@ func (p *functionParser) logError(format string, a...interface{}) {
 	p.error = errors.New(msg)
 }
 
-func (p *functionParser) ParseObjectComponent() (*ast.Function, error) {
+func (p *functionParser) ParseObjectComponent() (ast.ObjectComponent, error) {
 
 	switch p.curToken.Type {
 
@@ -106,6 +106,12 @@ func (p *functionParser) ParseObjectComponent() (*ast.Function, error) {
 
 	case token.CHECK:
 		return p.parseCheck()
+
+	case token.HANDLER:
+		return p.parseHandler()
+
+	case token.WHEN:
+		return p.parseWhen()
 
 	default:
 		p.logError("Unexpected token '%s'", p.curToken.Type);
@@ -135,7 +141,7 @@ func (p *functionParser) parseFunction() (*ast.Function, error) {
 func (p *functionParser) parseCheck() (*ast.Function, error) {
 
 	check := &ast.Function{Type: ast.FUNCTION}
-	
+
 	check.Name = p.curToken.Val
 
 	p.expectPeek(token.LPAREN)
@@ -143,6 +149,38 @@ func (p *functionParser) parseCheck() (*ast.Function, error) {
 	check.Parameters = []*ast.Parameter{}
 
 	check.Body = p.parseBlockStatement(token.LPAREN, token.RPAREN)
+
+	return check, p.error
+}
+
+func (p *functionParser) parseHandler() (*ast.Function, error) {
+
+	check := &ast.Function{Type: ast.FUNCTION}
+
+	check.Name = p.curToken.Val
+
+	p.expectPeek(token.LBRACE)
+
+	check.Parameters = []*ast.Parameter{}
+
+	check.Body = p.parseBlockStatement(token.LBRACE, token.RBRACE)
+
+	return check, p.error
+}
+
+func (p *functionParser) parseWhen() (*ast.When, error) {
+
+	check := &ast.When{Type: ast.WHEN}
+
+	p.expectPeek(token.IDENT)
+
+	p.expectPeek(token.OBJECTNAME)
+
+	check.Event = p.curToken.Val
+
+	p.expectPeek(token.LBRACE)
+
+	check.Body = p.parseBlockStatement(token.LBRACE, token.RBRACE)
 
 	return check, p.error
 }
