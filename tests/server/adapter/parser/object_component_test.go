@@ -255,6 +255,28 @@ var properties = []funcTestCase{
 			},
 		},
 	},
+	/*{
+		`properties{
+			value\category category = 'value\category'("category");
+		}`,
+		&ast.Properties{
+			ast.PROPERTIES,
+			[]*ast.Property{
+				{
+					ast.PROPERTY,
+					"value\\category",
+					"category",
+					&ast.ObjectCreation{
+						ast.OBJECT_CREATION,
+						"value\\category",
+						[]ast.Expression{
+							&ast.String{ast.STRING, "category"},
+						},
+					},,
+				},
+			},
+		},
+	},*/
 }
 
 func TestProperties(t *testing.T) {
@@ -274,14 +296,13 @@ Done
 - check
 - handler
 - when
+- properties
 
 Inprogress
 - properties
- - propery
+ - propery with expression
 
 Todo
-- properties
- - propery with constructor
 - Create AST for check
 - Clean up handing over of state back to function parser
  */

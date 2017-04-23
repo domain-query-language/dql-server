@@ -284,10 +284,24 @@ func (p *objectComponentParser) parseProperty() *ast.Property {
 
 	prop.Name = p.curToken.Val
 
-	p.expectPeek(token.SEMICOLON);
+	if (p.peekTokenIs(token.SEMICOLON)) {
+		p.nextToken()
+		p.nextToken()
+		return prop
+	}
 
+	p.expectPeek(token.ASSIGN);
 	p.nextToken()
+
+	prop.Exp = p.parseObjectCreation()
 
 	return prop
 }
+
+func (p *objectComponentParser) parseObjectCreation() ast.Expression {
+
+	return nil
+}
+
+
 

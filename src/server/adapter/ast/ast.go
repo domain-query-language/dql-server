@@ -468,7 +468,12 @@ type Property struct {
 
 func (p *Property) String() string {
 
-	return p.ValueType+" "+p.Name+";";
+	left := p.ValueType+" "+p.Name;
+	if (p.Exp == nil) {
+		return left + ";";
+	}
+
+	return left+" = "+p.Exp.String()+";";
 }
 
 func (p *Property) statementNode() {}
