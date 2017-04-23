@@ -118,16 +118,6 @@ func (p *statementParser) registerInfix(tokenType token.TokenType, fn infixParse
 	p.infixParseFns[tokenType] = fn
 }
 
-func (p *statementParser) expectPeek(t token.TokenType) bool {
-
-	return p.tokenStream.ExpectPeek(t)
-}
-
-func (p *statementParser) peekError(t token.TokenType) {
-
-	p.tokenStream.PeekError(t)
-}
-
 func (p *statementParser) logError(format string, a...interface{}) {
 
 	p.tokenStream.LogError(format, a...)
@@ -137,7 +127,7 @@ func (p *statementParser) logError(format string, a...interface{}) {
 func (p *statementParser) ParseBlockStatementSurroundedBy(open token.TokenType, close token.TokenType) (*ast.BlockStatement, error) {
 
 	if (!p.tokenStream.CurTokenIs(open)) {
-		p.logError("Expected next token to be '%s', got '%s' instead", open, p.tokenStream.CurToken().Val)
+		p.tokenStream.LogError("Expected next token to be '%s', got '%s' instead", open, p.tokenStream.CurToken().Val)
 		return nil, p.tokenStream.Error()
 	}
 
@@ -155,7 +145,7 @@ func (p *statementParser) ParseBlockStatementSurroundedBy(open token.TokenType, 
 		p.tokenStream.NextToken()
 
 		if p.tokenStream.CurToken() == nil {
-			p.logError("Unexpected EOF")
+			p.tokenStream.LogError("Unexpected EOF")
 			break;
 		}
 	}
@@ -202,7 +192,7 @@ func (p *statementParser) parseExpressionStatement() ast.Node {
 	if p.tokenStream.PeekTokenIs(token.SEMICOLON) {
 		p.tokenStream.NextToken()
 	} else {
-		p.logError("Expected %v, got %v", token.SEMICOLON, p.tokenStream.PeekToken());
+		p.tokenStream.LogError("Expected %v, got %v", token.SEMICOLON, p.tokenStream.PeekToken());
 	}
 
 	return stmt
@@ -302,7 +292,7 @@ func (p *statementParser) parseAssertStatement() ast.Statement {
 	}
 
 	if (p.tokenStream.CurToken().Val != "invariant") {
-		p.logError("Expected next identifier to be 'invariant', got '%s' instead", p.tokenStream.CurToken().Val)
+		p.tokenStream.LogError("Expected next identifier to be 'invariant', got '%s' instead", p.tokenStream.CurToken().Val)
 		return nil
 	}
 
@@ -331,7 +321,7 @@ func (p *statementParser) parseApplyStatement() ast.Statement {
 	}
 
 	if (p.tokenStream.CurToken().Val != "event") {
-		p.logError("Expected next identifier to be 'event', got '%s' instead", p.tokenStream.CurToken().Val)
+		p.tokenStream.LogError("Expected next identifier to be 'event', got '%s' instead", p.tokenStream.CurToken().Val)
 		return nil
 	}
 
@@ -440,7 +430,7 @@ func (p *statementParser) parseInfixExpression(left ast.Expression) ast.Expressi
 	expression.Right = p.parseExpression(precedence)
 
 	if (expression.Right == nil) {
-		p.logError("Expected expression, got nothing")
+		p.tokenStream.LogError("Expected expression, got nothing")
 		return nil
 	}
 
@@ -459,7 +449,7 @@ func (p *statementParser) parseIntegerLiteral() ast.Expression {
 	value, err := strconv.ParseInt(p.tokenStream.CurToken().Val, 0, 64)
 
 	if err != nil {
-		p.logError("could not parse %q as integer", p.tokenStream.CurToken().Val)
+		p.tokenStream.LogError("could not parse %q as integer", p.tokenStream.CurToken().Val)
 		return nil
 	}
 
@@ -492,7 +482,7 @@ func (p *statementParser) parseFloatLiteral() ast.Expression {
 
 	value, err := strconv.ParseFloat(p.tokenStream.CurToken().Val, 64)
 	if err != nil {
-		p.logError("could not parse %q as float", p.tokenStream.CurToken().Val);
+		p.tokenStream.LogError("could not parse %q as float", p.tokenStream.CurToken().Val);
 		return nil
 	}
 
@@ -583,7 +573,7 @@ func (p* statementParser) parseRunQuery() ast.Expression {
 	}
 
 	if (p.tokenStream.CurToken().Val != "query") {
-		p.logError("Expected next identifier to be 'query', got '%s' instead", p.tokenStream.CurToken().Val)
+		p.tokenStream.LogError("Expected next identifier to be 'query', got '%s' instead", p.tokenStream.CurToken().Val)
 		return nil
 	}
 
