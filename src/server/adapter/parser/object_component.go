@@ -243,7 +243,7 @@ func (p *objectComponentParser) parseBlockStatement(open token.TokenType, close 
 	}
 
 	//TODO: Cleanup
-	p.peekToken = statementParser.peekToken
+	p.peekToken = statementParser.tokenStream.peekToken
 	p.nextToken()
 
 	return blkStmnt
