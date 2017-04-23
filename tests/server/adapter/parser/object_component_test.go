@@ -300,13 +300,9 @@ Done
 - handler
 - when
 - properties
-
-Inprogress
-- properties
- - propery with expression
+- Clean up handing over of state back to function parser
 
 Todo
 - Create AST for check
-- Clean up handing over of state back to function parser
  */
 
