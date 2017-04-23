@@ -66,9 +66,7 @@ func NewStatement(statements string) *statementParser {
 	return p;
 }
 
-func NewStatementFromTokenizer(t tokenizer.Tokenizer, curToken *token.Token, peekToken *token.Token) *statementParser {
-
-	tknStrm := NewTokenStreamFromExistingTokenizer(t, curToken, peekToken)
+func NewStatementFromTokenStream(tknStrm *tokenStream) *statementParser {
 
 	p := &statementParser{
 		tokenStream: tknStrm,
@@ -117,12 +115,6 @@ func (p *statementParser) registerPrefix(tokenType token.TokenType, fn prefixPar
 func (p *statementParser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 	p.infixParseFns[tokenType] = fn
 }
-
-func (p *statementParser) logError(format string, a...interface{}) {
-
-	p.tokenStream.LogError(format, a...)
-}
-
 
 func (p *statementParser) ParseBlockStatementSurroundedBy(open token.TokenType, close token.TokenType) (*ast.BlockStatement, error) {
 
@@ -582,4 +574,9 @@ func (p* statementParser) parseRunQuery() ast.Expression {
 	r.Query = p.parseExpression(LOWEST)
 
 	return r
+}
+
+func (p* statementParser) TokenStream() *tokenStream {
+
+	return p.tokenStream
 }

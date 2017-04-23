@@ -4,102 +4,64 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/tokenizer"
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser/token"
 	"github.com/domain-query-language/dql-server/src/server/adapter/ast"
-	"fmt"
-	"errors"
 )
 
 /** Implementation of the adapter, written using the tokenizer, parser pattern */
 type objectComponentParser struct {
 
-	t tokenizer.Tokenizer
-	error error
-
-	curToken  *token.Token
-	peekToken *token.Token
-
-	prefixParseFns map[token.TokenType]prefixParseFn
-	infixParseFns  map[token.TokenType]infixParseFn
+	tokenStream *tokenStream
 }
 
 func NewObjectComponent(function string) *objectComponentParser {
 
 	t := tokenizer.NewTokenizer(function);
 
-	p := &objectComponentParser{
-		t: t,
-	};
+	tknStrm := NewTokenStreamFromFreshTokenizer(t)
 
-	p.nextToken()
-	p.nextToken()
+	p := &objectComponentParser{tknStrm};
 
 	return p;
 }
 
 func (p *objectComponentParser) nextToken() {
 
-	p.curToken = p.peekToken
-	p.peekToken = p.t.Next();
+	p.tokenStream.NextToken()
 }
 
 func (p *objectComponentParser) curTokenIs(t token.TokenType) bool {
 
-	return p.curToken.Type == t
+	return p.tokenStream.CurTokenIs(t)
 }
 
 
 func (p *objectComponentParser) peekTokenIs(t token.TokenType) bool {
 
-	if p.peekToken == nil {
-		return false
-	}
-
-	return p.peekToken.Type == t
+	return p.tokenStream.PeekTokenIs(t)
 }
 
 func (p *objectComponentParser) expectPeek(t token.TokenType) bool {
 
-	if p.peekTokenIs(t) {
-
-		p.nextToken()
-		return true
-	} else {
-
-		p.peekError(t)
-		return false
-	}
+	return p.tokenStream.ExpectPeek(t)
 }
 
 func (p *objectComponentParser) expectCurrent(t token.TokenType) bool {
 
-	if p.curTokenIs(t) {
-
-		p.nextToken()
-		return true
-	} else {
-
-		p.peekError(t)
-		return false
-	}
+	return p.tokenStream.ExpectCurrent(t)
 }
 
 func (p *objectComponentParser) peekError(t token.TokenType) {
 
-	if (p.peekToken == nil) {
-		p.logError("Expected next token to be '%s', got EOF instead", t)
-		return;
-	}
-	p.logError("Expected next token to be '%s', got '%s' instead", t, p.peekToken.Val)
+	p.tokenStream.PeekError(t)
 }
 
 func (p *objectComponentParser) logError(format string, a...interface{}) {
 
-	msg := fmt.Sprintf(format, a...)
-	p.error = errors.New(msg)
+	p.tokenStream.LogError(format, a)
 }
 
 func (p *objectComponentParser) ParseObjectComponent() (ast.ObjectComponent, error) {
 
-	switch p.curToken.Type {
+	switch p.tokenStream.CurToken().Type {
 
 	case token.FUNCTION:
 		return p.parseFunction()
@@ -117,8 +79,8 @@ func (p *objectComponentParser) ParseObjectComponent() (ast.ObjectComponent, err
 		return p.parseProperties()
 
 	default:
-		p.logError("Unexpected token '%s'", p.curToken.Type);
-		return nil, p.error
+		p.logError("Unexpected token '%s'", p.tokenStream.CurToken().Type);
+		return nil, p.tokenStream.Error()
 	}
 }
 
@@ -128,24 +90,24 @@ func (p *objectComponentParser) parseFunction() (*ast.Function, error) {
 
 	p.expectPeek(token.IDENT)
 
-	function.Name = p.curToken.Val
+	function.Name = p.tokenStream.CurToken().Val
 
 	p.expectPeek(token.LPAREN)
 
-	p.nextToken()
+	p.tokenStream.NextToken()
 
 	function.Parameters = p.parseParameters(token.RPAREN)
 
 	function.Body = p.parseBlockStatement(token.LBRACE, token.RBRACE)
 
-	return function, p.error
+	return function, p.tokenStream.Error()
 }
 
 func (p *objectComponentParser) parseCheck() (*ast.Function, error) {
 
 	check := &ast.Function{Type: ast.FUNCTION}
 
-	check.Name = p.curToken.Val
+	check.Name = p.tokenStream.CurToken().Val
 
 	p.expectPeek(token.LPAREN)
 
@@ -153,14 +115,14 @@ func (p *objectComponentParser) parseCheck() (*ast.Function, error) {
 
 	check.Body = p.parseBlockStatement(token.LPAREN, token.RPAREN)
 
-	return check, p.error
+	return check, p.tokenStream.Error()
 }
 
 func (p *objectComponentParser) parseHandler() (*ast.Function, error) {
 
 	check := &ast.Function{Type: ast.FUNCTION}
 
-	check.Name = p.curToken.Val
+	check.Name = p.tokenStream.CurToken().Val
 
 	p.expectPeek(token.LBRACE)
 
@@ -168,7 +130,7 @@ func (p *objectComponentParser) parseHandler() (*ast.Function, error) {
 
 	check.Body = p.parseBlockStatement(token.LBRACE, token.RBRACE)
 
-	return check, p.error
+	return check, p.tokenStream.Error()
 }
 
 func (p *objectComponentParser) parseWhen() (*ast.When, error) {
@@ -179,13 +141,13 @@ func (p *objectComponentParser) parseWhen() (*ast.When, error) {
 
 	p.expectPeek(token.OBJECTNAME)
 
-	check.Event = p.curToken.Val
+	check.Event = p.tokenStream.CurToken().Val
 
 	p.expectPeek(token.LBRACE)
 
 	check.Body = p.parseBlockStatement(token.LBRACE, token.RBRACE)
 
-	return check, p.error
+	return check, p.tokenStream.Error()
 }
 
 func (p *objectComponentParser) parseParameters(end token.TokenType) []*ast.Parameter {
@@ -193,15 +155,15 @@ func (p *objectComponentParser) parseParameters(end token.TokenType) []*ast.Para
 	list := []*ast.Parameter{}
 
 	if p.curTokenIs(end) {
-		p.nextToken()
+		p.tokenStream.NextToken()
 		return list
 	}
 
 	list = append(list, p.parseParameter())
 
 	for p.peekTokenIs(token.COMMA) {
-		p.nextToken()
-		p.nextToken()
+		p.tokenStream.NextToken()
+		p.tokenStream.NextToken()
 		list = append(list, p.parseParameter())
 	}
 
@@ -209,7 +171,7 @@ func (p *objectComponentParser) parseParameters(end token.TokenType) []*ast.Para
 		return nil
 	}
 
-	p.nextToken()
+	p.tokenStream.NextToken()
 
 	return list
 }
@@ -222,29 +184,28 @@ func (p *objectComponentParser) parseParameter() *ast.Parameter{
 	}
 
 	param := &ast.Parameter {
-		Type: p.curToken.Val,
+		Type: p.tokenStream.CurToken().Val,
 	}
 	p.expectPeek(token.IDENT)
 
-	param.Name = p.curToken.Val
+	param.Name = p.tokenStream.CurToken().Val
 
 	return param
 }
 
 func (p *objectComponentParser) parseBlockStatement(open token.TokenType, close token.TokenType) *ast.BlockStatement {
 
-	statementParser := NewStatementFromTokenizer(p.t, p.curToken, p.peekToken)
+	statementParser := NewStatementFromTokenStream(p.tokenStream)
 
 	blkStmnt, err := statementParser.ParseBlockStatementSurroundedBy(open, close)
 
 	if (err != nil) {
-		p.error = err
 		return nil
 	}
 
-	//TODO: Cleanup
-	p.peekToken = statementParser.tokenStream.peekToken
-	p.nextToken()
+	p.tokenStream = statementParser.TokenStream();
+
+	p.tokenStream.NextToken()
 
 	return blkStmnt
 }
@@ -256,42 +217,42 @@ func (p *objectComponentParser) parseProperties() (*ast.Properties, error) {
 	props.Properties = []*ast.Property{}
 
 	p.expectPeek(token.LBRACE)
-	p.nextToken()
+	p.tokenStream.NextToken()
 
-	for !p.curTokenIs(token.RBRACE) && p.error == nil  {
+	for !p.curTokenIs(token.RBRACE) && p.tokenStream.Error() == nil  {
 		prop := p.parseProperty()
 		if prop != nil {
 			props.Properties = append(props.Properties, prop)
 		}
 
-		if p.curToken == nil {
+		if p.tokenStream.CurToken() == nil {
 			p.logError("Unexpected EOF")
 			break;
 		}
 	}
 
 
-	return props, p.error
+	return props, p.tokenStream.Error()
 }
 
 func (p *objectComponentParser) parseProperty() *ast.Property {
 
 	prop := &ast.Property{Type:ast.PROPERTY}
 
-	prop.ValueType = p.curToken.Val
+	prop.ValueType = p.tokenStream.CurToken().Val
 
 	p.expectPeek(token.IDENT)
 
-	prop.Name = p.curToken.Val
+	prop.Name = p.tokenStream.CurToken().Val
 
 	if (p.peekTokenIs(token.SEMICOLON)) {
-		p.nextToken()
-		p.nextToken()
+		p.tokenStream.NextToken()
+		p.tokenStream.NextToken()
 		return prop
 	}
 
 	p.expectPeek(token.ASSIGN);
-	p.nextToken()
+	p.tokenStream.NextToken()
 
 	prop.Exp = p.parseObjectCreation()
 
