@@ -11,9 +11,9 @@ type funcTestCase struct {
 	node ast.Node
 }
 
-func testParsingFunction(testCase funcTestCase, t *testing.T) {
+func testParsingObjectComponent(testCase funcTestCase, t *testing.T) {
 
-	p := parser.NewFunction(testCase.function);
+	p := parser.NewObjectComponent(testCase.function);
 
 	parsed, err := p.ParseObjectComponent();
 
@@ -71,11 +71,11 @@ var functions = []funcTestCase {
 	},
 }
 
-func TestFunctionParsing(t *testing.T) {
+func TestFunctions(t *testing.T) {
 
 	for _, testCase := range functions {
 
-		testParsingFunction(testCase, t)
+		testParsingObjectComponent(testCase, t)
 	}
 }
 
@@ -88,7 +88,7 @@ func TestParsingMultipleFunctionsInOneString(t *testing.T) {
 		multipleFunctions += testCase.function
 	}
 
-	p := parser.NewFunction(multipleFunctions);
+	p := parser.NewObjectComponent(multipleFunctions);
 
 	for _, testCase := range functions {
 
@@ -116,7 +116,7 @@ func TestPrintingFunction(t *testing.T) {
 	return d;
 }`;
 
-	p := parser.NewFunction(input);
+	p := parser.NewObjectComponent(input);
 
 	parsed, err := p.ParseObjectComponent();
 
@@ -133,7 +133,7 @@ func TestPrintingFunction(t *testing.T) {
 
 }
 
-var checkStatements = []funcTestCase{
+var checks = []funcTestCase{
 	{
 		`check (
 			return a;
@@ -158,15 +158,15 @@ var checkStatements = []funcTestCase{
 	},
 }
 
-func TestCheckStatement(t *testing.T) {
+func TestChecks(t *testing.T) {
 
-	for _, testCase := range checkStatements {
+	for _, testCase := range checks {
 
-		testParsingFunction(testCase, t)
+		testParsingObjectComponent(testCase, t)
 	}
 }
 
-var handlerStatements = []funcTestCase{
+var handlers = []funcTestCase{
 	{
 		`handler {
 			return a;
@@ -191,15 +191,15 @@ var handlerStatements = []funcTestCase{
 	},
 }
 
-func TestHandlerStatement(t *testing.T) {
+func TestHandlers(t *testing.T) {
 
-	for _, testCase := range handlerStatements {
+	for _, testCase := range handlers {
 
-		testParsingFunction(testCase, t)
+		testParsingObjectComponent(testCase, t)
 	}
 }
 
-var whenStatements = []funcTestCase{
+var whens = []funcTestCase{
 	{
 		`WHEN event 'started' {
 			return a;
@@ -223,14 +223,47 @@ var whenStatements = []funcTestCase{
 	},
 }
 
-func TestWhenStatement(t *testing.T) {
+func TestWhens(t *testing.T) {
 
-	for _, testCase := range whenStatements {
+	for _, testCase := range whens {
 
-		testParsingFunction(testCase, t)
+		testParsingObjectComponent(testCase, t)
 	}
 }
 
+var properties = []funcTestCase{
+	{
+		`properties{
+			value\service_charge service_charge;
+			value\category category;
+		}`,
+		&ast.Properties{
+			ast.PROPERTIES,
+			[]*ast.Property{
+				{
+					ast.PROPERTY,
+					"value\\service_charge",
+					"service_charge",
+					nil,
+				},
+				{
+					ast.PROPERTY,
+					"value\\category",
+					"category",
+					nil,
+				},
+			},
+		},
+	},
+}
+
+func TestProperties(t *testing.T) {
+
+	for _, testCase := range properties {
+
+		testParsingObjectComponent(testCase, t)
+	}
+}
 
 /*
 Done
@@ -244,8 +277,12 @@ Done
 
 Inprogress
 - properties
+ - propery
 
 Todo
+- properties
+ - propery with constructor
+- Create AST for check
 - Clean up handing over of state back to function parser
  */
 

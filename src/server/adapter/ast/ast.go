@@ -30,6 +30,8 @@ const (
 
 	FUNCTION = "function"
 	WHEN = "when"
+	PROPERTIES = "properties"
+	PROPERTY = "property"
 )
 
 // The base Node interface
@@ -437,3 +439,37 @@ func (f *When) String() string {
 
 	return "when event  "+f.Event+ "{\n"+body+"\n}"
 }
+
+type Properties struct {
+	Type string
+	Properties []*Property
+}
+
+func (p *Properties) String() string {
+
+	var props = make([]string, len(p.Properties))
+	for _, prop := range p.Properties {
+		props = append(props, prop.String())
+	}
+
+	body := "\t"+strings.Replace(strings.Join(props, "\n"), "\n", "\n\t", -1)
+
+	return "properties {\n"+body+"}"
+}
+
+func (p *Properties) objectComponentNode() {}
+
+type Property struct {
+	Type string
+	ValueType string
+	Name string
+	Exp Expression
+}
+
+func (p *Property) String() string {
+
+	return p.ValueType+" "+p.Name+";";
+}
+
+func (p *Property) statementNode() {}
+

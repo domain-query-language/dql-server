@@ -9,7 +9,7 @@ import (
 )
 
 /** Implementation of the adapter, written using the tokenizer, parser pattern */
-type functionParser struct {
+type objectComponentParser struct {
 
 	t tokenizer.Tokenizer
 	error error
@@ -21,11 +21,11 @@ type functionParser struct {
 	infixParseFns  map[token.TokenType]infixParseFn
 }
 
-func NewFunction(function string) *functionParser {
+func NewObjectComponent(function string) *objectComponentParser {
 
 	t := tokenizer.NewTokenizer(function);
 
-	p := &functionParser{
+	p := &objectComponentParser{
 		t: t,
 	};
 
@@ -35,19 +35,19 @@ func NewFunction(function string) *functionParser {
 	return p;
 }
 
-func (p *functionParser) nextToken() {
+func (p *objectComponentParser) nextToken() {
 
 	p.curToken = p.peekToken
 	p.peekToken = p.t.Next();
 }
 
-func (p *functionParser) curTokenIs(t token.TokenType) bool {
+func (p *objectComponentParser) curTokenIs(t token.TokenType) bool {
 
 	return p.curToken.Type == t
 }
 
 
-func (p *functionParser) peekTokenIs(t token.TokenType) bool {
+func (p *objectComponentParser) peekTokenIs(t token.TokenType) bool {
 
 	if p.peekToken == nil {
 		return false
@@ -56,7 +56,7 @@ func (p *functionParser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
 }
 
-func (p *functionParser) expectPeek(t token.TokenType) bool {
+func (p *objectComponentParser) expectPeek(t token.TokenType) bool {
 
 	if p.peekTokenIs(t) {
 
@@ -69,7 +69,7 @@ func (p *functionParser) expectPeek(t token.TokenType) bool {
 	}
 }
 
-func (p *functionParser) expectCurrent(t token.TokenType) bool {
+func (p *objectComponentParser) expectCurrent(t token.TokenType) bool {
 
 	if p.curTokenIs(t) {
 
@@ -82,7 +82,7 @@ func (p *functionParser) expectCurrent(t token.TokenType) bool {
 	}
 }
 
-func (p *functionParser) peekError(t token.TokenType) {
+func (p *objectComponentParser) peekError(t token.TokenType) {
 
 	if (p.peekToken == nil) {
 		p.logError("Expected next token to be '%s', got EOF instead", t)
@@ -91,13 +91,13 @@ func (p *functionParser) peekError(t token.TokenType) {
 	p.logError("Expected next token to be '%s', got '%s' instead", t, p.peekToken.Val)
 }
 
-func (p *functionParser) logError(format string, a...interface{}) {
+func (p *objectComponentParser) logError(format string, a...interface{}) {
 
 	msg := fmt.Sprintf(format, a...)
 	p.error = errors.New(msg)
 }
 
-func (p *functionParser) ParseObjectComponent() (ast.ObjectComponent, error) {
+func (p *objectComponentParser) ParseObjectComponent() (ast.ObjectComponent, error) {
 
 	switch p.curToken.Type {
 
@@ -113,13 +113,16 @@ func (p *functionParser) ParseObjectComponent() (ast.ObjectComponent, error) {
 	case token.WHEN:
 		return p.parseWhen()
 
+	case token.PROPERTIES:
+		return p.parseProperties()
+
 	default:
 		p.logError("Unexpected token '%s'", p.curToken.Type);
 		return nil, p.error
 	}
 }
 
-func (p *functionParser) parseFunction() (*ast.Function, error) {
+func (p *objectComponentParser) parseFunction() (*ast.Function, error) {
 
 	function := &ast.Function{Type: ast.FUNCTION}
 
@@ -138,7 +141,7 @@ func (p *functionParser) parseFunction() (*ast.Function, error) {
 	return function, p.error
 }
 
-func (p *functionParser) parseCheck() (*ast.Function, error) {
+func (p *objectComponentParser) parseCheck() (*ast.Function, error) {
 
 	check := &ast.Function{Type: ast.FUNCTION}
 
@@ -153,7 +156,7 @@ func (p *functionParser) parseCheck() (*ast.Function, error) {
 	return check, p.error
 }
 
-func (p *functionParser) parseHandler() (*ast.Function, error) {
+func (p *objectComponentParser) parseHandler() (*ast.Function, error) {
 
 	check := &ast.Function{Type: ast.FUNCTION}
 
@@ -168,7 +171,7 @@ func (p *functionParser) parseHandler() (*ast.Function, error) {
 	return check, p.error
 }
 
-func (p *functionParser) parseWhen() (*ast.When, error) {
+func (p *objectComponentParser) parseWhen() (*ast.When, error) {
 
 	check := &ast.When{Type: ast.WHEN}
 
@@ -185,7 +188,7 @@ func (p *functionParser) parseWhen() (*ast.When, error) {
 	return check, p.error
 }
 
-func (p *functionParser) parseParameters(end token.TokenType) []*ast.Parameter {
+func (p *objectComponentParser) parseParameters(end token.TokenType) []*ast.Parameter {
 
 	list := []*ast.Parameter{}
 
@@ -211,7 +214,7 @@ func (p *functionParser) parseParameters(end token.TokenType) []*ast.Parameter {
 	return list
 }
 
-func (p *functionParser) parseParameter() *ast.Parameter{
+func (p *objectComponentParser) parseParameter() *ast.Parameter{
 
 	if (!p.curTokenIs(token.OBJECTNAME)) {
 		p.logError("Expected object name");
@@ -228,7 +231,7 @@ func (p *functionParser) parseParameter() *ast.Parameter{
 	return param
 }
 
-func (p *functionParser) parseBlockStatement(open token.TokenType, close token.TokenType) *ast.BlockStatement {
+func (p *objectComponentParser) parseBlockStatement(open token.TokenType, close token.TokenType) *ast.BlockStatement {
 
 	statementParser := NewStatementFromTokenizer(p.t, p.curToken, p.peekToken)
 
@@ -245,3 +248,46 @@ func (p *functionParser) parseBlockStatement(open token.TokenType, close token.T
 
 	return blkStmnt
 }
+
+func (p *objectComponentParser) parseProperties() (*ast.Properties, error) {
+
+	props := &ast.Properties{Type:ast.PROPERTIES}
+
+	props.Properties = []*ast.Property{}
+
+	p.expectPeek(token.LBRACE)
+	p.nextToken()
+
+	for !p.curTokenIs(token.RBRACE) && p.error == nil  {
+		prop := p.parseProperty()
+		if prop != nil {
+			props.Properties = append(props.Properties, prop)
+		}
+
+		if p.curToken == nil {
+			p.logError("Unexpected EOF")
+			break;
+		}
+	}
+
+
+	return props, p.error
+}
+
+func (p *objectComponentParser) parseProperty() *ast.Property {
+
+	prop := &ast.Property{Type:ast.PROPERTY}
+
+	prop.ValueType = p.curToken.Val
+
+	p.expectPeek(token.IDENT)
+
+	prop.Name = p.curToken.Val
+
+	p.expectPeek(token.SEMICOLON);
+
+	p.nextToken()
+
+	return prop
+}
+
