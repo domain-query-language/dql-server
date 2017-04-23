@@ -163,13 +163,12 @@ func (p *objectComponentParser) parseBlockStatement(open token.TokenType, close 
 
 	blkStmnt, err := statementParser.ParseBlockStatementSurroundedBy(open, close)
 
+	p.tokenStream = statementParser.TokenStream();
+	p.tokenStream.NextToken()
+
 	if (err != nil) {
 		return nil
 	}
-
-	p.tokenStream = statementParser.TokenStream();
-
-	p.tokenStream.NextToken()
 
 	return blkStmnt
 }
@@ -223,9 +222,20 @@ func (p *objectComponentParser) parseProperty() *ast.Property {
 	return prop
 }
 
-func (p *objectComponentParser) parseObjectCreation() ast.Expression {
+func (p *objectComponentParser) parseObjectCreation() ast.Node {
 
-	return nil
+	statementParser := NewStatementFromTokenStream(p.tokenStream)
+
+	expStmnt := statementParser.ParseExpressionStatement()
+
+	p.tokenStream = statementParser.TokenStream();
+	p.tokenStream.NextToken()
+
+	if (expStmnt == nil) {
+		return nil
+	}
+
+	return expStmnt
 }
 
 

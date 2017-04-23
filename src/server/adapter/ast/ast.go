@@ -463,7 +463,7 @@ type Property struct {
 	Type string
 	ValueType string
 	Name string
-	Exp Expression
+	Exp Node
 }
 
 func (p *Property) String() string {
@@ -473,7 +473,7 @@ func (p *Property) String() string {
 		return left + ";";
 	}
 
-	return left+" = "+p.Exp.String()+";";
+	return left+" = "+p.Exp.String();
 }
 
 func (p *Property) statementNode() {}

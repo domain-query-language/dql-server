@@ -170,12 +170,12 @@ func (p *statementParser) parseStatement() ast.Node {
 			return p.parseApplyStatement()
 
 		default:
-			return p.parseExpressionStatement()
+			return p.ParseExpressionStatement()
 	}
 }
 
 
-func (p *statementParser) parseExpressionStatement() ast.Node {
+func (p *statementParser) ParseExpressionStatement() ast.Node {
 
 	stmt := &ast.ExpressionStatement{Type:ast.EXPRESSION_STATEMENT}
 

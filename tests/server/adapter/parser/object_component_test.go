@@ -255,7 +255,7 @@ var properties = []funcTestCase{
 			},
 		},
 	},
-	/*{
+	{
 		`properties{
 			value\category category = 'value\category'("category");
 		}`,
@@ -266,17 +266,20 @@ var properties = []funcTestCase{
 					ast.PROPERTY,
 					"value\\category",
 					"category",
-					&ast.ObjectCreation{
-						ast.OBJECT_CREATION,
-						"value\\category",
-						[]ast.Expression{
-							&ast.String{ast.STRING, "category"},
+					&ast.ExpressionStatement{
+						Type: ast.EXPRESSION_STATEMENT,
+						Expression: &ast.ObjectCreation{
+							ast.OBJECT_CREATION,
+							"value\\category",
+							[]ast.Expression{
+								&ast.String{ast.STRING, "category"},
+							},
 						},
-					},,
+					},
 				},
 			},
 		},
-	},*/
+	},
 }
 
 func TestProperties(t *testing.T) {
