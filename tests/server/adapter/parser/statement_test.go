@@ -6,6 +6,7 @@ import (
 	"github.com/domain-query-language/dql-server/src/server/adapter/parser"
 )
 
+
 /*************************
   Helper funcs for tests
  ************************/
@@ -102,6 +103,7 @@ func (testCase testCase) test(t *testing.T) {
 		t.Error("Actual: " + actual.String());
 	}
 }
+
 
 /****************
   Test cases
@@ -767,6 +769,3 @@ func TestInvalidStatements(t *testing.T) {
 		}
 	}
 }
-
-
-

@@ -138,10 +138,8 @@ var checks = []funcTestCase{
 		`check (
 			return a;
 		)`,
-		&ast.Function{
-			ast.FUNCTION,
-			"check",
-			[]*ast.Parameter{},
+		&ast.Check{
+			ast.CHECK,
 			&ast.BlockStatement{
 				ast.BLOCK_STATEMENT,
 				[]ast.Node{
@@ -304,5 +302,6 @@ Done
 
 Todo
 - Create AST for check
+- ObjectComponent parser should be instantiable from tokenstream
  */
 

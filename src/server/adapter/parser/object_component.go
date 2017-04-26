@@ -67,15 +67,11 @@ func (p *objectComponentParser) parseFunction() (*ast.Function, error) {
 	return function, p.tokenStream.Error()
 }
 
-func (p *objectComponentParser) parseCheck() (*ast.Function, error) {
+func (p *objectComponentParser) parseCheck() (*ast.Check, error) {
 
-	check := &ast.Function{Type: ast.FUNCTION}
-
-	check.Name = p.tokenStream.CurToken().Val
+	check := &ast.Check{Type: ast.CHECK}
 
 	p.tokenStream.ExpectPeek(token.LPAREN)
-
-	check.Parameters = []*ast.Parameter{}
 
 	check.Body = p.parseBlockStatement(token.LPAREN, token.RPAREN)
 

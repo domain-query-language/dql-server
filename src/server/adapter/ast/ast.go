@@ -29,6 +29,7 @@ const (
 	RUN_QUERY = "runquery"
 
 	FUNCTION = "function"
+	CHECK = "check"
 	WHEN = "when"
 	PROPERTIES = "properties"
 	PROPERTY = "property"
@@ -421,6 +422,23 @@ type Parameter struct {
 
 func (p Parameter) String() string {
 	return p.Type+" "+p.Name
+}
+
+
+type Check struct {
+	Type string
+	Body Statement
+}
+
+func (f *Check) objectComponentNode() {}
+
+func (f *Check) String() string {
+
+	body := f.Body.String()
+
+	body = "\t"+strings.Replace(body, "\n", "\n\t", -1)
+
+	return "check {\n"+body+"\n}"
 }
 
 type When struct {
