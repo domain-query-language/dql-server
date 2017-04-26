@@ -1,5 +1,10 @@
 package parser
 
+/**
+ * Test that object components can be parsed correctly
+ * eg. functions, check, when, handler
+ */
+
 import (
 	"github.com/domain-query-language/dql-server/src/server/adapter/ast"
 	"testing"
@@ -287,21 +292,3 @@ func TestProperties(t *testing.T) {
 		testParsingObjectComponent(testCase, t)
 	}
 }
-
-/*
-Done
-- parsing two functions in sequence
-- function with params
-- function with body
-- printing a function
-- check
-- handler
-- when
-- properties
-- Clean up handing over of state back to function parser
-- Create AST for check
-
-Todo
-- ObjectComponent parser should be instantiable from tokenstream
- */
-

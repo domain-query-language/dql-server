@@ -23,6 +23,16 @@ func NewObjectComponent(function string) *objectComponentParser {
 	return p;
 }
 
+/**
+ * Ussed when this parser is a sub component of a another parser
+ */
+func NewObjectComponentFromTokenStream(tokenStream *tokenStream) *objectComponentParser {
+
+	p := &objectComponentParser{tokenStream};
+
+	return p;
+}
+
 func (p *objectComponentParser) ParseObjectComponent() (ast.ObjectComponent, error) {
 
 	switch p.tokenStream.CurToken().Type {

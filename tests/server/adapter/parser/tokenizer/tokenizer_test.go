@@ -1,5 +1,12 @@
 package tokenizer
 
+/**
+ * Ensure that the tokeniser is table to turn various strings into a series of tokens
+ *
+ * The tokenizer just turns strings into tokens, like converting a sentence into words and punctuation.
+ * It does not ensure that the series of tokens makes sense, that's the job of the parser
+ */
+
 import (
 	"testing"
 	"strconv"
@@ -224,8 +231,8 @@ var classComponents = testStatements{
 		`
 		properties
 		{
-			value\service_charge service_charge;
-			value\category category;
+			value\service_charge service_charge = 'value\service_charge'(1);
+			value\category category = [];
 		}`,
 		[]tok.Token{
 			tk(tok.PROPERTIES, "properties"),

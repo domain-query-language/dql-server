@@ -1,5 +1,9 @@
 package parser
 
+/**
+ * Test that parser is able to take statement blocks and parser them appropriately
+ */
+
 import (
 	"testing"
 	"github.com/domain-query-language/dql-server/src/server/adapter/ast"
