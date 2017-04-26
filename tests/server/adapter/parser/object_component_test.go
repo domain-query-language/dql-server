@@ -299,9 +299,9 @@ Done
 - when
 - properties
 - Clean up handing over of state back to function parser
+- Create AST for check
 
 Todo
-- Create AST for check
 - ObjectComponent parser should be instantiable from tokenstream
  */
 
