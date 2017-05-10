@@ -8,7 +8,7 @@ This means that we can parse the components of an object (functions, checks, han
 
 These are converted into ASTs. These ASTs do not have the ability to run, they are structs that represent the concept, with a guarantee that the data is stable and valid.
 
-Some basic work on the top level parser was done, but it is very limited. I'd suggest rewriting this using the techniques used in the existing parsers. The tests might still be useful though,
+Some basic work on the top level parser was done, but it is very limited. I'd suggest rewriting this using the techniques used in the existing parsers. The tests might still be useful though.
 
 ## Where to go next:
 Now that the basic compoents are working, a parser for high level DQL objects needs to be built.
@@ -23,6 +23,11 @@ Eg.
 - etc...
 
 This parser should be built like the other parsers. It takes in a token stream, then parses the objects, using the object_component parser to parse the components of the objects, meaning the work is primarily focussed on parsing the unique aspects of those objects.
+
+## Code structure:
+All the code for this component is stored in the parser folder, `/src/server/adapter/parser`.
+Each child folder is named appropriately for what it contains.
+The asts are stored in a single file `src/server/adapter/ast/ast.go`.
 
 ## How it is built:
 There are three main components
@@ -41,9 +46,6 @@ The parser are intended to be composible, a parser can be used inside another pa
 As each parser uses a tokenstream, it is fairly easy to do handover of token streams once a sub parser has completed it's work, you simply request the token stream from the sub parser and then set it as your own.
 
 Each of the parser tests turn a string/strings into an AST/ASTs. The results are compared by turning the AST back into a string, and then comparing that to the string created by the hardcoded result AST. This is useful as it makes it very easy to diagnose what went wrong. This does mean that you need to write a "String" method for each AST, its a little extra work, but it really helps in diagnosing parsing issues, so it's worth the effort.
-
-## Code structure:
-All the code for this component is stored in the parser folder. Each child folder is named appropriately for what it contains.
 
 ## Extension:
 Each of these components is designed to be extensible. They are based on the work on Thornsten Bell and his book on writing interpreters in GoLang. I recommend giving it a read before you start editing anything core.
