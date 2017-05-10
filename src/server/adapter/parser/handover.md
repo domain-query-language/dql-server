@@ -27,15 +27,16 @@ This parser should be built like the other parsers. It takes in a token stream, 
 ## How it is built:
 There are three main components
 
-Tokenizer: Turn DQL statements into a series of tokens, fail when the token doesn't make sense. Eg. A number with letters "-1sddfd".
+### Tokenizer: 
+Turn DQL statements into a series of tokens, fail when the token doesn't make sense. Eg. A number with letters "-1sddfd".
 
-TokenStream: Used internally in parsers, keep track of where you are in the stream, keeping the current token and the next token, makes it easy to ask questions and to navigate the stream.
+### TokenStream: 
+Used internally in parsers, keep track of where you are in the stream, keeping the current token and the next token, makes it easy to ask questions and to navigate the stream.
 
-Parser: Turns tokens streams into ASTs, keep going until there are no more ASTs to produce or it hits an error
+### Parser:
+Turns tokens streams into ASTs, keep going until there are no more ASTs to produce or it hits an error
 
-The parsers rely on the token stream internally, and parsers can be created from a token stream. 
-
-The parser are intended to be composible, a parser can be used inside another parser. Eg. The object_components parser used the statement parser internally, because functions contain statements. This was done to make it easier to build the parser from the ground up, allowing more complex parser to built from simpler components.
+The parser are intended to be composible, a parser can be used inside another parser. Eg. The object_components parser uses the statement_parser internally, because functions contain statements. This made it easier to build the parser from the ground up, allowing more complex parser to built from simpler components. 
 
 As each parser uses a tokenstream, it is fairly easy to do handover of token streams once a sub parser has completed it's work, you simply request the token stream from the sub parser and then set it as your own.
 
@@ -51,3 +52,6 @@ If you need to parse a new kind of object, statment, component, etc.., I'd do th
 - Write the test
 - Create the ASTs (so the test will actually run)
 - Write the parser function in the appropriate parser
+
+## Cleanup
+Like any existing codebase, there are a few things I would cleanup. Each of the ASTs requires a type field, which is just a string. This was added to make printing the ASTs easier. However, all the ASTs are stringable, and those string functions didn't end up using that variables, so it's now largely redunant. It could be safely removed, making things a bit simpler.
